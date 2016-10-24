@@ -1,3 +1,4 @@
+package com.scottlogic.kafkapoc;
 import java.util.Arrays;
 
 import org.springframework.boot.SpringApplication;

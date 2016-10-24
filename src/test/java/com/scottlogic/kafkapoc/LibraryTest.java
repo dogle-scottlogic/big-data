@@ -1,4 +1,9 @@
+package com.scottlogic.kafkapoc;
+
 import org.junit.Test;
+
+import com.scottlogic.kafkapoc.Library;
+
 import static org.junit.Assert.*;
 
 /*
@@ -8,9 +13,10 @@ import static org.junit.Assert.*;
  * @author smhall, @date 22/09/16 16:06
  */
 public class LibraryTest {
-    @Test public void testSomeLibraryMethod() {
-    	
-        Library classUnderTest = new Library();
-        assertTrue("someLibraryMethod should return 'true'", classUnderTest.someLibraryMethod());
-    }
+	@Test
+	public void testSomeLibraryMethod() {
+
+		Library classUnderTest = new Library();
+		assertTrue("someLibraryMethod should return 'true'", classUnderTest.someLibraryMethod());
+	}
 }
