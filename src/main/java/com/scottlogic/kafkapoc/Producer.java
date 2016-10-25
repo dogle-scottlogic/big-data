@@ -6,7 +6,7 @@ import javax.jms.*;
 
 class Producer {
 
-    Producer(){
+    Producer(ProducerClient producerClient){
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
