@@ -13,14 +13,12 @@ public class JmsBrokerClientConfig implements BrokerClientConfig {
 
 	@Override
 	public ProducerClient producerClient() {
-		// TODO Auto-generated method stub
-		return null;
+		return new JmsProducerClient();
 	}
 
 	@Override
 	public ConsumerClient consumerClient() {
-		// TODO Auto-generated method stub
-		return null;
+		return new JmsConsumerClient();
 	}
 
 }

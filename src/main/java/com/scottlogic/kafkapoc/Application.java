@@ -11,12 +11,6 @@ public class Application {
 
 	public static void main(String[] args) {
 		new SpringApplicationBuilder(Application.class).profiles(args).run(args);
-
-//		if (args[0].equals("--producer")) {
-//			new Producer(null);
-//		} else if (args[0].equals("--consumer")) {
-//			new Consumer(null);
-//		}
 	}
 	
 	@Autowired
