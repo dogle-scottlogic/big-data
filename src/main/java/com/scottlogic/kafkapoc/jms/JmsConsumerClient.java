@@ -63,7 +63,6 @@ class JmsConsumerClient implements ConsumerClient, MessageListener {
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
                 String text = textMessage.getText();
-                System.out.println("Received message: " + text);
                 if (this.listener != null) {
                     listener.onMessage(text);
                 }

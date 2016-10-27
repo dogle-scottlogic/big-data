@@ -41,7 +41,6 @@ class JmsProducerClient implements ProducerClient {
     public void send(String content) {
         try {
             TextMessage message = session.createTextMessage(content);
-            System.out.println("Sent message: " + message.getText());
             producer.send(message);
         } catch (JMSException e) {
             System.out.println("Caught: " + e);

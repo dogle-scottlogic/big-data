@@ -1,6 +1,5 @@
 package com.scottlogic.kafkapoc;
 
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -12,6 +11,8 @@ import java.util.Arrays;
 
 @SpringBootApplication
 public class Application {
+
+	private static final int DEFAULT_NUMBER_OF_MESSAGES = 50000;
 
 	public static void main(String[] args) {
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
@@ -26,12 +27,12 @@ public class Application {
 	@Bean
 	@Profile("producer")
 	public Producer producer() {
-		return new Producer(brokerClientConfig.producerClient());
+		return new Producer(brokerClientConfig.producerClient(), DEFAULT_NUMBER_OF_MESSAGES);
 	}
 
 	@Bean
 	@Profile("consumer")
 	public Consumer consumer() {
-		return new Consumer(brokerClientConfig.consumerClient());
+		return new Consumer(brokerClientConfig.consumerClient(), DEFAULT_NUMBER_OF_MESSAGES);
 	}
 }
