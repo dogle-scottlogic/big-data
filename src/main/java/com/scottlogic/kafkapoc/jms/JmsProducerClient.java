@@ -2,21 +2,25 @@ package com.scottlogic.kafkapoc.jms;
 
 import com.scottlogic.kafkapoc.ProducerClient;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.springframework.beans.factory.DisposableBean;
 
+import javax.annotation.PreDestroy;
 import javax.jms.*;
 
 class JmsProducerClient implements ProducerClient {
 
     private Session session;
+    private Connection connection;
     private MessageProducer producer;
 
     JmsProducerClient(){
+        System.out.println("Producerclient started up");
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
 
             // Create a Connection
-            Connection connection = connectionFactory.createConnection();
+            connection = connectionFactory.createConnection();
             connection.start();
 
             // Create a Session
@@ -27,13 +31,6 @@ class JmsProducerClient implements ProducerClient {
             // Create a MessageProducer from the Session to the Topic or Queue
             producer = session.createProducer(destination);
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
-
-            // Create a messages
-            String text = "Hello world!";
-
-            // Clean up
-            session.close();
-            connection.close();
         }
         catch (Exception e) {
             System.out.println("Caught: " + e);
@@ -43,13 +40,22 @@ class JmsProducerClient implements ProducerClient {
     
     public void send(String content) {
         try {
-            TextMessage message = null;
-            message = session.createTextMessage(content);
-
-            // Tell the producer to send the message
+            TextMessage message = session.createTextMessage(content);
             System.out.println("Sent message: " + message.getText());
             producer.send(message);
         } catch (JMSException e) {
+            System.out.println("Caught: " + e);
+            e.printStackTrace();
+        }
+    }
+
+    public void destroy() {
+        System.out.println("Producer client killed");
+        try {
+            session.close();
+            connection.close();
+        } catch (JMSException e) {
+            System.out.println("Caught: " + e);
             e.printStackTrace();
         }
     }

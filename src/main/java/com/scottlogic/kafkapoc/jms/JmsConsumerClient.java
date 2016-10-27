@@ -7,7 +7,11 @@ import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
 
-class JmsConsumerClient implements ConsumerClient {
+class JmsConsumerClient implements ConsumerClient, MessageListener {
+
+    private MessageConsumer consumer;
+    private Session session;
+    private Connection connection;
 
     private Listener listener;
 
@@ -17,42 +21,56 @@ class JmsConsumerClient implements ConsumerClient {
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
 
             // Create a Connection
-            Connection connection = connectionFactory.createConnection();
+            connection = connectionFactory.createConnection();
             connection.start();
 
             // Create a Session
-            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
 
             // Create the destination (Topic or Queue)
             Destination destination = session.createQueue("TEST.FOO");
 
             // Create a MessageConsumer from the Session to the Topic or Queue
-            MessageConsumer consumer = session.createConsumer(destination);
+            consumer = session.createConsumer(destination);
 
-            // This whole section needs to happen repeatedly.
-            // Wait for a message (no timeout)
-            Message message = consumer.receive();
-
-            if (message instanceof TextMessage) {
-                TextMessage textMessage = (TextMessage) message;
-                String text = textMessage.getText();
-                System.out.println("Received message: " + text);
-                if (this.listener != null) {
-                    listener.onReceiveMessage(text);
-                }
-            } else {
-                System.out.println("Received message: " + message);
-            }
-            consumer.close();
-            session.close();
-            connection.close();
+            consumer.setMessageListener(this);
         } catch (Exception e) {
             System.out.println("Caught: " + e);
             e.printStackTrace();
         }
     }
 
-    void setListener(Listener listener) {
+    @Override
+    public void setListener(Listener listener){
         this.listener = listener;
+    }
+
+    @Override
+    public void destroy() {
+        try {
+            consumer.close();
+            session.close();
+            connection.close();
+        } catch (JMSException e) {
+            System.out.println("Caught: " + e);
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onMessage(Message message) {
+        try {
+            if (message instanceof TextMessage) {
+                TextMessage textMessage = (TextMessage) message;
+                String text = textMessage.getText();
+                System.out.println("Received message: " + text);
+                if (this.listener != null) {
+                    listener.onMessage(text);
+                }
+            }
+        } catch (JMSException e) {
+            System.out.println("Caught: " + e);
+            e.printStackTrace();
+        }
     }
 }

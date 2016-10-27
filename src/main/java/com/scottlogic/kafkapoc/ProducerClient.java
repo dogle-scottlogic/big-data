@@ -4,4 +4,6 @@ public interface ProducerClient {
 
     void send(String content);
 
+    void destroy();
+
 }

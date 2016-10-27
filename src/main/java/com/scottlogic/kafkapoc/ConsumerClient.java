@@ -4,4 +4,5 @@ public interface ConsumerClient {
 
     void setListener(Listener listener);
 
+    void destroy();
 }

@@ -2,5 +2,6 @@ package com.scottlogic.kafkapoc;
 
 public interface Listener {
 
-    void onReceiveMessage(String message);
+    void onMessage(String message);
+
 }
