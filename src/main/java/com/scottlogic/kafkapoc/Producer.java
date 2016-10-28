@@ -8,7 +8,7 @@ class Producer implements DisposableBean{
     private int counter;
     private int amountToSend;
     private int ratePerSecond;
-    private long lastMillis;
+    private long lastNanos;
 
     Producer(ProducerClient producerClient, int amountToSend, int ratePerSecond){
         this.producerClient = producerClient;
@@ -20,22 +20,19 @@ class Producer implements DisposableBean{
     void sendMessages(){
         while (counter < amountToSend) {
             maybeSleep();
-            lastMillis = System.currentTimeMillis();
             producerClient.send(Integer.toString(counter++));
+            lastNanos = System.nanoTime();
         }
         outputStats();
         counter = 0;
     }
 
     private void maybeSleep() {
-        long millisToWait = 1000/ratePerSecond;
-        long currentMillis = System.currentTimeMillis();
-        if (currentMillis < lastMillis + millisToWait) {
-            try {
-                Thread.sleep(millisToWait - (currentMillis - lastMillis));
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+        long nanosToWait = 1000000000/ratePerSecond;
+        long currentNanos = System.nanoTime();
+        System.out.println(String.format("Waiting %s nanos", lastNanos - (currentNanos - nanosToWait)));
+        while (currentNanos < lastNanos + nanosToWait) {
+            currentNanos = System.nanoTime();
         }
     }
 
