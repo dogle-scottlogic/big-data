@@ -12,10 +12,17 @@ import java.util.Arrays;
 @SpringBootApplication
 public class Application {
 
-	private static final int DEFAULT_NUMBER_OF_MESSAGES = 50000;
+	private static final String DEFAULT_NUMBER_OF_MESSAGES = "50000";
+	private static int messages;
 
 	public static void main(String[] args) {
+		// Set up variables
+		messages = Integer.valueOf(System.getProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES));
+
+		// Create Spring app
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
+
+		// Start producer running
 		if (Arrays.asList(args).contains("producer")) {
 			appContext.getBean(Producer.class).sendMessages();
 		}
@@ -27,12 +34,12 @@ public class Application {
 	@Bean
 	@Profile("producer")
 	public Producer producer() {
-		return new Producer(brokerClientConfig.producerClient(), DEFAULT_NUMBER_OF_MESSAGES);
+		return new Producer(brokerClientConfig.producerClient(), messages);
 	}
 
 	@Bean
 	@Profile("consumer")
 	public Consumer consumer() {
-		return new Consumer(brokerClientConfig.consumerClient(), DEFAULT_NUMBER_OF_MESSAGES);
+		return new Consumer(brokerClientConfig.consumerClient(), messages);
 	}
 }
