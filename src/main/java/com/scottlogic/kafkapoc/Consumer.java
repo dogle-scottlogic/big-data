@@ -37,7 +37,7 @@ class Consumer implements Listener, DisposableBean {
         System.out.println(String.format("Messages received: %s", numbers.size()));
         boolean ordered = true;
         for (int i = 0; i < numbers.size(); i++) {
-            if (i != numbers.get(i)) {
+            if (i + 1 != numbers.get(i)) {
                 ordered = false;
             }
         }

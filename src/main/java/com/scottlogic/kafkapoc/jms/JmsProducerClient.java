@@ -14,7 +14,6 @@ class JmsProducerClient implements ProducerClient {
     private MessageProducer producer;
 
     JmsProducerClient(){
-        System.out.println("Producerclient started up");
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");

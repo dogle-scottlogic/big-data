@@ -14,13 +14,16 @@ public class Application {
 
 	private static final String DEFAULT_NUMBER_OF_MESSAGES = "50000";
 	private static final String DEFAULT_SEND_RATE_PER_SECOND = "3000";
+	private static final String DEFAULT_SEND_BATCH_SIZE = "100";
 	private static int messages;
 	private static int sendRate;
+	private static int sendBatchSize;
 
 	public static void main(String[] args) {
 		// Set up variables
 		messages = Integer.valueOf(System.getProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES));
 		sendRate = Integer.valueOf(System.getProperty("kafka.sendrate", DEFAULT_SEND_RATE_PER_SECOND));
+		sendBatchSize = Integer.valueOf(System.getProperty("kafka.sendBatchSize", DEFAULT_SEND_BATCH_SIZE));
 
 		// Create Spring app
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
@@ -37,7 +40,7 @@ public class Application {
 	@Bean
 	@Profile("producer")
 	public Producer producer() {
-		return new Producer(brokerClientConfig.producerClient(), messages, sendRate);
+		return new Producer(brokerClientConfig.producerClient(), messages, sendRate, sendBatchSize);
 	}
 
 	@Bean
