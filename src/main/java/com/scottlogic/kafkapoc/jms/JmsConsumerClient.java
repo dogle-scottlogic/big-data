@@ -6,6 +6,7 @@ import com.scottlogic.kafkapoc.ProducerClient;
 import org.apache.activemq.ActiveMQConnectionFactory;
 
 import javax.jms.*;
+import java.util.Timer;
 
 class JmsConsumerClient implements ConsumerClient, MessageListener {
 
@@ -14,8 +15,10 @@ class JmsConsumerClient implements ConsumerClient, MessageListener {
     private Connection connection;
 
     private Listener listener;
+    private Timer timer;
 
     JmsConsumerClient(){
+        timer = new java.util.Timer();
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
@@ -59,6 +62,17 @@ class JmsConsumerClient implements ConsumerClient, MessageListener {
 
     @Override
     public void onMessage(Message message) {
+        timer.cancel();
+        timer = new java.util.Timer();
+        timer.schedule(
+            new java.util.TimerTask() {
+                @Override
+                public void run() {
+                    listener.onTimeout();
+                }
+            },
+            5000
+        );
         try {
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;

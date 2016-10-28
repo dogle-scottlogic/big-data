@@ -7,7 +7,7 @@ import java.util.List;
 
 class Consumer implements Listener, DisposableBean {
 
-    ConsumerClient consumerClient;
+    private ConsumerClient consumerClient;
     private List<Integer> numbers;
     private int expected;
 
@@ -25,6 +25,12 @@ class Consumer implements Listener, DisposableBean {
             outputStats();
             numbers = new ArrayList<>();
         }
+    }
+
+    @Override
+    public void onTimeout() {
+        System.out.println("Timeout reached.");
+        outputStats();
     }
 
     @Override
