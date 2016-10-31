@@ -1,23 +1,51 @@
 package com.scottlogic.kafkapoc;
-import java.util.Arrays;
 
-import org.springframework.boot.SpringApplication;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ApplicationContext;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Profile;
+
+import java.util.Arrays;
 
 @SpringBootApplication
 public class Application {
 
-    public static void main(String[] args) {
-        ApplicationContext ctx = SpringApplication.run(Application.class, args);
+	private static final String DEFAULT_NUMBER_OF_MESSAGES = "50000";
+	private static final String DEFAULT_SEND_RATE_PER_SECOND = "3000";
+	private static final String DEFAULT_SEND_BATCH_SIZE = "100";
+	private static int messages;
+	private static int sendRate;
+	private static int sendBatchSize;
 
-        System.out.println("Let's inspect the beans provided by Spring Boot:");
+	public static void main(String[] args) {
+		// Set up variables
+		messages = Integer.valueOf(System.getProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES));
+		sendRate = Integer.valueOf(System.getProperty("kafka.sendrate", DEFAULT_SEND_RATE_PER_SECOND));
+		sendBatchSize = Integer.valueOf(System.getProperty("kafka.sendBatchSize", DEFAULT_SEND_BATCH_SIZE));
 
-        String[] beanNames = ctx.getBeanDefinitionNames();
-        Arrays.sort(beanNames);
-        for (String beanName : beanNames) {
-            System.out.println(beanName);
-        }
-    }
+		// Create Spring app
+		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
 
+		// Start producer running
+		if (Arrays.asList(args).contains("producer")) {
+			appContext.getBean(Producer.class).sendMessages();
+		}
+	}
+
+	@Autowired
+	private BrokerClientConfig brokerClientConfig;
+
+	@Bean
+	@Profile("producer")
+	public Producer producer() {
+		return new Producer(brokerClientConfig.producerClient(), messages, sendRate, sendBatchSize);
+	}
+
+	@Bean
+	@Profile("consumer")
+	public Consumer consumer() {
+		return new Consumer(brokerClientConfig.consumerClient(), messages);
+	}
 }
