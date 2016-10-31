@@ -2,6 +2,8 @@ package com.scottlogic.kafkapoc.jms;
 
 import com.scottlogic.kafkapoc.ProducerClient;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 
 import javax.annotation.PreDestroy;
@@ -9,6 +11,7 @@ import javax.jms.*;
 
 class JmsProducerClient implements ProducerClient {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JmsProducerClient.class);
     private Session session;
     private Connection connection;
     private MessageProducer producer;
@@ -32,7 +35,7 @@ class JmsProducerClient implements ProducerClient {
             producer.setDeliveryMode(DeliveryMode.NON_PERSISTENT);
         }
         catch (Exception e) {
-            System.out.println("Caught: " + e);
+            LOG.error("Caught: " + e);
             e.printStackTrace();
         }
     }
@@ -42,18 +45,18 @@ class JmsProducerClient implements ProducerClient {
             TextMessage message = session.createTextMessage(content);
             producer.send(message);
         } catch (JMSException e) {
-            System.out.println("Caught: " + e);
+            LOG.error("Caught: " + e);
             e.printStackTrace();
         }
     }
 
     public void destroy() {
-        System.out.println("Producer client killed");
+        LOG.info("Producer client killed");
         try {
             session.close();
             connection.close();
         } catch (JMSException e) {
-            System.out.println("Caught: " + e);
+            LOG.error("Caught: " + e);
             e.printStackTrace();
         }
     }

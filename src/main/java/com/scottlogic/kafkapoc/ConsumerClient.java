@@ -2,7 +2,7 @@ package com.scottlogic.kafkapoc;
 
 public interface ConsumerClient {
 
-    void setListener(Listener listener);
+    String listen(int timeout) throws TimeoutException;
 
     void destroy();
 }

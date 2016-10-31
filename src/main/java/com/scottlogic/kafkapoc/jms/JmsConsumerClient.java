@@ -1,24 +1,21 @@
 package com.scottlogic.kafkapoc.jms;
 
 import com.scottlogic.kafkapoc.ConsumerClient;
-import com.scottlogic.kafkapoc.Listener;
-import com.scottlogic.kafkapoc.ProducerClient;
+import com.scottlogic.kafkapoc.TimeoutException;
 import org.apache.activemq.ActiveMQConnectionFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jms.*;
-import java.util.Timer;
 
-class JmsConsumerClient implements ConsumerClient, MessageListener {
+class JmsConsumerClient implements ConsumerClient {
 
+    private static final Logger LOG = LoggerFactory.getLogger(JmsConsumerClient.class);
     private MessageConsumer consumer;
     private Session session;
     private Connection connection;
 
-    private Listener listener;
-    private Timer timer;
-
     JmsConsumerClient(){
-        timer = new java.util.Timer();
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
@@ -35,17 +32,29 @@ class JmsConsumerClient implements ConsumerClient, MessageListener {
 
             // Create a MessageConsumer from the Session to the Topic or Queue
             consumer = session.createConsumer(destination);
-
-            consumer.setMessageListener(this);
-        } catch (Exception e) {
-            System.out.println("Caught: " + e);
+        } catch (JMSException e) {
+            LOG.error("Caught: " + e);
             e.printStackTrace();
         }
     }
 
     @Override
-    public void setListener(Listener listener){
-        this.listener = listener;
+    public String listen(int timeout) throws TimeoutException {
+        try {
+            Message message = consumer.receive(timeout);
+            if (message instanceof TextMessage) {
+                TextMessage textMessage = (TextMessage) message;
+                return textMessage.getText();
+            } else if (message == null) {
+                throw new TimeoutException();
+            } else {
+                return null;
+            }
+        } catch (JMSException e) {
+            LOG.error("Caught: " + e);
+            e.printStackTrace();
+            throw new TimeoutException();
+        }
     }
 
     @Override
@@ -55,34 +64,7 @@ class JmsConsumerClient implements ConsumerClient, MessageListener {
             session.close();
             connection.close();
         } catch (JMSException e) {
-            System.out.println("Caught: " + e);
-            e.printStackTrace();
-        }
-    }
-
-    @Override
-    public void onMessage(Message message) {
-        timer.cancel();
-        timer = new java.util.Timer();
-        timer.schedule(
-            new java.util.TimerTask() {
-                @Override
-                public void run() {
-                    listener.onTimeout();
-                }
-            },
-            5000
-        );
-        try {
-            if (message instanceof TextMessage) {
-                TextMessage textMessage = (TextMessage) message;
-                String text = textMessage.getText();
-                if (this.listener != null) {
-                    listener.onMessage(text);
-                }
-            }
-        } catch (JMSException e) {
-            System.out.println("Caught: " + e);
+            LOG.error("Caught: " + e);
             e.printStackTrace();
         }
     }

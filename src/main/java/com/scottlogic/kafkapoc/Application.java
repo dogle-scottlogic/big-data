@@ -13,25 +13,39 @@ import java.util.Arrays;
 public class Application {
 
 	private static final String DEFAULT_NUMBER_OF_MESSAGES = "50000";
-	private static final String DEFAULT_SEND_RATE_PER_SECOND = "3000";
-	private static final String DEFAULT_SEND_BATCH_SIZE = "100";
+	private static final String DEFAULT_PRODUCER_RATE_PER_SECOND = "3000";
+	private static final String DEFAULT_CONSUMER_RATE_PER_SECOND = "10000";
+	private static final String DEFAULT_BATCH_SIZE = "100";
+	private static final String DEFAULT_CONSUMER_TIMEOUT = "5000";
 	private static int messages;
-	private static int sendRate;
-	private static int sendBatchSize;
+	private static int rate;
+	private static int batchSize;
+	private static int consumerTimeout;
+	private static boolean isProducer;
 
 	public static void main(String[] args) {
 		// Set up variables
+		if (Arrays.asList(args).contains("producer")) {
+			isProducer = true;
+		}
 		messages = Integer.valueOf(System.getProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES));
-		sendRate = Integer.valueOf(System.getProperty("kafka.sendrate", DEFAULT_SEND_RATE_PER_SECOND));
-		sendBatchSize = Integer.valueOf(System.getProperty("kafka.sendBatchSize", DEFAULT_SEND_BATCH_SIZE));
+		final String DEFAULT_RATE_PER_SECOND = isProducer ? DEFAULT_PRODUCER_RATE_PER_SECOND : DEFAULT_CONSUMER_RATE_PER_SECOND;
+		rate = Integer.valueOf(System.getProperty("kafka.rate", DEFAULT_RATE_PER_SECOND));
+		batchSize = Integer.valueOf(System.getProperty("kafka.batchSize", DEFAULT_BATCH_SIZE));
+		consumerTimeout = Integer.valueOf(System.getProperty("kafka.consumerTimeoutRate", DEFAULT_CONSUMER_TIMEOUT));
 
 		// Create Spring app
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
 
 		// Start producer running
-		if (Arrays.asList(args).contains("producer")) {
+		if (isProducer) {
 			appContext.getBean(Producer.class).sendMessages();
+		} else {
+			appContext.getBean(Consumer.class).startListening();
 		}
+
+		// Shutdown
+		appContext.close();
 	}
 
 	@Autowired
@@ -40,12 +54,12 @@ public class Application {
 	@Bean
 	@Profile("producer")
 	public Producer producer() {
-		return new Producer(brokerClientConfig.producerClient(), messages, sendRate, sendBatchSize);
+		return new Producer(brokerClientConfig.producerClient(), messages, rate, batchSize);
 	}
 
 	@Bean
 	@Profile("consumer")
 	public Consumer consumer() {
-		return new Consumer(brokerClientConfig.consumerClient(), messages);
+		return new Consumer(brokerClientConfig.consumerClient(), messages, consumerTimeout, rate, batchSize);
 	}
 }
