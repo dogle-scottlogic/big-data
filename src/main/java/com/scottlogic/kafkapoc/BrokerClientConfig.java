@@ -2,8 +2,8 @@ package com.scottlogic.kafkapoc;
 
 public interface BrokerClientConfig {
 
-	ProducerClient producerClient();
+	ProducerClient producerClient(boolean persistent, boolean topic);
 
-	ConsumerClient consumerClient();
+	ConsumerClient consumerClient(boolean topic);
 
 }

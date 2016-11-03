@@ -21,6 +21,8 @@ public class Application {
 	private static int rate;
 	private static int batchSize;
 	private static int timeout;
+	private static boolean persistent;
+	private static boolean topic;
 
 	public static void main(String[] args) {
 		// Set up variables
@@ -30,6 +32,8 @@ public class Application {
 		rate = Integer.valueOf(System.getProperty("kafka.rate", DEFAULT_RATE_PER_SECOND));
 		batchSize = Integer.valueOf(System.getProperty("kafka.batchSize", DEFAULT_BATCH_SIZE));
 		timeout = Integer.valueOf(System.getProperty("kafka.timeout", DEFAULT_TIMEOUT));
+		persistent = Boolean.valueOf(System.getProperty("kafka.persistent", Boolean.FALSE.toString()));
+		topic = Boolean.valueOf(System.getProperty("kafka.topic", Boolean.FALSE.toString()));
 
 		// Create Spring app
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
@@ -51,12 +55,12 @@ public class Application {
 	@Bean
 	@Profile("producer")
 	public Producer producer() {
-		return new Producer(brokerClientConfig.producerClient(), messages, rate, batchSize);
+		return new Producer(brokerClientConfig.producerClient(persistent, topic), messages, rate, batchSize);
 	}
 
 	@Bean
 	@Profile("consumer")
 	public Consumer consumer() {
-		return new Consumer(brokerClientConfig.consumerClient(), messages, timeout, rate, batchSize);
+		return new Consumer(brokerClientConfig.consumerClient(topic), messages, timeout, rate, batchSize);
 	}
 }

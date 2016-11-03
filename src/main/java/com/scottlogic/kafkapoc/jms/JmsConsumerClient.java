@@ -15,7 +15,7 @@ class JmsConsumerClient implements ConsumerClient {
     private Session session;
     private Connection connection;
 
-    JmsConsumerClient(){
+    JmsConsumerClient(boolean topic){
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
@@ -28,7 +28,7 @@ class JmsConsumerClient implements ConsumerClient {
             session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
 
             // Create the destination (Topic or Queue)
-            Destination destination = session.createQueue("TEST.FOO");
+            Destination destination = topic ? session.createTopic("TEST.FOO") : session.createQueue("TEST.FOO");
 
             // Create a MessageConsumer from the Session to the Topic or Queue
             consumer = session.createConsumer(destination);
