@@ -16,23 +16,20 @@ public class Application {
 	private static final String DEFAULT_PRODUCER_RATE_PER_SECOND = "3000";
 	private static final String DEFAULT_CONSUMER_RATE_PER_SECOND = "10000";
 	private static final String DEFAULT_BATCH_SIZE = "100";
-	private static final String DEFAULT_CONSUMER_TIMEOUT = "5000";
+	private static final String DEFAULT_TIMEOUT = "5000";
 	private static int messages;
 	private static int rate;
 	private static int batchSize;
-	private static int consumerTimeout;
-	private static boolean isProducer;
+	private static int timeout;
 
 	public static void main(String[] args) {
 		// Set up variables
-		if (Arrays.asList(args).contains("producer")) {
-			isProducer = true;
-		}
+		boolean isProducer = Arrays.asList(args).contains("producer");
 		messages = Integer.valueOf(System.getProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES));
 		final String DEFAULT_RATE_PER_SECOND = isProducer ? DEFAULT_PRODUCER_RATE_PER_SECOND : DEFAULT_CONSUMER_RATE_PER_SECOND;
 		rate = Integer.valueOf(System.getProperty("kafka.rate", DEFAULT_RATE_PER_SECOND));
 		batchSize = Integer.valueOf(System.getProperty("kafka.batchSize", DEFAULT_BATCH_SIZE));
-		consumerTimeout = Integer.valueOf(System.getProperty("kafka.consumerTimeoutRate", DEFAULT_CONSUMER_TIMEOUT));
+		timeout = Integer.valueOf(System.getProperty("kafka.timeout", DEFAULT_TIMEOUT));
 
 		// Create Spring app
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
@@ -60,6 +57,6 @@ public class Application {
 	@Bean
 	@Profile("consumer")
 	public Consumer consumer() {
-		return new Consumer(brokerClientConfig.consumerClient(), messages, consumerTimeout, rate, batchSize);
+		return new Consumer(brokerClientConfig.consumerClient(), messages, timeout, rate, batchSize);
 	}
 }

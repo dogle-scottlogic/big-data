@@ -50,6 +50,7 @@ class Producer implements DisposableBean{
                 chunkTimes.add(System.currentTimeMillis());
             }
         }
+        counter--;
         outputStats();
         counter = 1;
     }

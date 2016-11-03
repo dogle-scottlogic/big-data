@@ -25,7 +25,7 @@ class JmsConsumerClient implements ConsumerClient {
             connection.start();
 
             // Create a Session
-            session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
 
             // Create the destination (Topic or Queue)
             Destination destination = session.createQueue("TEST.FOO");
@@ -42,11 +42,13 @@ class JmsConsumerClient implements ConsumerClient {
     public String listen(int timeout) throws TimeoutException {
         try {
             Message message = consumer.receive(timeout);
+            if (message == null) {
+                throw new TimeoutException();
+            }
+            message.acknowledge();
             if (message instanceof TextMessage) {
                 TextMessage textMessage = (TextMessage) message;
                 return textMessage.getText();
-            } else if (message == null) {
-                throw new TimeoutException();
             } else {
                 return null;
             }
