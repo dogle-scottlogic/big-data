@@ -23,6 +23,7 @@ public class Application {
 	private static int timeout;
 	private static boolean persistent;
 	private static boolean topic;
+	private static boolean async;
 
 	public static void main(String[] args) {
 		// Set up variables
@@ -34,6 +35,7 @@ public class Application {
 		timeout = Integer.valueOf(System.getProperty("kafka.timeout", DEFAULT_TIMEOUT));
 		persistent = Boolean.valueOf(System.getProperty("kafka.persistent", Boolean.FALSE.toString()));
 		topic = Boolean.valueOf(System.getProperty("kafka.topic", Boolean.FALSE.toString()));
+		async = Boolean.valueOf(System.getProperty("kafka.async", Boolean.FALSE.toString()));
 
 		// Create Spring app
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
@@ -55,7 +57,7 @@ public class Application {
 	@Bean
 	@Profile("producer")
 	public Producer producer() {
-		return new Producer(brokerClientConfig.producerClient(persistent, topic), messages, rate, batchSize);
+		return new Producer(brokerClientConfig.producerClient(persistent, topic, async), messages, rate, batchSize);
 	}
 
 	@Bean

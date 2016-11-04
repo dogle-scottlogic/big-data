@@ -14,10 +14,11 @@ class JmsProducerClient implements ProducerClient {
     private Connection connection;
     private MessageProducer producer;
 
-    JmsProducerClient(boolean persistent, boolean topic){
+    JmsProducerClient(boolean persistent, boolean topic, boolean async){
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
+            connectionFactory.setUseAsyncSend(async);
 
             // Create a Connection
             connection = connectionFactory.createConnection();
