@@ -4,6 +4,6 @@ public interface BrokerClientConfig {
 
 	ProducerClient producerClient(boolean persistent, boolean topic, boolean async);
 
-	ConsumerClient consumerClient(boolean topic);
+	ConsumerClient consumerClient(boolean persistent, boolean topic, String clientId);
 
 }

@@ -15,13 +15,14 @@ class JmsConsumerClient implements ConsumerClient {
     private Session session;
     private Connection connection;
 
-    JmsConsumerClient(boolean topic){
+    JmsConsumerClient(boolean persistent, boolean topic, String clientId){
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
 
             // Create a Connection
             connection = connectionFactory.createConnection();
+            connection.setClientID(clientId);
             connection.start();
 
             // Create a Session
@@ -29,9 +30,11 @@ class JmsConsumerClient implements ConsumerClient {
 
             // Create the destination (Topic or Queue)
             Destination destination = topic ? session.createTopic("TEST.FOO") : session.createQueue("TEST.FOO");
-
-            // Create a MessageConsumer from the Session to the Topic or Queue
-            consumer = session.createConsumer(destination);
+            if (topic && persistent) {
+                consumer = session.createDurableSubscriber((Topic) destination, "TEST.FOO");
+            } else {
+                consumer = session.createConsumer(destination);
+            }
         } catch (JMSException e) {
             LOG.error("Caught: " + e);
             e.printStackTrace();

@@ -12,15 +12,16 @@ import java.util.Arrays;
 @SpringBootApplication
 public class Application {
 
-	private static final String DEFAULT_NUMBER_OF_MESSAGES = "50000";
-	private static final String DEFAULT_PRODUCER_RATE_PER_SECOND = "3000";
-	private static final String DEFAULT_CONSUMER_RATE_PER_SECOND = "10000";
-	private static final String DEFAULT_BATCH_SIZE = "100";
-	private static final String DEFAULT_TIMEOUT = "5000";
+	private static final int DEFAULT_NUMBER_OF_MESSAGES = 50000;
+	private static final int DEFAULT_PRODUCER_RATE_PER_SECOND = 3000;
+	private static final int DEFAULT_CONSUMER_RATE_PER_SECOND = 10000;
+	private static final int DEFAULT_BATCH_SIZE = 100;
+	private static final int DEFAULT_TIMEOUT = 5000;
 	private static int messages;
 	private static int rate;
 	private static int batchSize;
 	private static int timeout;
+	private static String clientId;
 	private static boolean persistent;
 	private static boolean topic;
 	private static boolean async;
@@ -28,14 +29,15 @@ public class Application {
 	public static void main(String[] args) {
 		// Set up variables
 		boolean isProducer = Arrays.asList(args).contains("producer");
-		messages = Integer.valueOf(System.getProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES));
-		final String DEFAULT_RATE_PER_SECOND = isProducer ? DEFAULT_PRODUCER_RATE_PER_SECOND : DEFAULT_CONSUMER_RATE_PER_SECOND;
-		rate = Integer.valueOf(System.getProperty("kafka.rate", DEFAULT_RATE_PER_SECOND));
-		batchSize = Integer.valueOf(System.getProperty("kafka.batchSize", DEFAULT_BATCH_SIZE));
-		timeout = Integer.valueOf(System.getProperty("kafka.timeout", DEFAULT_TIMEOUT));
-		persistent = Boolean.valueOf(System.getProperty("kafka.persistent", Boolean.FALSE.toString()));
-		topic = Boolean.valueOf(System.getProperty("kafka.topic", Boolean.FALSE.toString()));
-		async = Boolean.valueOf(System.getProperty("kafka.async", Boolean.FALSE.toString()));
+		messages = getSystemProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES);
+		final int DEFAULT_RATE_PER_SECOND = isProducer ? DEFAULT_PRODUCER_RATE_PER_SECOND : DEFAULT_CONSUMER_RATE_PER_SECOND;
+		rate = getSystemProperty("kafka.rate", DEFAULT_RATE_PER_SECOND);
+		batchSize = getSystemProperty("kafka.batchSize", DEFAULT_BATCH_SIZE);
+		timeout = getSystemProperty("kafka.timeout", DEFAULT_TIMEOUT);
+		clientId = getSystemProperty("kafka.clientId", "client123");
+		persistent = getSystemProperty("kafka.persistent", false);
+		topic = getSystemProperty("kafka.topic", false);
+		async = getSystemProperty("kafka.async", false);
 
 		// Create Spring app
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
@@ -51,6 +53,18 @@ public class Application {
 		appContext.close();
 	}
 
+	private static boolean getSystemProperty(String name, Boolean defaultValue) {
+		return Boolean.valueOf(System.getProperty(name, defaultValue.toString()));
+	}
+
+	private static String getSystemProperty(String name, String defaultValue) {
+		return System.getProperty(name, defaultValue);
+	}
+
+	private static Integer getSystemProperty(String name, Integer defaultValue) {
+		return Integer.valueOf(System.getProperty(name, defaultValue.toString()));
+	}
+
 	@Autowired
 	private BrokerClientConfig brokerClientConfig;
 
@@ -63,6 +77,6 @@ public class Application {
 	@Bean
 	@Profile("consumer")
 	public Consumer consumer() {
-		return new Consumer(brokerClientConfig.consumerClient(topic), messages, timeout, rate, batchSize);
+		return new Consumer(brokerClientConfig.consumerClient(persistent, topic, clientId), messages, timeout, rate, batchSize);
 	}
 }

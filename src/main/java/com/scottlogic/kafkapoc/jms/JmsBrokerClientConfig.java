@@ -17,8 +17,8 @@ public class JmsBrokerClientConfig implements BrokerClientConfig {
 	}
 
 	@Override
-	public ConsumerClient consumerClient(boolean topic) {
-		return new JmsConsumerClient(topic);
+	public ConsumerClient consumerClient(boolean persistent, boolean topic, String clientId) {
+		return new JmsConsumerClient(persistent, topic, clientId);
 	}
 
 }
