@@ -12,26 +12,57 @@ import java.util.Arrays;
 @SpringBootApplication
 public class Application {
 
-	private static final String DEFAULT_NUMBER_OF_MESSAGES = "50000";
-	private static final String DEFAULT_SEND_RATE_PER_SECOND = "3000";
-	private static final String DEFAULT_SEND_BATCH_SIZE = "100";
+	private static final int DEFAULT_NUMBER_OF_MESSAGES = 50000;
+	private static final int DEFAULT_PRODUCER_RATE_PER_SECOND = 3000;
+	private static final int DEFAULT_CONSUMER_RATE_PER_SECOND = 10000;
+	private static final int DEFAULT_BATCH_SIZE = 100;
+	private static final int DEFAULT_TIMEOUT = 5000;
 	private static int messages;
-	private static int sendRate;
-	private static int sendBatchSize;
+	private static int rate;
+	private static int batchSize;
+	private static int timeout;
+	private static String clientId;
+	private static boolean persistent;
+	private static boolean topic;
+	private static boolean async;
 
 	public static void main(String[] args) {
 		// Set up variables
-		messages = Integer.valueOf(System.getProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES));
-		sendRate = Integer.valueOf(System.getProperty("kafka.sendrate", DEFAULT_SEND_RATE_PER_SECOND));
-		sendBatchSize = Integer.valueOf(System.getProperty("kafka.sendBatchSize", DEFAULT_SEND_BATCH_SIZE));
+		boolean isProducer = Arrays.asList(args).contains("producer");
+		messages = getSystemProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES);
+		final int DEFAULT_RATE_PER_SECOND = isProducer ? DEFAULT_PRODUCER_RATE_PER_SECOND : DEFAULT_CONSUMER_RATE_PER_SECOND;
+		rate = getSystemProperty("kafka.rate", DEFAULT_RATE_PER_SECOND);
+		batchSize = getSystemProperty("kafka.batchSize", DEFAULT_BATCH_SIZE);
+		timeout = getSystemProperty("kafka.timeout", DEFAULT_TIMEOUT);
+		clientId = getSystemProperty("kafka.clientId", "client123");
+		persistent = getSystemProperty("kafka.persistent", false);
+		topic = getSystemProperty("kafka.topic", false);
+		async = getSystemProperty("kafka.async", false);
 
 		// Create Spring app
 		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
 
 		// Start producer running
-		if (Arrays.asList(args).contains("producer")) {
+		if (isProducer) {
 			appContext.getBean(Producer.class).sendMessages();
+		} else {
+			appContext.getBean(Consumer.class).startListening();
 		}
+
+		// Shutdown
+		appContext.close();
+	}
+
+	private static boolean getSystemProperty(String name, Boolean defaultValue) {
+		return Boolean.valueOf(System.getProperty(name, defaultValue.toString()));
+	}
+
+	private static String getSystemProperty(String name, String defaultValue) {
+		return System.getProperty(name, defaultValue);
+	}
+
+	private static Integer getSystemProperty(String name, Integer defaultValue) {
+		return Integer.valueOf(System.getProperty(name, defaultValue.toString()));
 	}
 
 	@Autowired
@@ -40,12 +71,12 @@ public class Application {
 	@Bean
 	@Profile("producer")
 	public Producer producer() {
-		return new Producer(brokerClientConfig.producerClient(), messages, sendRate, sendBatchSize);
+		return new Producer(brokerClientConfig.producerClient(persistent, topic, async), messages, rate, batchSize);
 	}
 
 	@Bean
 	@Profile("consumer")
 	public Consumer consumer() {
-		return new Consumer(brokerClientConfig.consumerClient(), messages);
+		return new Consumer(brokerClientConfig.consumerClient(persistent, topic, clientId), messages, timeout, rate, batchSize);
 	}
 }

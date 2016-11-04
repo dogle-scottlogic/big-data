@@ -12,13 +12,13 @@ import com.scottlogic.kafkapoc.ProducerClient;
 public class JmsBrokerClientConfig implements BrokerClientConfig {
 
 	@Override
-	public ProducerClient producerClient() {
-		return new JmsProducerClient();
+	public ProducerClient producerClient(boolean persistent, boolean topic, boolean async) {
+		return new JmsProducerClient(persistent, topic, async);
 	}
 
 	@Override
-	public ConsumerClient consumerClient() {
-		return new JmsConsumerClient();
+	public ConsumerClient consumerClient(boolean persistent, boolean topic, String clientId) {
+		return new JmsConsumerClient(persistent, topic, clientId);
 	}
 
 }

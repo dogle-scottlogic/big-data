@@ -1,5 +1,7 @@
 package com.scottlogic.kafkapoc;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
 
 import java.util.ArrayList;
@@ -7,6 +9,7 @@ import java.util.List;
 
 class Producer implements DisposableBean{
 
+    private static final Logger LOG = LoggerFactory.getLogger(Producer.class);
     private ProducerClient producerClient;
     private int amountToSend;
     private int ratePerSecond;
@@ -32,7 +35,7 @@ class Producer implements DisposableBean{
     }
 
     void sendMessages(){
-        System.out.println(String.format("Sending %s messages at a rate of ~%s/sec in batches of %s", amountToSend, ratePerSecond, batchSize));
+        LOG.info(String.format("Sending %s messages at a rate of ~%s/sec in batches of %s", amountToSend, ratePerSecond, batchSize));
         startTime = System.currentTimeMillis();
         chunkTimes.add(startTime);
         lastMillis = startTime;
@@ -47,8 +50,9 @@ class Producer implements DisposableBean{
                 chunkTimes.add(System.currentTimeMillis());
             }
         }
+        counter--;
         outputStats();
-        counter = 0;
+        counter = 1;
     }
 
     private void maybeSleep() {
@@ -70,20 +74,20 @@ class Producer implements DisposableBean{
     public void destroy() {
         interrupted = true;
         producerClient.destroy();
-        if (counter > 0) {
+        if (counter > 1) {
             outputStats();
         }
     }
 
     private void outputStats() {
         long endTime = System.currentTimeMillis();
-        System.out.println(String.format("Messages sent: %s", counter));
-        System.out.println(String.format("Time to send: %s milliseconds", endTime - startTime));
-        System.out.println(String.format("Overall real rate: %s/sec", getRate(startTime, endTime, counter)));
-        System.out.println("Chunk rates: ");
+        LOG.info("Messages sent: {}", counter);
+        LOG.info("Time to send: {} milliseconds", endTime - startTime);
+        LOG.info("Overall real rate: {}/sec", getRate(startTime, endTime, counter));
+        LOG.info("Chunk rates: ");
         for (int i = 1; i < chunkTimes.size(); i++) {
             long chunkRate = getRate(chunkTimes.get(i-1), chunkTimes.get(i), chunkSize);
-            System.out.println(String.format("Chunk %s: %s/sec", i, chunkRate));
+            LOG.info("Chunk {}: {}/sec", i, chunkRate);
         }
     }
 
