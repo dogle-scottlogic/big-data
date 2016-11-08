@@ -4,25 +4,23 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.scottlogic.kafkapoc.ProducerClient;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
+@Component
+@Lazy
+@Profile("producer")
 class Amqp09ProducerClient implements ProducerClient {
-	
-	/**
-	 * This can probably be autowired, but I'm also happy if it is injected from the broker.
-	 */
-	@Autowired
-	private RabbitTemplate rabbitTemplate;
-	
-    Amqp09ProducerClient(){
-        System.out.println("Producerclient started up");
-    }
-    
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
     public void send(String content) {
-        rabbitTemplate.convertAndSend(content);
+        rabbitTemplate.convertAndSend("AMQP.QUEUE", content);
     }
 
     public void destroy() {
-        System.out.println("Producer client killed");
         // no action required, I don't think
     }
 }

@@ -14,7 +14,7 @@ class JmsProducerClient implements ProducerClient {
     private Connection connection;
     private MessageProducer producer;
 
-    JmsProducerClient(boolean persistent, boolean topic, boolean async){
+    JmsProducerClient(String name, boolean persistent, boolean topic, boolean async){
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");
@@ -27,7 +27,7 @@ class JmsProducerClient implements ProducerClient {
             // Create a Session
             session = connection.createSession(false, Session.CLIENT_ACKNOWLEDGE);
             // Create the destination (Topic or Queue)
-            Destination destination = topic ? session.createTopic("TEST.FOO") : session.createQueue("TEST.FOO");
+            Destination destination = topic ? session.createTopic(name) : session.createQueue(name);
 
             // Create a MessageProducer from the Session to the Topic or Queue
             producer = session.createProducer(destination);
