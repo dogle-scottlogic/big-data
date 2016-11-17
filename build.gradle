@@ -44,6 +44,7 @@ dependencies {
         compile('org.springframework.boot:spring-boot-starter-activemq')
         compile('org.springframework.boot:spring-boot-starter-amqp')
         compile('org.springframework.kafka:spring-kafka:1.1.1.RELEASE')
+        compile("com.fasterxml.jackson.core:jackson-databind")
         testCompile('org.springframework.boot:spring-boot-starter-test')
 }
 
