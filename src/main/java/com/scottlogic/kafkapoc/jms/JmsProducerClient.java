@@ -4,17 +4,34 @@ import com.scottlogic.kafkapoc.ProducerClient;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.jms.*;
 
+@Component
+@Lazy
+@Profile("producer")
 class JmsProducerClient implements ProducerClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(JmsProducerClient.class);
     private Session session;
     private Connection connection;
     private MessageProducer producer;
+    @Value("${persistent}")
+    private boolean persistent;
+    @Value("${async}")
+    private boolean async;
+    @Value("${name}")
+    private String name;
+    @Value("${topic}")
+    private boolean topic;
 
-    JmsProducerClient(String name, boolean persistent, boolean topic, boolean async){
+    @PostConstruct
+    public void init() {
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");

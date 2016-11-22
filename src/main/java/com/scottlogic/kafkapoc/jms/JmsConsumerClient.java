@@ -5,9 +5,17 @@ import com.scottlogic.kafkapoc.Listener;
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.jms.*;
 
+@Component
+@Lazy
+@Profile("consumer")
 class JmsConsumerClient implements ConsumerClient, MessageListener {
 
     private static final Logger LOG = LoggerFactory.getLogger(JmsConsumerClient.class);
@@ -15,8 +23,17 @@ class JmsConsumerClient implements ConsumerClient, MessageListener {
     private Session session;
     private Connection connection;
     private Listener listener;
+    @Value("${persistent}")
+    private boolean persistent;
+    @Value("${clientId}")
+    private String clientId;
+    @Value("${name}")
+    private String name;
+    @Value("${topic}")
+    private boolean topic;
 
-    JmsConsumerClient(String name, boolean persistent, boolean topic, String clientId){
+    @PostConstruct
+    public void init() {
         try {
             // Create a ConnectionFactory
             ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory("tcp://localhost:61616");

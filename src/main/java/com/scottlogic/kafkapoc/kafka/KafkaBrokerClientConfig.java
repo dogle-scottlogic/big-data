@@ -10,6 +10,7 @@ import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.EnableKafka;
@@ -25,18 +26,20 @@ import java.util.Map;
 @Profile("kafka")
 public class KafkaBrokerClientConfig implements BrokerClientConfig {
 
+    @Value("${name}")
+    private String name;
     @Autowired(required = false)
     private KafkaProducerClient producerClient;
     @Autowired(required = false)
     private KafkaConsumerClient consumerClient;
 
     @Override
-    public ProducerClient producerClient(boolean persistent, boolean topic, boolean async) {
+    public ProducerClient producerClient() {
         return producerClient;
     }
 
     @Override
-    public ConsumerClient consumerClient(boolean persistent, boolean topic, String clientId) {
+    public ConsumerClient consumerClient() {
         return consumerClient;
     }
 
@@ -87,7 +90,7 @@ public class KafkaBrokerClientConfig implements BrokerClientConfig {
     @Bean
     public KafkaTemplate<Integer, String> kafkaTemplate() {
         KafkaTemplate<Integer, String> template =new KafkaTemplate<>(producerFactory());
-        template.setDefaultTopic("KAFKA.FOO2");
+        template.setDefaultTopic(name);
         return template;
     }
 }
