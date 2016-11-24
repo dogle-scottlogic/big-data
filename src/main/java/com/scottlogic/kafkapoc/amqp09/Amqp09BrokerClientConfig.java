@@ -24,12 +24,12 @@ public class Amqp09BrokerClientConfig implements BrokerClientConfig {
     private Amqp09ConsumerClient consumerClient;
 
     @Override
-    public ProducerClient producerClient(boolean persistent, boolean topic, boolean async) {
+    public ProducerClient producerClient() {
         return producerClient;
     }
 
     @Override
-    public ConsumerClient consumerClient(boolean persistent, boolean topic, String clientId) {
+    public ConsumerClient consumerClient() {
         return consumerClient;
     }
 

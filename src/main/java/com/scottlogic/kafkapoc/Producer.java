@@ -3,16 +3,26 @@ package com.scottlogic.kafkapoc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
+@Profile("producer")
 class Producer implements DisposableBean{
 
     private static final Logger LOG = LoggerFactory.getLogger(Producer.class);
     private ProducerClient producerClient;
+    @Value("${messages}")
     private int amountToSend;
+    @Value("${rate}")
     private int ratePerSecond;
+    @Value("${batchSize}")
     private int batchSize;
     private int chunkSize;
 
@@ -22,11 +32,13 @@ class Producer implements DisposableBean{
     private List<Long> chunkTimes;
     private boolean interrupted;
 
-    Producer(ProducerClient producerClient, int amountToSend, int ratePerSecond, int batchSize){
+
+    Producer(ProducerClient producerClient) {
         this.producerClient = producerClient;
-        this.amountToSend = amountToSend;
-        this.ratePerSecond = ratePerSecond;
-        this.batchSize = batchSize;
+    }
+
+    @PostConstruct
+    public void init() {
         this.chunkSize = amountToSend / 10;
 
         this.counter = 1;
@@ -93,6 +105,9 @@ class Producer implements DisposableBean{
 
     private long getRate(long startTime, long endTime, int number) {
         long elapsed = (endTime - startTime);
+        if (elapsed == 0) {
+            elapsed = 1;
+        }
         return number*1000/elapsed;
     }
 }

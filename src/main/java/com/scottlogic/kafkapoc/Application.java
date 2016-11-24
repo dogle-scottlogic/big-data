@@ -1,6 +1,5 @@
 package com.scottlogic.kafkapoc;
 
-import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
@@ -9,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 @SpringBootApplication
 public class Application {
@@ -16,26 +17,26 @@ public class Application {
 	private static final int DEFAULT_NUMBER_OF_MESSAGES = 50000;
 	private static final int DEFAULT_RATE_PER_SECOND = 3000;
 	private static final int DEFAULT_BATCH_SIZE = 100;
-	private static int messages;
-	private static int rate;
-	private static int batchSize;
-	private static String clientId;
-	private static boolean persistent;
-	private static boolean topic;
-	private static boolean async;
+	private static final String DEFAULT_CHANNEL_NAME = "TEST.FOO";
+	private static final String DEFAULT_CLIENT_ID = "client123";
 
 	public static void main(String[] args) {
 		// Set up variables
-		messages = getSystemProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES);
-		rate = getSystemProperty("kafka.rate", DEFAULT_RATE_PER_SECOND);
-		batchSize = getSystemProperty("kafka.batchSize", DEFAULT_BATCH_SIZE);
-		clientId = getSystemProperty("kafka.clientId", "client123");
-		persistent = getSystemProperty("kafka.persistent", false);
-		topic = getSystemProperty("kafka.topic", false);
-		async = getSystemProperty("kafka.async", false);
+		Map<String, Object> properties = new HashMap<>();
+		properties.put("messages", getSystemProperty("kafka.messages", DEFAULT_NUMBER_OF_MESSAGES));
+		properties.put("rate", getSystemProperty("kafka.rate", DEFAULT_RATE_PER_SECOND));
+		properties.put("batchSize", getSystemProperty("kafka.batchSize", DEFAULT_BATCH_SIZE));
+		properties.put("clientId", getSystemProperty("kafka.clientId", DEFAULT_CLIENT_ID));
+		properties.put("persistent", getSystemProperty("kafka.persistent", false));
+		properties.put("topic", getSystemProperty("kafka.topic", false));
+		properties.put("async", getSystemProperty("kafka.async", false));
+		properties.put("name", getSystemProperty("kafka.name", DEFAULT_CHANNEL_NAME));
 
 		// Create Spring app
-		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class).profiles(args).run(args);
+		ConfigurableApplicationContext appContext = new SpringApplicationBuilder(Application.class)
+				.properties(properties)
+				.profiles(args)
+				.run(args);
 
 		boolean isProducer = Arrays.asList(args).contains("producer");
 		// Start producer/consumer running
@@ -67,12 +68,12 @@ public class Application {
 	@Bean
 	@Profile("producer")
 	public Producer producer() {
-		return new Producer(brokerClientConfig.producerClient(persistent, topic, async), messages, rate, batchSize);
+		return new Producer(brokerClientConfig.producerClient());
 	}
 
 	@Bean
 	@Profile("consumer")
 	public Consumer consumer() {
-		return new Consumer(brokerClientConfig.consumerClient(persistent, topic, clientId), messages);
+		return new Consumer(brokerClientConfig.consumerClient());
 	}
 }

@@ -3,26 +3,38 @@ package com.scottlogic.kafkapoc;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
+@Profile("consumer")
 class Consumer implements DisposableBean, Listener {
 
     private static final Logger LOG = LoggerFactory.getLogger(Consumer.class);
     private ConsumerClient consumerClient;
-    private List<Integer> numbers;
+    @Value("${messages}")
     private int expected;
+    private List<Integer> numbers;
     private int chunkSize;
 
     private long startTime;
     private List<Long> chunkTimes;
     private boolean interrupted;
 
-    Consumer(ConsumerClient consumerClient, int expected) {
+
+    Consumer(ConsumerClient consumerClient) {
         this.consumerClient = consumerClient;
+    }
+
+    @PostConstruct
+    public void init() {
         numbers = new ArrayList<>();
-        this.expected = expected;
         this.chunkTimes = new ArrayList<>();
         this.chunkSize = expected / 10;
     }
@@ -53,6 +65,10 @@ class Consumer implements DisposableBean, Listener {
     private void outputStats() {
         long endTime = System.currentTimeMillis();
         LOG.info("Messages received: {}", numbers.size());
+        if (numbers.isEmpty()) {
+            return;
+        }
+
         boolean ordered = true;
         for (int i = 0; i < numbers.size(); i++) {
             if (i + 1 != numbers.get(i)) {
@@ -67,6 +83,7 @@ class Consumer implements DisposableBean, Listener {
             long chunkRate = getRate(chunkTimes.get(i-1), chunkTimes.get(i), chunkSize);
             LOG.info("Chunk {}: {}/sec", i, chunkRate);
         }
+
     }
 
     private long getRate(long startTime, long endTime, int number) {
@@ -78,8 +95,6 @@ class Consumer implements DisposableBean, Listener {
     public void destroy() throws Exception {
         interrupted = true;
         this.consumerClient.destroy();
-        if (!numbers.isEmpty()) {
-            outputStats();
-        }
+        outputStats();
     }
 }
