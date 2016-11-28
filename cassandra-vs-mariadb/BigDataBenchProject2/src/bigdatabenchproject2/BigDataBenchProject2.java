@@ -24,7 +24,7 @@ public class BigDataBenchProject2 {
      */
     public static void main(String[] args) {
         // TODO code application logic here
-        Random random = new Random(/* Seed Here*/);
+        Random random = new Random(2134/* Seed Here*/);
 //        ClientGenerator clientGenerator = new ClientGenerator(random);
 //        ArrayList<Client> clients = clientGenerator.getClients(11);
 //        clients.forEach((client) ->  System.out.println(client.getName()));
