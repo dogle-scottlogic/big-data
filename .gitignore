@@ -1,8 +1,3 @@
-.gradle/
-bin/
-build/
-.classpath
-.project
-.settings
-.idea/
-
+/cassandra-vs-mariadb/BigDataBenchProject2/build/
+/cassandra-vs-mariadb/BigDataBenchProject2/dist/
+/cassandra-vs-mariadb/BigDataBenchProject2/nbproject/private/
