@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entities;
 
 import java.util.UUID;
@@ -12,27 +7,38 @@ import java.util.UUID;
  * @author lcollingwood
  */
 public class LineItem {
-        private UUID id; // Should be seedable
-        private Product product;
-        private int quantity;
-        private String color; // enum type
-        private String size; //enum type
+    private UUID id;
+    private Product product;
+    private int quantity;
+    private String color;
+    private String size;
+    private double linePrice;
 
-    public LineItem(UUID id, Product product, int quantity, String color, String size) {
+    public LineItem(
+        UUID id, 
+        Product product, 
+        int quantity, 
+        String color, 
+        String size
+    ) {
         this.id = id;
         this.product = product;
         this.quantity = quantity;
         this.color = color;
         this.size = size;
-        /*
-            Sub total field could be added here.
-        */
+    }
+    
+    public double getLinePrice() {
+        return this.quantity * this.product.getPrice();
     }
     
     public void display() {
-        System.out.println("Line Item(" + this.id + "): " + this.quantity + "x " + this.size + " " + this.color + " "+ this.product.getName());
+        System.out.println(
+            "Line Item(" + this.id + "): " + this.quantity + "x " + this.size 
+            + " " + this.color + " "+ this.product.getName()
+        );
     }
-
+      
     public UUID getId() {
         return id;
     }
@@ -72,5 +78,4 @@ public class LineItem {
     public void setSize(String size) {
         this.size = size;
     }
-        
 }

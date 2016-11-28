@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package entities;
 
 import java.util.ArrayList;
@@ -18,13 +13,20 @@ public class Order {
     private Client client;
     private double subTotal;
 
-    public Order(UUID id, ArrayList<LineItem> lineItems, Client client, double subTotal) {
+    public Order(UUID id, ArrayList<LineItem> lineItems, Client client) {
         this.id = id;
         this.lineItems = lineItems;
         this.client = client;
-        this.subTotal = subTotal; // Might want to sum this from line items
     }
 
+    public double getSubTotal() {
+        double subTotal = 0;
+        for (LineItem lineItem : lineItems) {
+            subTotal = subTotal + lineItem.getLinePrice();
+        }
+        return subTotal;
+    }
+    
     public UUID getId() {
         return id;
     }
@@ -47,10 +49,6 @@ public class Order {
 
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    public double getSubTotal() {
-        return subTotal;
     }
 
     public void setSubTotal(double subTotal) {

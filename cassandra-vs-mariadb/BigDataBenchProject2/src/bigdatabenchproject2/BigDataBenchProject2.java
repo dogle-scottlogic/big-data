@@ -5,10 +5,13 @@
  */
 package bigdatabenchproject2;
 
+import entities.Client;
 import entities.LineItem;
+import entities.Order;
 import entities.Product;
 import generators.ClientGenerator;
 import generators.LineItemGenerator;
+import generators.OrderGenerator;
 import generators.ProductGenerator;
 import java.util.ArrayList;
 import java.util.Random;
@@ -18,22 +21,38 @@ import java.util.Random;
  * @author lcollingwood
  */
 public class BigDataBenchProject2 {
-
-    /**
-     * @param args the command line arguments
-     */
+   
+  
+    
     public static void main(String[] args) {
-        // TODO code application logic here
-        Random random = new Random(2134/* Seed Here*/);
-//        ClientGenerator clientGenerator = new ClientGenerator(random);
-//        ArrayList<Client> clients = clientGenerator.getClients(11);
-//        clients.forEach((client) ->  System.out.println(client.getName()));
-        ProductGenerator pg = new ProductGenerator(random);
-        ArrayList<Product> products = pg.generateProducts(11);
-        products.forEach((product) -> System.out.println(product.getId()));
-        LineItemGenerator lg = new LineItemGenerator(random, products);
-        ArrayList<LineItem> lineItems = lg.generateLineItems(11);
-        lineItems.forEach(lineItem -> lineItem.display());
+        Random random = new Random(12345/* Seed Here*/);
+        
+        int nClients = 11;
+        int nProducts = 11;
+        int nOrderLimit = 11;
+        
+        ClientGenerator clientGenerator;
+        ProductGenerator productGenerator;
+        LineItemGenerator lineItemGenerator;
+        
+        ArrayList<Client> clients = new ArrayList<>();
+        ArrayList<Product> products = new ArrayList<>();
+        ArrayList<Order> orders = new ArrayList<>();
+        
+        clientGenerator = new ClientGenerator(random);
+        clients.addAll(clientGenerator.getClients(nClients));
+        
+        productGenerator = new ProductGenerator(random);
+        products.addAll(productGenerator.generateProducts(nProducts));
+        
+        lineItemGenerator = new LineItemGenerator(random, products);
+        
+        
+        // For Each Client, generate orders.
+        clients.forEach(client -> {
+            OrderGenerator orderGenerator = new OrderGenerator(random, lineItemGenerator, client);
+            orders.addAll(orderGenerator.generateOrders(nOrderLimit));
+        });
     }
 
 }
