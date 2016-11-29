@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.bigdataproject2withmaven.spring.dao;
+package com.scottlogic.bigdataproject2withmaven.spring.dao;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;

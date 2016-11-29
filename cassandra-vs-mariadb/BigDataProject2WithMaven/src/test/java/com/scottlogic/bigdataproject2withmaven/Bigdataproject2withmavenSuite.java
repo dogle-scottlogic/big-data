@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.bigdataproject2withmaven;
+package com.scottlogic.bigdataproject2withmaven;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;

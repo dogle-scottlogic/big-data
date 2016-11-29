@@ -6,7 +6,6 @@
 package bigdatabenchproject2;
 
 import entities.Client;
-import entities.LineItem;
 import entities.Order;
 import entities.Product;
 import generators.ClientGenerator;
@@ -25,7 +24,8 @@ public class BigDataBenchProject2 {
   
     
     public static void main(String[] args) {
-        Random random = new Random(12345/* Seed Here*/);
+        int seed = 3423423;
+        Random random = new Random(seed);
         
         int nClients = 11;
         int nProducts = 11;

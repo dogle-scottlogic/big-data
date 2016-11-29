@@ -5,7 +5,7 @@
  */
 package com;
 
-import com.mycompany.MycompanySuite;
+import com.scottlogic.ScottlogicSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -14,7 +14,7 @@ import org.junit.runners.Suite;
  * @author lcollingwood
  */
 @org.junit.runner.RunWith(org.junit.runners.Suite.class)
-@org.junit.runners.Suite.SuiteClasses({MycompanySuite.class})
+@org.junit.runners.Suite.SuiteClasses({ScottlogicSuite.class})
 public class ComSuite {
 
     @org.junit.BeforeClass

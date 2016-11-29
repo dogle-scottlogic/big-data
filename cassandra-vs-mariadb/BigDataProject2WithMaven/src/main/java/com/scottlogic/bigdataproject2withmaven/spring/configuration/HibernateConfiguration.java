@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany.bigdataproject2withmaven.spring.configuration;
+package com.scottlogic.bigdataproject2withmaven.spring.configuration;
  
 import java.util.Properties;
  

@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.mycompany;
+package com.scottlogic;
 
-import com.mycompany.bigdataproject2withmaven.Bigdataproject2withmavenSuite;
+import com.scottlogic.bigdataproject2withmaven.Bigdataproject2withmavenSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -15,7 +15,7 @@ import org.junit.runners.Suite;
  */
 @org.junit.runner.RunWith(org.junit.runners.Suite.class)
 @org.junit.runners.Suite.SuiteClasses({Bigdataproject2withmavenSuite.class})
-public class MycompanySuite {
+public class ScottlogicSuite {
 
     @org.junit.BeforeClass
     public static void setUpClass() throws Exception {
