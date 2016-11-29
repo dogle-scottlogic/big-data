@@ -5,11 +5,11 @@
  */
 package bigdatabenchproject2;
 
-import com.scottlogic.bigdataproject2withmaven.spring.configuration.AppConfig;
-import com.scottlogic.bigdataproject2withmaven.spring.service.ClientService;
-import entities.Client;
-import entities.Order;
-import entities.Product;
+import com.scottlogic.cassandravsmariadb.configuration.AppConfig;
+import com.scottlogic.cassandravsmariadb.services.ClientService;
+import com.scottlogic.cassandravsmariadb.entities.Client;
+import com.scottlogic.cassandravsmariadb.entities.Order;
+import com.scottlogic.cassandravsmariadb.entities.Product;
 import generators.ClientGenerator;
 import generators.LineItemGenerator;
 import generators.OrderGenerator;
@@ -24,8 +24,6 @@ import org.springframework.context.support.AbstractApplicationContext;
  * @author lcollingwood
  */
 public class BigDataBenchProject2 {
-   
-  
     
     public static void main(String[] args) {
         AbstractApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);

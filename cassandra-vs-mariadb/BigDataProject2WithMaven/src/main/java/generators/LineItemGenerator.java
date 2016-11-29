@@ -5,8 +5,8 @@
  */
 package generators;
 
-import entities.LineItem;
-import entities.Product;
+import com.scottlogic.cassandravsmariadb.entities.LineItem;
+import com.scottlogic.cassandravsmariadb.entities.Product;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;

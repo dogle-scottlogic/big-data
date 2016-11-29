@@ -5,7 +5,7 @@
  */
 package generators;
 
-import entities.Client;
+import com.scottlogic.cassandravsmariadb.entities.Client;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;

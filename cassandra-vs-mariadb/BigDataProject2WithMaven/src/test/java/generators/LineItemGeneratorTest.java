@@ -5,7 +5,7 @@
  */
 package generators;
 
-import entities.LineItem;
+import com.scottlogic.cassandravsmariadb.entities.LineItem;
 import java.util.ArrayList;
 import java.util.Random;
 import org.junit.After;

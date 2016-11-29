@@ -5,7 +5,7 @@
  */
 package generators;
 
-import entities.Product;
+import com.scottlogic.cassandravsmariadb.entities.Product;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
