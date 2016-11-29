@@ -5,6 +5,8 @@
  */
 package bigdatabenchproject2;
 
+import com.scottlogic.bigdataproject2withmaven.spring.configuration.AppConfig;
+import com.scottlogic.bigdataproject2withmaven.spring.service.ClientService;
 import entities.Client;
 import entities.Order;
 import entities.Product;
@@ -14,6 +16,8 @@ import generators.OrderGenerator;
 import generators.ProductGenerator;
 import java.util.ArrayList;
 import java.util.Random;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.AbstractApplicationContext;
 
 /**
  *
@@ -24,6 +28,9 @@ public class BigDataBenchProject2 {
   
     
     public static void main(String[] args) {
+        AbstractApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+        ClientService clientService = (ClientService) context.getBean("clientService");
+        
         int seed = 3423423;
         Random random = new Random(seed);
         
@@ -42,16 +49,17 @@ public class BigDataBenchProject2 {
         clientGenerator = new ClientGenerator(random);
         clients.addAll(clientGenerator.getClients(nClients));
         
-        productGenerator = new ProductGenerator(random);
-        products.addAll(productGenerator.generateProducts(nProducts));
-        
-        lineItemGenerator = new LineItemGenerator(random, products);
+//        productGenerator = new ProductGenerator(random);
+//        products.addAll(productGenerator.generateProducts(nProducts));
+//        
+//        lineItemGenerator = new LineItemGenerator(random, products);
         
         
         // For Each Client, generate orders.
         clients.forEach(client -> {
-            OrderGenerator orderGenerator = new OrderGenerator(random, lineItemGenerator, client);
-            orders.addAll(orderGenerator.generateOrders(nOrderLimit));
+            clientService.saveClient(client);
+//            OrderGenerator orderGenerator = new OrderGenerator(random, lineItemGenerator, client);
+//            orders.addAll(orderGenerator.generateOrders(nOrderLimit));
         });
     }
 

@@ -1,29 +1,44 @@
 package entities;
 
 import java.util.UUID;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 /**
  *
  * @author lcollingwood
  */
+@Entity
+@Table(name="CLIENT")
 public class Client {
-    private UUID id;
+    @Id
+    private String id;
+    
+    @Column(name="NAME", nullable=false)
     private String name;
+    
+    @Column(name = "ADDRESS", nullable=false)
     private String address;
+    
+    @Column(name = "EMAIL", nullable=true)
     private String email;
     
     public Client(UUID id, String name, String address, String email) {
-        this.id = id;
+        this.id = id.toString();
         this.name = name;
         this.address = address;
         this.email = email;
     }
     
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 
