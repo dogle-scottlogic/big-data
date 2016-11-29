@@ -20,11 +20,10 @@ public class Order {
     }
 
     public double getSubTotal() {
-        double subTotal = 0;
-        for (LineItem lineItem : lineItems) {
-            subTotal = subTotal + lineItem.getLinePrice();
-        }
-        return subTotal;
+        lineItems.forEach((lineItem) -> {
+            this.subTotal = this.subTotal + lineItem.getLinePrice();
+        });
+        return this.subTotal;
     }
     
     public UUID getId() {
