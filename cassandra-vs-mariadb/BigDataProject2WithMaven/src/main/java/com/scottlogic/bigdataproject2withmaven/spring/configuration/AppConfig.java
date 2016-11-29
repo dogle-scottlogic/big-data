@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
  
 @Configuration
-@ComponentScan(basePackages = "com.mycompany.bigdataproject2withmaven.spring")
+@ComponentScan(basePackages = "com.scottlogic.bigdataproject2withmaven.spring")
 public class AppConfig {
  
 }
