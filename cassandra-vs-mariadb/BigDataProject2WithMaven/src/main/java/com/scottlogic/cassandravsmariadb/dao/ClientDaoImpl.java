@@ -33,13 +33,12 @@ public class ClientDaoImpl extends AbstractDao implements ClientDao{
     }
      
     @Override
-    public void deleteClientById(String ssn) {
-        Query query = getSession().createSQLQuery("delete from Employee where ssn = :ssn");
-        query.setString("ssn", ssn);
+    public void deleteClientById(String id) {
+        Query query = getSession().createSQLQuery("delete from Client where id = :id");
+        query.setString("id", id);
         query.executeUpdate();
     }
  
-     
     @Override
     public Client findById(String id){
         Criteria criteria = getSession().createCriteria(Client.class);
