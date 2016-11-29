@@ -6,7 +6,6 @@
 package bigdatabenchproject2;
 
 import entities.Client;
-import entities.LineItem;
 import entities.Order;
 import entities.Product;
 import generators.ClientGenerator;

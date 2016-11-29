@@ -23,7 +23,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  
 @Configuration
 @EnableTransactionManagement
-@ComponentScan({ "com.mycompany.bigdataproject2withmaven.spring.configuration" })
+@ComponentScan({ "com.scottlogic.bigdataproject2withmaven.spring.configuration" })
 @PropertySource(value = { "classpath:application.properties" })
 public class HibernateConfiguration {
  
