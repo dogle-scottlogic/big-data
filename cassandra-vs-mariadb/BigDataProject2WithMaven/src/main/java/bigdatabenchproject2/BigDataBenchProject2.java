@@ -14,6 +14,7 @@ import com.scottlogic.cassandravsmariadb.entities.Product;
 import com.scottlogic.cassandravsmariadb.services.LineItemService;
 import com.scottlogic.cassandravsmariadb.services.ProductService;
 import generators.ClientGenerator;
+import generators.DataGenerator;
 import generators.LineItemGenerator;
 import generators.OrderGenerator;
 import generators.ProductGenerator;
@@ -29,6 +30,11 @@ import org.springframework.context.support.AbstractApplicationContext;
 public class BigDataBenchProject2 {
     
     public static void main(String[] args) {
+        
+        DataGenerator dg = new DataGenerator();
+        dg.populateRedis();
+        
+        
         AbstractApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
 //        ClientService clientService = (ClientService) context.getBean("clientService");
         ProductService productService = (ProductService) context.getBean("productService");
@@ -54,13 +60,13 @@ public class BigDataBenchProject2 {
 //        clients.addAll(clientGenerator.getClients(nClients));
         
         productGenerator = new ProductGenerator(random);
-        products.addAll(productGenerator.generateProducts(nProducts));
-             
-        products.forEach(product -> productService.saveProduct(product));
-        
-        lineItemGenerator = new LineItemGenerator(random, products);
-        ArrayList<LineItem> items = lineItemGenerator.generateLineItems(2);
-        items.forEach(item -> lis.saveLineItem(item));
+//        products.addAll(productGenerator.generateProducts(nProducts));
+//             
+//        products.forEach(product -> productService.saveProduct(product));
+//        
+//        lineItemGenerator = new LineItemGenerator(random, products);
+//        ArrayList<LineItem> items = lineItemGenerator.generateLineItems(2);
+//        items.forEach(item -> lis.saveLineItem(item));
         // For Each Client, generate orders.
 //        clients.forEach(client -> {
 //            OrderGenerator orderGenerator = new OrderGenerator(random, lineItemGenerator, client);
