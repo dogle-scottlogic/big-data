@@ -1,4 +1,6 @@
-/cassandra-vs-mariadb/BigDataBenchProject2/build/
-/cassandra-vs-mariadb/BigDataBenchProject2/dist/
-/cassandra-vs-mariadb/BigDataBenchProject2/nbproject/private/
-pom.properties
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/private/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/build/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/nbbuild/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/dist/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/nbdist/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/.nb-gradle/

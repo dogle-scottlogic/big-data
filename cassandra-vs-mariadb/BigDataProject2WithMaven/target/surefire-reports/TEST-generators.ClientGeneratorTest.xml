@@ -62,6 +62,6 @@
     <property name="sun.cpu.isalist" value="amd64"/>
   </properties>
   <testcase classname="generators.ClientGeneratorTest" name="testGetClientsZeroNumber" time="0"/>
-  <testcase classname="generators.ClientGeneratorTest" name="testGetClients" time="0.066"/>
+  <testcase classname="generators.ClientGeneratorTest" name="testGetClients" time="0.063"/>
   <testcase classname="generators.ClientGeneratorTest" name="testGenerateClientRandomSeed" time="0"/>
 </testsuite>
