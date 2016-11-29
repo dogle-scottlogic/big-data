@@ -4,3 +4,15 @@ cassandra-vs-mariadb/BigDataProject2WithMavennbproject/nbbuild/
 cassandra-vs-mariadb/BigDataProject2WithMavennbproject/dist/
 cassandra-vs-mariadb/BigDataProject2WithMavennbproject/nbdist/
 cassandra-vs-mariadb/BigDataProject2WithMavennbproject/.nb-gradle/
+**/target/
+**/pom.xml.tag
+**/pom.xml.releaseBackup
+**/pom.xml.versionsBackup
+**/pom.xml.next
+**/release.properties
+**/dependency-reduced-pom.xml
+**/buildNumber.properties
+**/.mvn/timing.properties
+
+# Exclude maven wrapper
+!/**/.mvn/wrapper/maven-wrapper.jar
