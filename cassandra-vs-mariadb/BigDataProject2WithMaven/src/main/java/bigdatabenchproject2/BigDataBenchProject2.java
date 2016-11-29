@@ -10,6 +10,7 @@ import com.scottlogic.cassandravsmariadb.services.ClientService;
 import com.scottlogic.cassandravsmariadb.entities.Client;
 import com.scottlogic.cassandravsmariadb.entities.Order;
 import com.scottlogic.cassandravsmariadb.entities.Product;
+import com.scottlogic.cassandravsmariadb.services.ProductService;
 import generators.ClientGenerator;
 import generators.LineItemGenerator;
 import generators.OrderGenerator;
@@ -27,8 +28,9 @@ public class BigDataBenchProject2 {
     
     public static void main(String[] args) {
         AbstractApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-        ClientService clientService = (ClientService) context.getBean("clientService");
-        
+//        ClientService clientService = (ClientService) context.getBean("clientService");
+        ProductService productService = (ProductService) context.getBean("productService");
+
         int seed = 3423423;
         Random random = new Random(seed);
         
@@ -44,21 +46,22 @@ public class BigDataBenchProject2 {
         ArrayList<Product> products = new ArrayList<>();
         ArrayList<Order> orders = new ArrayList<>();
         
-        clientGenerator = new ClientGenerator(random);
-        clients.addAll(clientGenerator.getClients(nClients));
+//        clientGenerator = new ClientGenerator(random);
+//        clients.addAll(clientGenerator.getClients(nClients));
         
-//        productGenerator = new ProductGenerator(random);
-//        products.addAll(productGenerator.generateProducts(nProducts));
+        productGenerator = new ProductGenerator(random);
+        products.addAll(productGenerator.generateProducts(nProducts));
+        
+        products.forEach(product -> productService.saveProduct(product));
 //        
 //        lineItemGenerator = new LineItemGenerator(random, products);
         
         
         // For Each Client, generate orders.
-        clients.forEach(client -> {
-            clientService.saveClient(client);
+//        clients.forEach(client -> {
 //            OrderGenerator orderGenerator = new OrderGenerator(random, lineItemGenerator, client);
 //            orders.addAll(orderGenerator.generateOrders(nOrderLimit));
-        });
+//        });
     }
 
 }

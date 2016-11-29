@@ -1,4 +1,8 @@
 -------------------------------------------------------------------------------
 Test set: generators.LineItemGeneratorTest
 -------------------------------------------------------------------------------
+<<<<<<< 689c23db2d4ad4457b920ca6c2ed3a964a64b63d
 Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.002 sec
+=======
+Tests run: 3, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.005 sec
+>>>>>>> Add persistence to Product entity
