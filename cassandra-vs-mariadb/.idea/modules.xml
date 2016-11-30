@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mariadb-vs-cassandra.iml" filepath="$PROJECT_DIR$/.idea/modules/mariadb-vs-cassandra.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mariadb-vs-cassandra_main.iml" filepath="$PROJECT_DIR$/.idea/modules/mariadb-vs-cassandra_main.iml" group="mariadb-vs-cassandra" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/mariadb-vs-cassandra_test.iml" filepath="$PROJECT_DIR$/.idea/modules/mariadb-vs-cassandra_test.iml" group="mariadb-vs-cassandra" />
+    </modules>
+  </component>
+</project>
