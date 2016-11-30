@@ -22,6 +22,7 @@ public class EventGeneratorTest {
     ProductGenerator pg;
     LineItemGenerator lig;
     Client client;
+    ClientGenerator cg;
 
     public EventGeneratorTest() {
 
@@ -40,7 +41,7 @@ public class EventGeneratorTest {
         this.random = new Random(this.seed);
         this.pg = new ProductGenerator(this.random);
         this.lig = new LineItemGenerator(this.random, this.pg, 5);
-        ClientGenerator cg = new ClientGenerator(this.random);
+        cg = new ClientGenerator(this.random);
         this.client = cg.generateClient();
         this.og = new OrderGenerator(this.random, lig, this.client);
     }
@@ -51,9 +52,8 @@ public class EventGeneratorTest {
 
     @Test
     public void generateCreateEvent() throws Exception {
-        EventGenerator eg = new EventGenerator();
-        Order myOrder = og.generateOrder();
-        Event newEvent = eg.generateCreateEvent(myOrder);
+        EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
+        Event newEvent = eg.generateCreateEvent();
 
         Assert.assertNotNull(newEvent);
         Assert.assertNotNull(newEvent.getData());

@@ -26,13 +26,16 @@ public class EventGenerator implements Runnable {
 
     public void run() {
         while(true) {
+            Event newEvent = null;
             // Get an event type
             EventType type = getEventType();
             switch (type) {
                 case CREATE:
-                    generateCreateEvent();
+                    newEvent = generateCreateEvent();
                     break;
             }
+            // Emit event
+
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
@@ -67,6 +70,7 @@ public class EventGenerator implements Runnable {
         System.out.println("data: " + createEvent.getData().toString());
 
         Event event = new Event(EventType.CREATE, order);
+
         return event;
     }
 }
