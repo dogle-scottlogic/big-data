@@ -46,9 +46,14 @@ public class Main {
         // Add to list of raised orders
         orderList.put(order.getId(), order);
         // Create Event
+
+
+
         Event createEvent = new Event<Order>(EventType.CREATE, order);
+
         System.out.println("Created event: ");
         System.out.println("Type: " + createEvent.getType());
         System.out.println("data: " + createEvent.getData().toString());
+
     }
 }
