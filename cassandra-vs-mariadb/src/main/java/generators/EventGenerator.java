@@ -4,6 +4,7 @@ import entities.Client;
 import entities.Event;
 import entities.Order;
 import enums.Enums.EventType;
+import transmission.Emitter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +26,7 @@ public class EventGenerator implements Runnable {
     }
 
     public void run() {
-        while(true) {
+         while(true) {
             Event newEvent = null;
             // Get an event type
             EventType type = getEventType();
@@ -35,6 +36,7 @@ public class EventGenerator implements Runnable {
                     break;
             }
             // Emit event
+            Emitter.emitEvent(newEvent);
 
             try {
                 Thread.sleep(2000);
@@ -42,6 +44,7 @@ public class EventGenerator implements Runnable {
                 e.printStackTrace();
             }
         }
+
     }
 
     private EventType getEventType() {

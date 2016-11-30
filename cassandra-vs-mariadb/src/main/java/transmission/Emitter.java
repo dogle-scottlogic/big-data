@@ -1,10 +1,11 @@
+package transmission;
+
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import entities.Event;
 
 import java.io.IOException;
-import java.util.concurrent.TimeoutException;
 
 /**
  * Created by lcollingwood on 30/11/2016.
@@ -21,8 +22,8 @@ public class Emitter {
         try {
             Emitter.factory = new ConnectionFactory();
             factory.setHost(HOST_NAME);
-            Emitter.channel = connection.createChannel();
             Emitter.connection = Emitter.factory.newConnection();
+            Emitter.channel = connection.createChannel();
             Emitter.channel.queueDeclare(QUEUE_NAME, false, false, false, null);
         } catch (Exception e) {
             e.printStackTrace();

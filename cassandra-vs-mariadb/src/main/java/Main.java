@@ -3,6 +3,7 @@ import entities.Order;
 import enums.Enums.EventType;
 import generators.*;
 import entities.Client;
+import transmission.Emitter;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -29,8 +30,10 @@ public class Main {
 
         EventGenerator eg = new EventGenerator(clients, random);
         thread = new Thread(eg);
+        Emitter.initialize();
         thread.start();
         System.in.read();
         thread.stop();
+        Emitter.end();
     }
 }
