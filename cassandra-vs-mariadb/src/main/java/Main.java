@@ -1,3 +1,4 @@
+import entities.Order;
 import generators.ClientGenerator;
 import entities.Client;
 import generators.LineItemGenerator;
@@ -15,6 +16,9 @@ public class Main {
 
     public static void main(String[] args) {
 
+        OrderGenerator og;
+        ArrayList<Order> orders = new ArrayList<Order>();
+
         int seed = 12345;
         int numProducts = 11;
         int numClients = 11;
@@ -26,12 +30,14 @@ public class Main {
 
         ArrayList<Client> clients = cg.getClients(numClients);
 
+        // Add orders to the list for each client
         for (Client client:clients) {
-            OrderGenerator og = new OrderGenerator(rand, lig, client);
-            ArrayList<entities.Order> orders = og.generateOrders(numOrders);
-            for (entities.Order order: orders) {
-                System.out.println(order.getId());
-            }
+             og = new OrderGenerator(rand, lig, client);
+            orders.addAll(og.generateOrders(numOrders));
+        }
+
+        for (Order order:orders) {
+            System.out.println(order.getId());
         }
     }
 }
