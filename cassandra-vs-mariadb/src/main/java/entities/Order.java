@@ -8,13 +8,13 @@ import java.util.UUID;
  * @author lcollingwood
  */
 public class Order {
-    private UUID id;
+    private String id;
     private ArrayList<LineItem> lineItems;
     private Client client;
     private double subTotal;
 
     public Order(UUID id, ArrayList<LineItem> lineItems, Client client) {
-        this.id = id;
+        this.id = id.toString();
         this.lineItems = lineItems;
         this.client = client;
     }
@@ -27,12 +27,12 @@ public class Order {
         return subTotal;
     }
     
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
     public void setId(UUID id) {
-        this.id = id;
+        this.id = id.toString();
     }
 
     public ArrayList<LineItem> getLineItems() {

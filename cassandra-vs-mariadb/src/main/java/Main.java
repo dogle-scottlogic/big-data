@@ -1,12 +1,14 @@
+import entities.Event;
 import entities.Order;
+import enums.Enums.EventType;
 import generators.ClientGenerator;
 import entities.Client;
 import generators.LineItemGenerator;
 import generators.OrderGenerator;
 import generators.ProductGenerator;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 
 /**
@@ -14,30 +16,39 @@ import java.util.Random;
  */
 public class Main {
 
+    private static final int seed = 123435;
+    private static Random random = new Random(seed);
+
+    private static ArrayList<Client> clients = new ArrayList<Client>();
+    private static final ClientGenerator clientGen = new ClientGenerator(random);
+    private static final int numClients = 20;
+
+
+    private static HashMap<String, Order> orderList = new HashMap<String, Order>();
+
     public static void main(String[] args) {
 
-        OrderGenerator og;
-        ArrayList<Order> orders = new ArrayList<Order>();
+        // Create a list of clients
+        clients = clientGen.getClients(numClients);
 
-        int seed = 12345;
-        int numProducts = 11;
-        int numClients = 11;
-        int numOrders = 11;
+        /*
+        Raise a create event
+        Select a random client
+        */
+        Client client = clients.get(random.nextInt(clients.size()));
 
-        Random rand = new Random(seed);
-        LineItemGenerator lig = new LineItemGenerator(rand, new ProductGenerator(rand), numProducts);
-        ClientGenerator cg = new ClientGenerator(rand);
+        //raise an order
+        ProductGenerator pg = new ProductGenerator(random);
+        LineItemGenerator lig = new LineItemGenerator(random, pg, random.nextInt(20) + 1);
+        OrderGenerator og = new OrderGenerator(random, lig, client);
+        Order order = og.generateOrder();
 
-        ArrayList<Client> clients = cg.getClients(numClients);
-
-        // Add orders to the list for each client
-        for (Client client:clients) {
-             og = new OrderGenerator(rand, lig, client);
-            orders.addAll(og.generateOrders(numOrders));
-        }
-
-        for (Order order:orders) {
-            System.out.println(order.getId());
-        }
+        // Add to list of raised orders
+        orderList.put(order.getId(), order);
+        // Create Event
+        Event createEvent = new Event<Order>(EventType.CREATE, order);
+        System.out.println("Created event: ");
+        System.out.println("Type: " + createEvent.getType());
+        System.out.println("data: " + createEvent.getData().toString());
     }
 }
