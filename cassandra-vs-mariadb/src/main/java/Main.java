@@ -33,7 +33,7 @@ public class Main {
         Emitter.initialize();
         thread.start();
         System.in.read();
-        thread.stop();
+//        thread.stop();
         Emitter.end();
     }
 }

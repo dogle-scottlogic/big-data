@@ -20,11 +20,11 @@ public class Emitter {
 
     public static void initialize() {
         try {
-            Emitter.factory = new ConnectionFactory();
+            factory = new ConnectionFactory();
             factory.setHost(HOST_NAME);
-            Emitter.connection = Emitter.factory.newConnection();
-            Emitter.channel = connection.createChannel();
-            Emitter.channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+            connection = factory.newConnection();
+            channel = connection.createChannel();
+            channel.queueDeclare(QUEUE_NAME, false, false, false, null);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -32,8 +32,8 @@ public class Emitter {
 
     public static void end() {
         try {
-            Emitter.channel.close();
-            Emitter.connection.close();
+            channel.close();
+            connection.close();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class Emitter {
         System.out.println(" SENT: " + jsonOrder);
 
         try {
-            Emitter.channel.basicPublish("", QUEUE_NAME, null, jsonOrder.getBytes());
+            channel.basicPublish("", QUEUE_NAME, null, jsonOrder.getBytes());
         } catch (IOException e1) {
             e1.printStackTrace();
         }
