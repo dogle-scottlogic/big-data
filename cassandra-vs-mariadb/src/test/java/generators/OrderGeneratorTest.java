@@ -67,8 +67,6 @@ public class OrderGeneratorTest {
             this.og = new OrderGenerator(this.random, this.lig, this.client);
             ArrayList<Order> orderList2 = og.generateOrders(5);
             for (int i = 0; i < orderList.size(); i++) {
-            System.out.println(orderList.get(i).getSubTotal());
-            System.out.println(orderList2.get(i).getSubTotal());
             assertEquals(0, Double.doubleToLongBits(orderList.get(i).getSubTotal()), Double.doubleToLongBits(orderList2.get(i).getSubTotal()));
         }
     }

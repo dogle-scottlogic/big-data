@@ -26,16 +26,14 @@ public class JsonLoader {
     }
 
     public JSONObject loadJson() {
-        this.filePath = new File("").getAbsolutePath().concat(this.filePath);
-
+        String absPath = new File("").getAbsolutePath().concat(this.filePath);
         JSONParser parser = new JSONParser();
 
         try {
 
-            Object obj = parser.parse(new FileReader(this.filePath));
+            Object obj = parser.parse(new FileReader(absPath));
 
             JSONObject jsonObject = (JSONObject) obj;
-
             return jsonObject;
 
         } catch (FileNotFoundException e) {

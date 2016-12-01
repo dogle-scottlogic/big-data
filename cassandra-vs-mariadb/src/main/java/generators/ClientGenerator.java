@@ -17,13 +17,11 @@ import java.util.UUID;
 public class ClientGenerator {
 
     private final Random random;
-    private final String[] names;
-    private final String[] addresses;
+    private final DataGenerator dataGenerator;
 
     public ClientGenerator(Random random) {
         this.random = random;
-        this.names = getFirstNames(); // load from file
-        this.addresses = getAddresses();
+        this.dataGenerator = new DataGenerator(random);;
     }
 
     public ArrayList<Client> getClients(int number) {
@@ -36,53 +34,10 @@ public class ClientGenerator {
     
     public Client generateClient() {
         UUID clientUUID = UUID.randomUUID();
-        String name = this.names[random.nextInt(this.names.length)];
-        String address = this.addresses[random.nextInt(this.addresses.length)];
-        String email = getEmail(name);
+        String name = dataGenerator.getNames(1)[0];
+        String address = dataGenerator.getAddresses(1)[0];
+        String email = dataGenerator.getEmail(name);
         Client newClient = new Client(clientUUID, name, address, email);
         return newClient;
-    }
-
-    private String[] getFirstNames() {
-        String[] mynames
-                = {
-                    "Helen Erickson",
-                    "Alexis Dean",
-                    "Georgia Webb",
-                    "George Lloyd",
-                    "Rick Richardson",
-                    "Toni Reid",
-                    "Brenda Pearson",
-                    "Melba Patrick",
-                    "Sylvia Cortez",
-                    "Marlene Olson",
-                    "Joan Marsh",
-                    "Lamar Mckenzie",
-                    "Ralph Sparks",
-                    "Henry Nguyen",
-                    "Gary Hunter"
-                };
-        return mynames;
-    }
-
-    private String[] getAddresses() {
-        String[] myAdd = {
-            "1/3 Peffermill Rd, Edinburgh EH16 5LE, UK",
-            "11C Niddrie Marischal Gardens, Edinburgh EH16 4LX, UK",
-            "60 Priestfield Rd, Edinburgh EH16 5JA, UK",
-            "33 Old Dalkeith Rd, Edinburgh EH16 4TE, UK",
-            "1 Craigmillar Park, Edinburgh EH16 5PG, UK",
-            "12-20 A701, Edinburgh EH16, UK",
-            "12-4 Burnhead Cres, Edinburgh EH16 6EA, UK",
-            "21 Hay Gardens, Edinburgh EH16 4QY, UK",
-            "4 Captain's Dr, Edinburgh EH16 6QE, UK",
-            "5 Savile Terrace, Edinburgh EH9, UK",
-            "Steedman Row, Edinburgh EH16, UK"
-        };
-        return myAdd;
-    }
-
-    private String getEmail(String name) {
-        return name.replaceAll("\\s+","") + "@fakemail.com";
     }
 }

@@ -34,4 +34,28 @@ public class DataGenerator {
         return names;
     }
 
+    public String[] getAddresses(int num) {
+        if(num == 0) return new String[]{};
+
+        String[] addresses = new String[num];
+
+        JSONObject client = this.jsonLoader.getJsonField("Client");
+        JSONArray streetNames = (JSONArray)client.get("streetName");
+        JSONArray streetTypes = (JSONArray)client.get("streetType");
+        JSONArray towns = (JSONArray)client.get("town");
+
+        for(int i = 0; i < num; i++) {
+            String address = Integer.toString(random.nextInt(998) + 1);
+            address+= (", " + streetNames.get(random.nextInt(streetNames.size())));
+            address+= (" " + streetTypes.get(random.nextInt(streetTypes.size())));
+            address+= (", " + towns.get(random.nextInt(towns.size())));
+            addresses[i] = address;
+        }
+        return  addresses;
+    }
+
+    public String getEmail(String name) {
+        return name.replaceAll("\\s+","") + "@fakemail.com";
+    }
+
 }
