@@ -26,7 +26,8 @@ public class EventGenerator implements Runnable {
     }
 
     public void run() {
-         while(true) {
+        boolean interrupted = false;
+         while(!interrupted) {
             Event newEvent = null;
             // Get an event type
             EventType type = getEventType();
@@ -41,7 +42,9 @@ public class EventGenerator implements Runnable {
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                interrupted = true;
+                System.out.println("Stopping: ");
+                System.out.println(e.getMessage());
             }
         }
 
