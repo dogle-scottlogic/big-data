@@ -47,7 +47,6 @@ public class EventGenerator implements Runnable {
                 System.out.println(e.getMessage());
             }
         }
-
     }
 
     private EventType getEventType() {

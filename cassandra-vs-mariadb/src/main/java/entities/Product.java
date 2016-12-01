@@ -8,11 +8,9 @@ import java.util.UUID;
  *
  * @author lcollingwood
  */
-public class Product {
+public abstract class Product {
     private String id;
     private String name;
-    private List<String> availableColours;
-    private List<String> availableSizes;
     private double weight;
     private double price;
 
@@ -20,14 +18,10 @@ public class Product {
         UUID id, 
         String name, 
         double price,
-        double weight, 
-        ArrayList<String> availableColours, 
-        ArrayList<String> availableSizes
+        double weight
     ) {
         this.id = id.toString();
         this.name = name;
-        this.availableColours = availableColours;
-        this.availableSizes = availableSizes;
         this.weight = weight;
         this.price = price;
     }
@@ -46,22 +40,6 @@ public class Product {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<String> getColors() {
-        return availableColours;
-    }
-
-    public void setColors(List<String> colors) {
-        this.availableColours = colors;
-    }
-
-    public List<String> getSizes() {
-        return availableSizes;
-    }
-
-    public void setSizes(ArrayList<String> sizes) {
-        this.availableSizes = sizes;
     }
 
     public double getWeight() {

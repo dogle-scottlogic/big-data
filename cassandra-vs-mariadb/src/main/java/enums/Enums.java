@@ -8,4 +8,8 @@ public class Enums {
     public enum EventType {
         CREATE, UPDATE, DELETE
     }
+
+    public enum ProductType {
+        HAT
+    }
 }

@@ -5,11 +5,15 @@
  */
 package generators;
 
+import entities.Hat;
 import entities.Product;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.UUID;
+
+import enums.Enums;
+import enums.Enums.ProductType;
 
 /**
  *
@@ -39,17 +43,21 @@ public class ProductGenerator {
         this.random = random;
     }
 
-    public Product generateProduct() {
+    public Product generateProduct(ProductType productType) {
         UUID id = UUID.randomUUID();
-        String name = this.generateName();
-        double price = this.generatePrice();
-        double weight = this.generateWeight();
-        ArrayList<String> availableColours = this.generateAvailableColours();
-        ArrayList<String> availableSizes = this.generateAvailableSizes();
+        Product product = null;
 
-        Product product = new Product(
-                id, name, price, weight, availableColours, availableSizes
-        );
+        switch(productType) {
+            case HAT:
+                String name = this.generateName();
+                double price = this.generatePrice();
+                double weight = this.generateWeight();
+                ArrayList<String> availableColours = this.generateAvailableColours();
+                ArrayList<String> availableSizes = this.generateAvailableSizes();
+
+                product = new Hat(id, name, availableColours, availableSizes, price, weight);
+                break;
+        }
         return product;
     }
 
@@ -86,10 +94,10 @@ public class ProductGenerator {
         );
     }
 
-    public ArrayList<Product> generateProducts(int n) {
+    public ArrayList<Product> generateProducts(int n, ProductType productType) {
         ArrayList<Product> generatedProducts = new ArrayList();
         for (int i = 0; i < n; i++) {
-            generatedProducts.add(this.generateProduct());
+            generatedProducts.add(this.generateProduct(productType));
         }
         return generatedProducts;
     }
