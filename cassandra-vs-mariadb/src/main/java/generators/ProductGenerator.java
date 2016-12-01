@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.UUID;
 
-import enums.Enums;
 import enums.Enums.ProductType;
 
 /**

@@ -3,6 +3,7 @@ package generators;
 import entities.Client;
 import entities.Event;
 import entities.Order;
+import enums.Enums.ProductType;
 import enums.Enums.EventType;
 import transmission.Emitter;
 
@@ -62,7 +63,8 @@ public class EventGenerator implements Runnable {
 
         //raise an order
         ProductGenerator pg = new ProductGenerator(random);
-        LineItemGenerator lig = new LineItemGenerator(random, pg, random.nextInt(20) + 1);
+        ProductType[] productList = {ProductType.HAT};
+        LineItemGenerator lig = new LineItemGenerator(random, pg, productList);
         OrderGenerator og = new OrderGenerator(random, lig, client);
         Order order = og.generateOrder();
 

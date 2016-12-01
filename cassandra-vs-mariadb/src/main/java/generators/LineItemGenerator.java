@@ -5,11 +5,12 @@
  */
 package generators;
 
+import entities.Hat;
 import entities.LineItem;
-import entities.Product;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
+import enums.Enums.ProductType;
 
 /**
  *
@@ -18,36 +19,45 @@ import java.util.UUID;
 public class LineItemGenerator {
 
     private final Random random;
-    private final ArrayList<Product> products;
+    private final ProductGenerator productGenerator;
+    private final ProductType[] productList;
 
-    public LineItemGenerator(Random random, ProductGenerator productGenerator, int numProducts) {
+    public LineItemGenerator(Random random, ProductGenerator productGenerator, ProductType[] productList) {
         this.random = random;
-        this.products = productGenerator.generateProducts(numProducts);
+        this.productGenerator = productGenerator;
+        this.productList = productList;
     }
 
     public ArrayList<LineItem> generateLineItems(int num) {
         ArrayList<LineItem> items = new ArrayList();
         for(int i = 0; i < num; i++) {
-            items.add(generateLineItem());
+            //get a random product
+            int productIndex = random.nextInt(productList.length);
+            ProductType randomProduct = productList[productIndex];
+            items.add(generateLineItem(randomProduct));
         }
         return items;
     }
     
-    public LineItem generateLineItem() {
+    public LineItem generateLineItem(ProductType productType) {
         UUID id = UUID.randomUUID();
-        Product product = getProduct();
-        int quantity = random.nextInt(10) + 1;
-        int colourIndex = random.nextInt(product.getColors().size());
-        String colour = product.getColors().get(colourIndex);
-        int sizeIndex = random.nextInt(product.getSizes().size());
-        String size = product.getSizes().get(sizeIndex);
-        LineItem lineItem = new LineItem(id, product, quantity, colour, size);
-        return lineItem;
+        switch (productType)
+        {
+            case HAT:
+                Hat hat = (Hat)productGenerator.generateProduct(ProductType.HAT);
+                return  getHatLineItem(id, hat);
+        }
+        return null;
     }
     
-    private Product getProduct() {
-       int productIndex = random.nextInt(this.products.size());
-       return this.products.get(productIndex);
+    private LineItem getHatLineItem(UUID id, Hat hat) {
+        int quantity = random.nextInt(10) + 1;
+        int colourIndex = random.nextInt(hat.getAvailableColours().size());
+        String colour = hat.getAvailableColours().get(colourIndex);
+        int sizeIndex = random.nextInt(hat.getAvailableSizes().size());
+        String size = hat.getAvailableSizes().get(sizeIndex);
+        LineItem lineItem = new LineItem(id, hat, quantity, colour, size);
+        return lineItem;
     }
 
 }
