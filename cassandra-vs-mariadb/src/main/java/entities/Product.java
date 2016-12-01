@@ -1,7 +1,7 @@
 package entities;
 
-import java.util.ArrayList;
-import java.util.List;
+import enums.Enums.ProductType;
+
 import java.util.UUID;
 
 /**
@@ -10,17 +10,20 @@ import java.util.UUID;
  */
 public abstract class Product {
     private String id;
+    private ProductType productType;
     private String name;
     private double weight;
     private double price;
 
     public Product(
-        UUID id, 
+        UUID id,
+        ProductType productType,
         String name, 
         double price,
         double weight
     ) {
         this.id = id.toString();
+        this.productType = productType;
         this.name = name;
         this.weight = weight;
         this.price = price;
@@ -32,6 +35,14 @@ public abstract class Product {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public ProductType getProductType() {
+        return productType;
+    }
+
+    public void setProductType(ProductType productType) {
+        this.productType = productType;
     }
   
     public String getName() {

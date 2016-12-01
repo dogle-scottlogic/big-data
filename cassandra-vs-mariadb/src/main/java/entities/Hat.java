@@ -1,5 +1,7 @@
 package entities;
 
+import enums.Enums.ProductType;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -13,13 +15,14 @@ public class Hat extends Product {
 
     public Hat(
             UUID id,
+            ProductType productType,
             String name,
             List<String>availableColours,
             List<String> availableSizes,
             double weight,
             double price
             ) {
-        super(id, name, weight, price);
+        super(id, productType, name, weight, price);
         this.availableColours = availableColours;
         this.availableSizes = availableSizes;
     }

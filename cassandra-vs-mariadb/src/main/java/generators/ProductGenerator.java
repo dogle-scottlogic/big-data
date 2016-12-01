@@ -46,7 +46,7 @@ public class ProductGenerator {
                 double weight = dg.generatePriceWeight(1, 1000);
                 ArrayList<String> availableColours = hatData.get("colours");
                 ArrayList<String> availableSizes = hatData.get("sizes");
-                product = new Hat(id, name, availableColours, availableSizes, price, weight);
+                product = new Hat(id, ProductType.HAT, name, availableColours, availableSizes, price, weight);
                 break;
         }
         return product;
