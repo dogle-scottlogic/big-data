@@ -4,6 +4,7 @@ import data_handlers.JsonLoader;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -58,4 +59,33 @@ public class DataGenerator {
         return name.replaceAll("\\s+","") + "@fakemail.com";
     }
 
+    public HashMap<String, ArrayList<String>> getHatData() {
+        HashMap<String, ArrayList<String>> hatData = new HashMap<String, ArrayList<String>>();
+
+        JSONObject hat = this.jsonLoader.getJsonField("Hat");
+        JSONArray names = (JSONArray)hat.get("productNames");
+        JSONArray colours = (JSONArray)hat.get("productColours");
+        JSONArray sizes = (JSONArray)hat.get("productSizes");
+
+        ArrayList<String> nameList = new ArrayList<String>();
+        nameList.add((String)names.get(random.nextInt(names.size())));
+
+        ArrayList<String> colourList = new ArrayList<String>();
+        colourList.addAll(colours);
+
+        ArrayList<String> sizeList = new ArrayList<String>();
+        sizeList.addAll(sizes);
+
+        hatData.put("name", nameList);
+        hatData.put("colours", colourList);
+        hatData.put("sizes", sizeList);
+        return hatData;
+    }
+
+    public double generatePriceWeight(int min, int max) {
+        double price = (double)this.random.nextInt(max) + min;
+        if(price > max) price = max;
+        double pennies = (this.random.nextInt(99) + 1)/(double)100;
+        return  price + pennies;
+    }
 }
