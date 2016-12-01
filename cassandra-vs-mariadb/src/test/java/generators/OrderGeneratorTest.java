@@ -2,6 +2,7 @@ package generators;
 
 import entities.Client;
 import entities.Order;
+import enums.Enums;
 import org.junit.*;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class OrderGeneratorTest {
     ProductGenerator pg;
     LineItemGenerator lig;
     Client client;
+    Enums.ProductType[] productList = {Enums.ProductType.HAT};
 
     public OrderGeneratorTest() {
 
@@ -35,9 +37,10 @@ public class OrderGeneratorTest {
 
     @Before
     public void setUp() {
+
         this.random = new Random(this.seed);
         this.pg = new ProductGenerator(this.random);
-        this.lig = new LineItemGenerator(this.random, this.pg, 5);
+        this.lig = new LineItemGenerator(this.random, this.pg, this.productList);
         ClientGenerator cg = new ClientGenerator(this.random);
             this.client = cg.generateClient();
             this.og = new OrderGenerator(this.random, lig, this.client);
@@ -58,7 +61,7 @@ public class OrderGeneratorTest {
 
             this.random = new Random(this.seed);
             this.pg = new ProductGenerator(this.random);
-            this.lig = new LineItemGenerator(this.random, this.pg, 5);
+            this.lig = new LineItemGenerator(this.random, this.pg, this.productList);
             ClientGenerator cg = new ClientGenerator(this.random);
             this.client = cg.generateClient();
             this.og = new OrderGenerator(this.random, this.lig, this.client);

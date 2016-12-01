@@ -1,5 +1,7 @@
 package generators;
 
+import entities.Hat;
+import enums.Enums;
 import org.junit.*;
 
 import java.util.ArrayList;
@@ -40,12 +42,12 @@ public class ProductGeneratorTest {
         System.out.println("generateProducts - With random seed");
         Random random = new Random(1234);
         ProductGenerator pg = new ProductGenerator(random);
-        ArrayList<Product> productList = pg.generateProducts(5);
+        ArrayList<Product> productList = pg.generateProducts(5, Enums.ProductType.HAT);
         assertEquals(productList.size(), 5);
 
         random = new Random(1234);
         pg = new ProductGenerator(random);
-        ArrayList<Product> productList2 = pg.generateProducts(5);
+        ArrayList<Product> productList2 = pg.generateProducts(5, Enums.ProductType.HAT);
         for (int i = 0; i < productList.size(); i++) {
             assertEquals(productList.get(i).getName(), productList2.get(i).getName());
         }
@@ -59,7 +61,7 @@ public class ProductGeneratorTest {
         System.out.println("generateProducts - With Random Seed - Empty List");
         Random random = new Random(1234);
         ProductGenerator pg = new ProductGenerator(random);
-        ArrayList<Product> productList = pg.generateProducts(0);
+        ArrayList<Product> productList = pg.generateProducts(0, Enums.ProductType.HAT);
         assertEquals(productList.size(), 0);
     }
 
@@ -67,17 +69,17 @@ public class ProductGeneratorTest {
      * Test of generateProducts method, of class ProductGenerator.
      */
     @Test
-    public void testGenerateProduct() {
-        System.out.println("generateProduct - With random seed");
+    public void testGenerateProductHat() {
+        System.out.println("generateProduct - With random seed - HAT");
         Random random = new Random(1234);
         ProductGenerator pg = new ProductGenerator(random);
-        Product testClient = pg.generateProduct();
+        Hat testHat = (Hat)pg.generateProduct(Enums.ProductType.HAT);
 
-        assertNotNull(testClient.getName());
-        assertNotNull(testClient.getColors());
-        assertNotNull(testClient.getId());
-        assertNotNull(testClient.getPrice());
-        assertNotNull(testClient.getSizes());
-        assertNotNull(testClient.getWeight());
+        assertNotNull(testHat.getName());
+        assertNotNull(testHat.getAvailableColours());
+        assertNotNull(testHat.getId());
+        assertNotNull(testHat.getPrice());
+        assertNotNull(testHat.getAvailableSizes());
+        assertNotNull(testHat.getWeight());
     }
 }

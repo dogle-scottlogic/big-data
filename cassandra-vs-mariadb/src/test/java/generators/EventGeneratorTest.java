@@ -40,7 +40,8 @@ public class EventGeneratorTest {
     public void setUp() {
         this.random = new Random(this.seed);
         this.pg = new ProductGenerator(this.random);
-        this.lig = new LineItemGenerator(this.random, this.pg, 5);
+        Enums.ProductType[] productList = {Enums.ProductType.HAT};
+        this.lig = new LineItemGenerator(this.random, this.pg, productList);
         cg = new ClientGenerator(this.random);
         this.client = cg.generateClient();
         this.og = new OrderGenerator(this.random, lig, this.client);
