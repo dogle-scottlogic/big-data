@@ -22,7 +22,7 @@ public class ClientGenerator {
 
     public ClientGenerator(Random random) {
         this.random = random;
-        this.names = getFirstNames();
+        this.names = getFirstNames(); // load from file
         this.addresses = getAddresses();
     }
 
