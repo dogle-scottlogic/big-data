@@ -3,12 +3,14 @@ package generators;
 import entities.Client;
 import entities.Event;
 import entities.Order;
+import enums.Enums;
 import enums.Enums.ProductType;
 import enums.Enums.EventType;
 import transmission.Emitter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -16,10 +18,11 @@ import java.util.Random;
  */
 public class EventGenerator implements Runnable {
 
-    private final EventType[] eventList = {EventType.CREATE};
-    private static HashMap<String, Order> orderList = new HashMap<String, Order>();
+    private final EventType[] eventList = {EventType.CREATE}; //TODO put back in Enums.EventType.values();
+    private HashMap<String, Order> orderList = new HashMap<String, Order>();
     private ArrayList<Client> clientList;
     private Random random;
+    private final int totalStoredOrders = 20; //TODO config file
 
     public EventGenerator(ArrayList<Client> clientList, Random random) {
         this.clientList = clientList;
@@ -28,7 +31,7 @@ public class EventGenerator implements Runnable {
 
     public void run() {
         boolean interrupted = false;
-         while(!interrupted) {
+        while (!interrupted) {
             Event newEvent = null;
             // Get an event type
             EventType type = getEventType();
@@ -36,22 +39,21 @@ public class EventGenerator implements Runnable {
                 case CREATE:
                     newEvent = generateCreateEvent();
                     break;
+                case UPDATE:
+                    newEvent = generateUpdateEvent();
             }
-            // Emit event
-            Emitter.emitEvent(newEvent);
-
             try {
-                Thread.sleep(2000);
+                // Emit event
+                Emitter.emitEvent(newEvent);
+                addOrderToList((Order) newEvent.getData());
+                Thread.sleep(2000); //TODO move to config file
             } catch (InterruptedException e) {
                 interrupted = true;
                 System.out.println("Stopping: ");
                 System.out.println(e.getMessage());
             }
-        }
-    }
 
-    private EventType getEventType() {
-        return eventList[random.nextInt(eventList.length)];
+        }
     }
 
     public Event generateCreateEvent() {
@@ -67,17 +69,48 @@ public class EventGenerator implements Runnable {
         LineItemGenerator lig = new LineItemGenerator(random, pg, productList);
         OrderGenerator og = new OrderGenerator(random, lig, client);
         Order order = og.generateOrder();
-
-        // Add to list of raised orders
-        orderList.put(order.getId(), order);
         // Create Event
         Event createEvent = new Event<Order>(EventType.CREATE, order);
-        System.out.println("Created event: ");
+        System.out.println("Event raised: ");
         System.out.println("Type: " + createEvent.getType());
-        System.out.println("data: " + createEvent.getData().toString());
-
         Event event = new Event(EventType.CREATE, order);
-
         return event;
     }
-}
+
+    public Event generateUpdateEvent() {
+                /*
+        Raise an update event
+        Select a random order
+        */
+        String randomOrderId = this.orderList.keySet().toArray()[this.random.nextInt(this.orderList.keySet().toArray().length)].toString();
+        Order updateOrder = this.orderList.get(randomOrderId);
+
+        // Modify the order in some way
+        return null;
+    }
+
+    public HashMap<String, Order> getOrderList() {
+        return this.orderList;
+    }
+
+    public Order getOrderById(String id) {
+        return this.orderList.get(id);
+    }
+
+    public int getTotalStoredOrders() {
+        return this.totalStoredOrders;
+    }
+
+    public void addOrderToList(Order order) {
+        if(this.orderList.size() >= this.totalStoredOrders) {
+            String toRemove = (this.orderList.keySet()).toArray()[0].toString();
+            orderList.remove(toRemove);
+        }
+        // Add to list of raised orders
+        orderList.put(order.getId(), order);
+    }
+
+    private EventType getEventType() {
+        return eventList[random.nextInt(eventList.length)];
+    }
+    }

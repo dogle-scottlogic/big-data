@@ -12,7 +12,7 @@ import java.util.Random;
 public class Main {
 
     private static Thread thread = null;
-    private static final int seed = 123435;
+    private static final int seed = 123435; //TODO config file
     private static Random random = new Random(seed);
 
     private static ArrayList<Client> clients = new ArrayList<Client>();

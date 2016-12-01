@@ -64,4 +64,32 @@ public class EventGeneratorTest {
         assertThat(newEvent.getData(), instanceOf(Order.class));
     }
 
+    @Test
+    public void addOrderToList() {
+        EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
+
+        for(int i = 0; i < eg.getTotalStoredOrders(); i++) {
+            Event newEvent = eg.generateCreateEvent();
+            eg.addOrderToList((Order)newEvent.getData());
+        }
+        assertTrue(eg.getOrderList().size() == eg.getTotalStoredOrders());
+        Event newEvent = eg.generateCreateEvent();
+        eg.addOrderToList((Order)newEvent.getData());
+        assertTrue(eg.getOrderList().size() == eg.getTotalStoredOrders());
+        assertTrue(eg.getOrderList().containsKey(((Order) newEvent.getData()).getId()));
+    }
+
+    @Test
+    public void generateUpdateEvent() throws Exception {
+        EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
+        Event newEvent = eg.generateUpdateEvent();
+
+        Assert.assertNotNull(newEvent);
+        Assert.assertNotNull(newEvent.getData());
+        Assert.assertNotNull(newEvent.getType());
+
+        assertEquals(Enums.EventType.UPDATE, newEvent.getType());
+        assertThat(newEvent.getData(), instanceOf(Order.class));
+    }
+
 }
