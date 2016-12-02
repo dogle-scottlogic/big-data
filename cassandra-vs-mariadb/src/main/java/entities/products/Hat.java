@@ -1,5 +1,6 @@
-package entities;
+package entities.products;
 
+import entities.Product;
 import enums.Enums.ProductType;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class Hat extends Product {
             UUID id,
             ProductType productType,
             String name,
-            List<String>availableColours,
+            List<String>availableColours, //TODO remove these and make single colour and size?
             List<String> availableSizes,
             double weight,
             double price

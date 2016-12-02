@@ -5,7 +5,8 @@
  */
 package generators;
 
-import entities.Hat;
+import data_handlers.Settings;
+import entities.products.Hat;
 import entities.LineItem;
 import java.util.ArrayList;
 import java.util.Random;
@@ -21,13 +22,13 @@ public class LineItemGenerator {
     private final Random random;
     private final ProductGenerator productGenerator;
     private final ProductType[] productList;
-    private int maxQuantity; //TODO add this to config file
+    private int maxQuantity;
 
     public LineItemGenerator(Random random, ProductGenerator productGenerator, ProductType[] productList) {
         this.random = random;
         this.productGenerator = productGenerator;
         this.productList = productList;
-        this.maxQuantity = 10;
+        this.maxQuantity = Settings.getIntSetting("MAX_PRODUCTS");
     }
 
     public ArrayList<LineItem> generateLineItems(int num) {

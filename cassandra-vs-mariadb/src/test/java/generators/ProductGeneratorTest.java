@@ -1,6 +1,6 @@
 package generators;
 
-import entities.Hat;
+import entities.products.Hat;
 import enums.Enums;
 import org.junit.*;
 

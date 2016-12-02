@@ -1,6 +1,7 @@
 package generators;
 
 import Updaters.OrderUpdater;
+import data_handlers.Settings;
 import entities.Client;
 import entities.Event;
 import entities.Order;
@@ -21,7 +22,7 @@ public class EventGenerator implements Runnable {
     private HashMap<String, Order> orderList = new HashMap<String, Order>();
     private ArrayList<Client> clientList;
     private Random random;
-    private final int totalStoredOrders = 20; //TODO config file
+    private final int totalStoredOrders = Settings.getIntSetting("ORDER_CACHE_SIZE");
 
     public EventGenerator(ArrayList<Client> clientList, Random random) {
         this.clientList = clientList;
@@ -50,13 +51,12 @@ public class EventGenerator implements Runnable {
                 Emitter.emitEvent(newEvent);
                 if(newEvent.getType() == EventType.CREATE) addOrderToList((Order) newEvent.getData());
                 if(newEvent.getType() == EventType.DELETE) removeOrderFromList((String) newEvent.getData());
-                Thread.sleep(2000); //TODO move to config file
+                Thread.sleep(Settings.getIntSetting("SLEEP"));
             } catch (InterruptedException e) {
                 interrupted = true;
                 System.out.println("Stopping: ");
                 System.out.println(e.getMessage());
             }
-
         }
     }
 
@@ -79,8 +79,6 @@ public class EventGenerator implements Runnable {
         Order order = og.generateOrder();
         // Create Event
         Event createEvent = new Event<Order>(EventType.CREATE, order);
-        System.out.println("Event raised: ");
-        System.out.println("Type: " + createEvent.getType());
         Event event = new Event(EventType.CREATE, order);
         return event;
     }

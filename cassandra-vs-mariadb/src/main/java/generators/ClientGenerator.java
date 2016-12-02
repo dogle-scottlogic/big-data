@@ -21,7 +21,7 @@ public class ClientGenerator {
 
     public ClientGenerator(Random random) {
         this.random = random;
-        this.dataGenerator = new DataGenerator(random);;
+        this.dataGenerator = new DataGenerator(random);
     }
 
     public ArrayList<Client> getClients(int number) {

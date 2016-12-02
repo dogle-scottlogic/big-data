@@ -1,8 +1,7 @@
 package Updaters;
 
-import entities.Hat;
+import entities.products.Hat;
 import entities.LineItem;
-import entities.Product;
 import enums.Enums;
 import org.junit.Before;
 import org.junit.Test;

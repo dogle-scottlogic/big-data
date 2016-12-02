@@ -1,3 +1,4 @@
+import data_handlers.Settings;
 import generators.*;
 import entities.Client;
 import transmission.Emitter;
@@ -12,12 +13,12 @@ import java.util.Random;
 public class Main {
 
     private static Thread thread = null;
-    private static final int seed = 123435; //TODO config file
+    private static final int seed = Settings.getIntSetting("SEED");
     private static Random random = new Random(seed);
 
     private static ArrayList<Client> clients = new ArrayList<Client>();
     private static final ClientGenerator clientGen = new ClientGenerator(random);
-    private static final int numClients = 20;
+    private static final int numClients = Settings.getIntSetting("NUM_CLIENTS");
 
     public static void main(String[] args) throws IOException {
 

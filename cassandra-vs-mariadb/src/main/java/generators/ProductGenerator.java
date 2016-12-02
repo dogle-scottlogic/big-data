@@ -5,7 +5,8 @@
  */
 package generators;
 
-import entities.Hat;
+import data_handlers.Settings;
+import entities.products.Hat;
 import entities.Product;
 
 import java.util.*;
@@ -13,14 +14,13 @@ import java.util.*;
 import enums.Enums.ProductType;
 
 /**
- *
  * @author lcollingwood
  */
 public class ProductGenerator {
 
     private Random random;
     private DataGenerator dg;
-    
+
     public ProductGenerator(Random random) {
         this.random = random;
         this.dg = new DataGenerator(this.random);
@@ -38,12 +38,12 @@ public class ProductGenerator {
         UUID id = UUID.randomUUID();
         Product product = null;
 
-        switch(productType) {
+        switch (productType) {
             case HAT:
                 HashMap<String, ArrayList<String>> hatData = dg.getHatData();
                 String name = hatData.get("name").get(0);
-                double price = dg.generatePriceWeight(1, 100);
-                double weight = dg.generatePriceWeight(1, 1000);
+                double price = dg.generatePriceWeight(Settings.getIntHatSetting("MIN_PRICE"), Settings.getIntHatSetting("MAX_PRICE"));
+                double weight = dg.generatePriceWeight(Settings.getIntHatSetting("MIN_WEIGHT"), Settings.getIntHatSetting("MAX_WEIGHT"));
                 ArrayList<String> availableColours = hatData.get("colours");
                 ArrayList<String> availableSizes = hatData.get("sizes");
                 product = new Hat(id, ProductType.HAT, name, availableColours, availableSizes, price, weight);

@@ -13,11 +13,9 @@ import java.util.Random;
 public abstract class LineItemUpdater {
 
     private final Random random;
-    private DataGenerator dataGenerator;
 
     public LineItemUpdater(Random random) {
         this.random = random;
-        this.dataGenerator = new DataGenerator(this.random);
     }
 
     public abstract LineItem updateRandomLineItemField(LineItem originalLineItem);

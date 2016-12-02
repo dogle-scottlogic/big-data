@@ -1,5 +1,6 @@
 package generators;
 
+import data_handlers.Settings;
 import entities.Client;
 import entities.LineItem;
 import entities.Order;
@@ -15,6 +16,7 @@ public class OrderGenerator {
     private Random random;
     private LineItemGenerator lineItemGenerator;
     private final Client client;
+    private final int maxLineItems;
 
     public OrderGenerator(
         Random random, 
@@ -24,10 +26,11 @@ public class OrderGenerator {
         this.random = random;
         this.lineItemGenerator = lineItemGenerator;
         this.client = client;
+        this.maxLineItems = Settings.getIntSetting("MAX_LINE_ITEMS");
     }
     
     public Order generateOrder() {
-        int nLineItems = this.random.nextInt(10) + 1;
+        int nLineItems = this.random.nextInt(this.maxLineItems) + 1;
         UUID id = UUID.randomUUID();
         ArrayList<LineItem> lineItems = this.lineItemGenerator.generateLineItems(nLineItems);
 
