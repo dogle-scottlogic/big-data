@@ -4,14 +4,12 @@ import Updaters.OrderUpdater;
 import entities.Client;
 import entities.Event;
 import entities.Order;
-import enums.Enums;
 import enums.Enums.ProductType;
 import enums.Enums.EventType;
 import transmission.Emitter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Random;
 
 /**
@@ -19,7 +17,7 @@ import java.util.Random;
  */
 public class EventGenerator implements Runnable {
 
-    private final EventType[] eventList = {EventType.CREATE, EventType.UPDATE}; //TODO put back in Enums.EventType.values();
+    private final EventType[] eventList = EventType.values();
     private HashMap<String, Order> orderList = new HashMap<String, Order>();
     private ArrayList<Client> clientList;
     private Random random;
@@ -44,13 +42,14 @@ public class EventGenerator implements Runnable {
                     newEvent = generateUpdateEvent();
                     break;
                 case DELETE:
-                    newEvent = generarateDeleteEvent();
+                    newEvent = generateDeleteEvent();
                     break;
             }
             try {
                 // Emit event
                 Emitter.emitEvent(newEvent);
-                addOrderToList((Order) newEvent.getData());
+                if(newEvent.getType() == EventType.CREATE) addOrderToList((Order) newEvent.getData());
+                if(newEvent.getType() == EventType.DELETE) removeOrderFromList((String) newEvent.getData());
                 Thread.sleep(2000); //TODO move to config file
             } catch (InterruptedException e) {
                 interrupted = true;
@@ -59,6 +58,10 @@ public class EventGenerator implements Runnable {
             }
 
         }
+    }
+
+    private void removeOrderFromList(String id) {
+        this.orderList.remove(id);
     }
 
     public Event generateCreateEvent() {
@@ -102,8 +105,20 @@ public class EventGenerator implements Runnable {
         return event;
     }
 
-    public Event generarateDeleteEvent() {
-        
+    public Event generateDeleteEvent() {
+        /*
+        Raise an update event
+        Select a random order
+        */
+        Event event;
+
+        if (this.orderList.size() >= 1) {
+            String randomOrderId = this.orderList.keySet().toArray()[this.random.nextInt(this.orderList.keySet().toArray().length)].toString();
+            event = new Event(EventType.DELETE, randomOrderId);
+        } else { // If there have been no create events yet, raise a create event instead
+            event = generateCreateEvent();
+        }
+        return event;
     }
 
     public HashMap<String, Order> getOrderList() {

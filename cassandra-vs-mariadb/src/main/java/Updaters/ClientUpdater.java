@@ -48,7 +48,7 @@ public class ClientUpdater {
         if(emailParts.length == 1) {
             client.setEmail(emailParts[0] + ".com");
         } else {
-            client.setEmail(emailParts[0] + emailParts[1]);
+            client.setEmail(emailParts[0] + "." + emailParts[1]);
         }
         return client;
     }
