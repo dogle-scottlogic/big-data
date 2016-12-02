@@ -10,6 +10,7 @@ import enums.Enums.EventType;
 import transmission.Emitter;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -78,7 +79,6 @@ public class EventGenerator implements Runnable {
         OrderGenerator og = new OrderGenerator(random, lig, client);
         Order order = og.generateOrder();
         // Create Event
-        Event createEvent = new Event<Order>(EventType.CREATE, order);
         Event event = new Event(EventType.CREATE, order);
         return event;
     }
@@ -123,21 +123,32 @@ public class EventGenerator implements Runnable {
         return this.orderList;
     }
 
-    public Order getOrderById(String id) {
-        return this.orderList.get(id);
-    }
-
     public int getTotalStoredOrders() {
         return this.totalStoredOrders;
     }
 
     public void addOrderToList(Order order) {
         if (this.orderList.size() >= this.totalStoredOrders) {
-            String toRemove = (this.orderList.keySet()).toArray()[0].toString();
+            String toRemove = findLastUpdate();
             orderList.remove(toRemove);
         }
         // Add to list of raised orders
         orderList.put(order.getId(), order);
+    }
+
+    private String findLastUpdate() {
+        String oldestOrder = "";
+        Date oldestDate = new Date();
+
+        Object[] keyList = this.orderList.keySet().toArray();
+        for (Object key: keyList) {
+            Order o = this.orderList.get(key.toString());
+            if(o.getDate().before(oldestDate)) {
+                oldestOrder = o.getId();
+                oldestDate = o.getDate();
+            }
+        }
+        return oldestOrder;
     }
 
     private EventType getEventType() {
