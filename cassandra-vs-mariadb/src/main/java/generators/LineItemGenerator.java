@@ -21,11 +21,13 @@ public class LineItemGenerator {
     private final Random random;
     private final ProductGenerator productGenerator;
     private final ProductType[] productList;
+    private int maxQuantity; //TODO add this to config file
 
     public LineItemGenerator(Random random, ProductGenerator productGenerator, ProductType[] productList) {
         this.random = random;
         this.productGenerator = productGenerator;
         this.productList = productList;
+        this.maxQuantity = 10;
     }
 
     public ArrayList<LineItem> generateLineItems(int num) {
@@ -51,13 +53,21 @@ public class LineItemGenerator {
     }
     
     private LineItem getHatLineItem(UUID id, Hat hat) {
-        int quantity = random.nextInt(10) + 1;
+        int quantity = random.nextInt(this.maxQuantity) + 1;
         int colourIndex = random.nextInt(hat.getAvailableColours().size());
         String colour = hat.getAvailableColours().get(colourIndex);
         int sizeIndex = random.nextInt(hat.getAvailableSizes().size());
         String size = hat.getAvailableSizes().get(sizeIndex);
         LineItem lineItem = new LineItem(id, hat, quantity, colour, size);
         return lineItem;
+    }
+
+    public int getMaxQuantity() {
+        return maxQuantity;
+    }
+
+    public void setMaxQuantity(int maxQuantity) {
+        this.maxQuantity = maxQuantity;
     }
 
 }

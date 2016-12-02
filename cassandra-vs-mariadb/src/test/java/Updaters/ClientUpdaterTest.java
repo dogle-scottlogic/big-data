@@ -1,10 +1,18 @@
 package Updaters;
 
 import entities.Client;
+import entities.Order;
+import enums.Enums;
+import generators.ClientGenerator;
+import generators.LineItemGenerator;
+import generators.OrderGenerator;
+import generators.ProductGenerator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
@@ -28,10 +36,10 @@ public class ClientUpdaterTest {
     }
 
     @Test
-    public void updateClientUnknownField() throws Exception {
+    public void updateClient() throws Exception {
         Client testClient = new Client(UUID.randomUUID(), "bob", "bob_land", "bob@bob");
         ClientUpdater cu = new ClientUpdater(random);
-        Client returnValue = cu.updateClient("not_a_field", testClient);
+        Client returnValue = cu.updateClient(testClient);
         assertNotNull(returnValue);
         assertEquals(testClient.getName(), returnValue.getName());
         assertEquals(testClient.getId(), returnValue.getId());
@@ -40,25 +48,25 @@ public class ClientUpdaterTest {
     }
 
     @Test
-    public void updateClient_Name() throws Exception {
+    public void updateClientName() throws Exception {
         Client testClient = new Client(UUID.randomUUID(), "bob", "bob_land", "bob@bob");
         ClientUpdater cu = new ClientUpdater(random);
-        Client newClient = cu.updateClient("name", testClient);
+        Client newClient = cu.updateClientName(testClient);
         assertNotNull(newClient);
         assertNotEquals(newClient.getName(), "bob");
     }
 
     @Test
-    public void updateClient_Address() throws Exception {
+    public void updateClientAddress() throws Exception {
         Client testClient = new Client(UUID.randomUUID(), "bob", "bob_land", "bob@bob");
         ClientUpdater cu = new ClientUpdater(random);
-        Client newClient = cu.updateClient("address", testClient);
+        Client newClient = cu.updateClientAddress(testClient);
         assertNotNull(newClient);
         assertNotEquals(newClient.getName(), "bob_land");
     }
 
     @Test
-    public void updateClientEmail() throws Exception {
+    public void updateClientEmail1() throws Exception {
         Client testClient = new Client(UUID.randomUUID(), "bob", "bob_land", "bob@bob.com");
         ClientUpdater cu = new ClientUpdater(random);
         String oldEmail = testClient.getEmail();
@@ -67,4 +75,28 @@ public class ClientUpdaterTest {
         assertNotEquals(newClient.getEmail(), oldEmail);
     }
 
+    @Test
+    public void removeIdFromFieldsList() throws Exception {
+        ClientUpdater cu = new ClientUpdater(this.random);
+        ClientGenerator cg = new ClientGenerator(this.random);
+        ProductGenerator pg = new ProductGenerator(this.random);
+        LineItemGenerator lig = new LineItemGenerator(this.random, pg, Enums.ProductType.values());
+
+        Field[] fieldsWithId = Order.class.getDeclaredFields();
+        boolean containsId = false;
+        for (Field field:fieldsWithId) {
+            if(field.getName().equals("id")) {
+                containsId = true;
+            }
+        }
+        assertTrue(containsId);
+        containsId = false;
+        ArrayList<Field> fieldsWithoutId = cu.removeIdFromFieldsList(fieldsWithId);
+        for (Field field:fieldsWithoutId) {
+            if(field.getName().equals("id")) {
+                containsId = true;
+            }
+        }
+        assertFalse(containsId);
+    }
 }

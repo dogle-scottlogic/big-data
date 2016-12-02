@@ -40,33 +40,6 @@ public class OrderUpdaterTest {
     }
 
     @Test
-    public void removeIdFromFieldsList() throws Exception {
-        OrderUpdater ou = new OrderUpdater(this.random);
-        ClientGenerator cg = new ClientGenerator(this.random);
-        ProductGenerator pg = new ProductGenerator(this.random);
-        LineItemGenerator lig = new LineItemGenerator(this.random, pg, Enums.ProductType.values());
-        OrderGenerator og = new OrderGenerator(this.random, lig, cg.generateClient());
-
-        Order testOrder = og.generateOrder();
-        Field[] fieldsWithId = Order.class.getDeclaredFields();
-        boolean containsId = false;
-        for (Field field:fieldsWithId) {
-            if(field.getName().equals("id")) {
-                containsId = true;
-            }
-        }
-        assertTrue(containsId);
-        containsId = false;
-        ArrayList<Field> fieldsWithoutId = ou.removeIdFromFieldsList(fieldsWithId);
-        for (Field field:fieldsWithoutId) {
-            if(field.getName().equals("id")) {
-                containsId = true;
-            }
-        }
-        assertFalse(containsId);
-    }
-
-    @Test
     public void updateClient() {
         OrderUpdater ou = new OrderUpdater(this.random);
         ClientGenerator cg = new ClientGenerator(this.random);

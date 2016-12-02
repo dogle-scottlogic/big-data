@@ -80,9 +80,32 @@ public class EventGeneratorTest {
     }
 
     @Test
-    public void generateUpdateEvent() throws Exception {
+    public void generateUpdateEvent_NoCreatedOrders() throws Exception {
         EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
         Event newEvent = eg.generateUpdateEvent();
+
+        Assert.assertNotNull(newEvent);
+        Assert.assertNotNull(newEvent.getData());
+        Assert.assertNotNull(newEvent.getType());
+
+        assertEquals(Enums.EventType.CREATE, newEvent.getType());
+        assertThat(newEvent.getData(), instanceOf(Order.class));
+    }
+
+    @Test
+    public void generateUpdateEvent_CreatedOrders() throws Exception {
+        EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
+        Event newEvent = eg.generateUpdateEvent();
+
+        Assert.assertNotNull(newEvent);
+        Assert.assertNotNull(newEvent.getData());
+        Assert.assertNotNull(newEvent.getType());
+
+        assertEquals(Enums.EventType.CREATE, newEvent.getType());
+        assertThat(newEvent.getData(), instanceOf(Order.class));
+
+        eg.addOrderToList((Order)newEvent.getData());
+        newEvent = eg.generateUpdateEvent();
 
         Assert.assertNotNull(newEvent);
         Assert.assertNotNull(newEvent.getData());

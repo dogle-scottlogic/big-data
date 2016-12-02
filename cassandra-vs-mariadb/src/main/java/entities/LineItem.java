@@ -33,13 +33,6 @@ public class LineItem {
     public double getLinePrice() {
         return this.quantity * this.product.getPrice();
     }
-    
-    public void display() {
-        System.out.println(
-            "Line Item(" + this.id + "): " + this.quantity + "x " + this.size 
-            + " " + this.colour + " "+ this.product.getName()
-        );
-    }
       
     public String getId() {
         return id;
