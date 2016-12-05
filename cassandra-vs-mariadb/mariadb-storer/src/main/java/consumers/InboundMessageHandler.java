@@ -4,6 +4,7 @@ import com.rabbitmq.client.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import storers.CassandraDBStorer;
 import storers.MariaDBStorer;
 import java.io.UnsupportedEncodingException;
 
@@ -30,19 +31,20 @@ public abstract class InboundMessageHandler {
                 JSONParser parser = new JSONParser();
 
                 // Init storers
-                MariaDBStorer storer = new MariaDBStorer();
+                MariaDBStorer mariaDBStorer = new MariaDBStorer();
+                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer();
 
                 public void handleDelivery(
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body
                 ) throws UnsupportedEncodingException {
                     String message = new String(body, "UTF-8");
-
                     Object obj = null;
                     try {
                         obj = parser.parse(message);
                         JSONObject jsonObject = (JSONObject) obj;
                         // Pass To Storers
-                        storer.messageHandler(jsonObject);
+                        mariaDBStorer.messageHandler(jsonObject);
+                        cassandraDBStorer.messageHandler(jsonObject);
 
                     } catch (ParseException e) {
                         e.printStackTrace();
