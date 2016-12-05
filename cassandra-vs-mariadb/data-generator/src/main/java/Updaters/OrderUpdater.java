@@ -1,10 +1,10 @@
 package Updaters;
 
+import Updaters.Products.HatUpdater;
 import entities.Client;
 import entities.LineItem;
 import entities.Order;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -21,17 +21,8 @@ public class OrderUpdater {
 
     public Order updateOrder(Order order) {
 
-        boolean updateClient = random.nextBoolean();
-        if (updateClient) {
-            try {
-                order.setClient(updateClient(order.getClient()));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        } else {
-            // Update the line item
-            order.setLineItems(updateLineItems(order.getLineItems()));
-        }
+        // Update the line item
+        order.setLineItems(updateLineItems(order.getLineItems()));
         return order;
     }
 

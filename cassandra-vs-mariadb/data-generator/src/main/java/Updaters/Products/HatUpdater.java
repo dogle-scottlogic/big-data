@@ -1,6 +1,8 @@
-package Updaters;
+package Updaters.Products;
 
+import Updaters.ProductUpdater;
 import entities.Product;
+import entities.products.Hat;
 import generators.DataGenerator;
 
 import java.lang.reflect.Field;
@@ -11,7 +13,7 @@ import java.util.Random;
 /**
  * Created by dogle on 05/12/2016.
  */
-public class HatUpdater extends ProductUpdater{
+public class HatUpdater extends ProductUpdater {
 
     private Random random;
     private DataGenerator dataGenerator;
@@ -31,8 +33,8 @@ public class HatUpdater extends ProductUpdater{
         if (fieldName.equals("name")) return updateProductName(originalProduct);
         if (fieldName.equals("weight")) return  updateProductWeight(originalProduct);
         if (fieldName.equals("price")) return  updateProductPrice(originalProduct);
-        if (fieldName.equals("colour")) return updateProductColour(originalProduct);
-        if (fieldName.equals("size")) return updateProductSize(originalProduct);
+        if (fieldName.equals("colour")) return updateProductColour((Hat)originalProduct);
+        if (fieldName.equals("size")) return updateProductSize((Hat)originalProduct);
         return originalProduct;
     }
 
@@ -54,15 +56,15 @@ public class HatUpdater extends ProductUpdater{
         return originalProduct;
     }
 
-    private Product updateProductColour(Product originalProduct) {
+    private Product updateProductColour(Hat originalProduct) {
         String colour = productData.get("colour");
-        originalProduct.setName(colour);
+        originalProduct.setColour(colour);
         return originalProduct;
     }
 
-    private Product updateProductSize(Product originalProduct) {
+    private Product updateProductSize(Hat originalProduct) {
         String size = productData.get("size");
-        originalProduct.setName(size);
+        originalProduct.setSize(size);
         return originalProduct;
     }
 
