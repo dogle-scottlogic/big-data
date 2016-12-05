@@ -55,11 +55,7 @@ public class LineItemGenerator {
     
     private LineItem getHatLineItem(UUID id, Hat hat) {
         int quantity = random.nextInt(this.maxQuantity) + 1;
-        int colourIndex = random.nextInt(hat.getAvailableColours().size());
-        String colour = hat.getAvailableColours().get(colourIndex);
-        int sizeIndex = random.nextInt(hat.getAvailableSizes().size());
-        String size = hat.getAvailableSizes().get(sizeIndex);
-        LineItem lineItem = new LineItem(id, hat, quantity, colour, size);
+        LineItem lineItem = new LineItem(id, hat, quantity);
         return lineItem;
     }
 

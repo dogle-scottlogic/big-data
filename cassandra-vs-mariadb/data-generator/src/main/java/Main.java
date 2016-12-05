@@ -28,14 +28,15 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         // Create a list of clients
-        clients = clientGen.getClients(numClients);
-        EventGenerator eg = new EventGenerator(clients, random);
-        thread = new Thread(eg);
         run();
     }
 
     public static void run() throws IOException {
         String input = "";
+        clients = clientGen.getClients(numClients);
+        EventGenerator eg = new EventGenerator(clients, random);
+        thread = new Thread(eg);
+
         out.println("Data Generator 1.0");
         while(!input.equals("exit")) {
             System.out.print(">");
@@ -47,6 +48,7 @@ public class Main {
             if (input.equals("stop")) {
                 thread.interrupt();
                 Emitter.end();
+                thread = new Thread(eg);
             }
         }
     }

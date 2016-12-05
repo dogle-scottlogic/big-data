@@ -40,13 +40,13 @@ public class ProductGenerator {
 
         switch (productType) {
             case HAT:
-                HashMap<String, ArrayList<String>> hatData = dg.getHatData();
-                String name = hatData.get("name").get(0);
+                HashMap<String, String> hatData = dg.getHatData();
+                String name = hatData.get("name");
                 double price = dg.generatePriceWeight(Settings.getIntHatSetting("MIN_PRICE"), Settings.getIntHatSetting("MAX_PRICE"));
                 double weight = dg.generatePriceWeight(Settings.getIntHatSetting("MIN_WEIGHT"), Settings.getIntHatSetting("MAX_WEIGHT"));
-                ArrayList<String> availableColours = hatData.get("colours");
-                ArrayList<String> availableSizes = hatData.get("sizes");
-                product = new Hat(id, ProductType.HAT, name, availableColours, availableSizes, price, weight);
+                String colour = hatData.get("colours");
+                String size = hatData.get("sizes");
+                product = new Hat(id, ProductType.HAT, name, colour, size, price, weight);
                 break;
         }
         return product;

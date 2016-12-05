@@ -2,7 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/data-generator.iml" filepath="$PROJECT_DIR$/.idea/data-generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data-generator.iml" filepath="$PROJECT_DIR$/.idea/modules/data-generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data-generator_main.iml" filepath="$PROJECT_DIR$/.idea/modules/data-generator_main.iml" group="data-generator" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/data-generator_test.iml" filepath="$PROJECT_DIR$/.idea/modules/data-generator_test.iml" group="data-generator" />
     </modules>
   </component>
 </project>

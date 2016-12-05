@@ -59,26 +59,21 @@ public class DataGenerator {
         return name.replaceAll("\\s+","") + "@fakemail.com";
     }
 
-    public HashMap<String, ArrayList<String>> getHatData() {
-        HashMap<String, ArrayList<String>> hatData = new HashMap<String, ArrayList<String>>();
+    public HashMap<String, String> getHatData() {
+        HashMap<String, String> hatData = new HashMap<String, String>();
 
         JSONObject hat = this.jsonLoader.getJsonField("Hat");
         JSONArray names = (JSONArray)hat.get("productNames");
         JSONArray colours = (JSONArray)hat.get("productColours");
         JSONArray sizes = (JSONArray)hat.get("productSizes");
 
-        ArrayList<String> nameList = new ArrayList<String>();
-        nameList.add((String)names.get(random.nextInt(names.size())));
+        String name = (String)names.get(random.nextInt(names.size()));
+        String colour = (String)colours.get(random.nextInt(colours.size()));
+        String size = (String)sizes.get(random.nextInt(sizes.size()));
 
-        ArrayList<String> colourList = new ArrayList<String>();
-        colourList.addAll(colours);
-
-        ArrayList<String> sizeList = new ArrayList<String>();
-        sizeList.addAll(sizes);
-
-        hatData.put("name", nameList);
-        hatData.put("colours", colourList);
-        hatData.put("sizes", sizeList);
+        hatData.put("name", name);
+        hatData.put("colours", colour);
+        hatData.put("sizes", size);
         return hatData;
     }
 

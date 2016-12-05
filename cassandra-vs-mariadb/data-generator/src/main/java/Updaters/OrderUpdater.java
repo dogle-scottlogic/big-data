@@ -48,16 +48,16 @@ public class OrderUpdater {
         boolean updateProduct = random.nextBoolean();
         if (updateProduct) {
             // Update a random product field
-            ProductUpdater productUpdater = new ProductUpdater(this.random);
+            ProductUpdater productUpdater = null;
+            switch (lineItemToAmend.getProduct().getProductType()) {
+                case HAT:
+                    productUpdater = new HatUpdater(this.random);
+                    break;
+            }
             lineItemToAmend.setProduct(productUpdater.updateRandomProduct(lineItemToAmend.getProduct()));
         } else {
             // Update a random line item field
-            LineItemUpdater lineItemUpdater = null;
-            switch (lineItemToAmend.getProduct().getProductType()) {
-                case HAT:
-                    lineItemUpdater = new HatLineItemUpdater(this.random);
-                    break;
-            }
+            LineItemUpdater lineItemUpdater = new LineItemUpdater(this.random);
             lineItems.set(lineItemToAmendIndex, lineItemUpdater.updateRandomLineItemField(lineItemToAmend));
         }
         return lineItems;

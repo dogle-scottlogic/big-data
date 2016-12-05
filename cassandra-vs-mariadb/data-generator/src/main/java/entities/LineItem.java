@@ -11,22 +11,16 @@ public class LineItem {
     private String id;
     private Product product;
     private int quantity;
-    private String colour;
-    private String size;
     private double linePrice;
 
     public LineItem(
         UUID id, 
         Product product, 
-        int quantity, 
-        String color, 
-        String size
+        int quantity
     ) {
         this.id = id.toString();
         this.product = product;
         this.quantity = quantity;
-        this.colour = color;
-        this.size = size;
         this.linePrice = this.quantity * this.product.getPrice();
     }
     
@@ -58,21 +52,5 @@ public class LineItem {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
         this.linePrice = this.quantity * this.product.getPrice();
-    }
-
-    public String getColor() {
-        return colour;
-    }
-
-    public void setColor(String color) {
-        this.colour = color;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
     }
 }
