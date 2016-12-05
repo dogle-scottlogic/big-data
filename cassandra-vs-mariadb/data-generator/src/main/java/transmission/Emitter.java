@@ -54,5 +54,9 @@ public class Emitter {
         } catch (IOException e1) {
             e1.printStackTrace();
         }
+        catch (NullPointerException npe) {
+           System.out.println(npe.getMessage());
+           System.out.println("Exception: The queue may not be running.");
+        }
     }
 }
