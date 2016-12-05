@@ -1,10 +1,10 @@
 package Updaters;
 
+import Updaters.Products.HatUpdater;
 import entities.Client;
 import entities.LineItem;
 import entities.Order;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -21,17 +21,8 @@ public class OrderUpdater {
 
     public Order updateOrder(Order order) {
 
-        boolean updateClient = random.nextBoolean();
-        if (updateClient) {
-            try {
-                order.setClient(updateClient(order.getClient()));
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            }
-        } else {
-            // Update the line item
-            order.setLineItems(updateLineItems(order.getLineItems()));
-        }
+        // Update the line item
+        order.setLineItems(updateLineItems(order.getLineItems()));
         return order;
     }
 
@@ -48,16 +39,16 @@ public class OrderUpdater {
         boolean updateProduct = random.nextBoolean();
         if (updateProduct) {
             // Update a random product field
-            ProductUpdater productUpdater = new ProductUpdater(this.random);
+            ProductUpdater productUpdater = null;
+            switch (lineItemToAmend.getProduct().getProductType()) {
+                case HAT:
+                    productUpdater = new HatUpdater(this.random);
+                    break;
+            }
             lineItemToAmend.setProduct(productUpdater.updateRandomProduct(lineItemToAmend.getProduct()));
         } else {
             // Update a random line item field
-            LineItemUpdater lineItemUpdater = null;
-            switch (lineItemToAmend.getProduct().getProductType()) {
-                case HAT:
-                    lineItemUpdater = new HatLineItemUpdater(this.random);
-                    break;
-            }
+            LineItemUpdater lineItemUpdater = new LineItemUpdater(this.random);
             lineItems.set(lineItemToAmendIndex, lineItemUpdater.updateRandomLineItemField(lineItemToAmend));
         }
         return lineItems;

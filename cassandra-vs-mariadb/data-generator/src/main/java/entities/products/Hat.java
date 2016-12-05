@@ -11,36 +11,36 @@ import java.util.UUID;
  */
 public class Hat extends Product {
 
-    private List<String>availableColours;
-    private List<String> availableSizes;
+    private String colour;
+    private String size;
 
     public Hat(
             UUID id,
             ProductType productType,
             String name,
-            List<String>availableColours, //TODO remove these and make single colour and size?
-            List<String> availableSizes,
+            String colour,
+            String size,
             double weight,
             double price
             ) {
         super(id, productType, name, weight, price);
-        this.availableColours = availableColours;
-        this.availableSizes = availableSizes;
+        this.colour = colour;
+        this.size = size;
     }
 
-    public List<String> getAvailableColours() {
-        return availableColours;
+    public String getColour() {
+        return this.colour;
     }
 
-    public void setAvailableColours(List<String> availableColours) {
-        this.availableColours = availableColours;
+    public void setColour(String colour) {
+        this.colour = colour;
     }
 
-    public List<String> getAvailableSizes() {
-        return availableSizes;
+    public String getSize() {
+        return this.size;
     }
 
-    public void setAvailableSizes(List<String> availableSizes) {
-        this.availableSizes = availableSizes;
+    public void setSize(String size) {
+        this.size = size;
     }
 }

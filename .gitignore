@@ -49,3 +49,5 @@ fabric.properties
 cassandra-vs-mariadb/build/classes/main/transmission/Serializer.class
 cassandra-vs-mariadb/build/
 cassandra-vs-mariadb/.idea/
+cassandra-vs-mariadb/data-generator/build/*
+cassandra-vs-mariadb/data-generator/.idea/*

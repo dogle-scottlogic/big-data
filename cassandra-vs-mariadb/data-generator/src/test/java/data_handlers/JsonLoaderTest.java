@@ -32,16 +32,6 @@ public class JsonLoaderTest {
     }
 
     /**
-     * Test of loadJson method, of class JsonLoader.
-     */
-    @Test
-    public void testLoadJson_Fail() {
-        JsonLoader jl = new JsonLoader("not_a_file");
-        JSONObject file = jl.loadJson();
-        assertNull(file);
-    }
-
-    /**
      * Test of getJsonField method, of class JsonLoader
      */
     @Test
