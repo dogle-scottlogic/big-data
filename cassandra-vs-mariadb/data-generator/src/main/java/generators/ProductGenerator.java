@@ -44,8 +44,8 @@ public class ProductGenerator {
                 String name = hatData.get("name");
                 double price = dg.generatePriceWeight(Settings.getIntHatSetting("MIN_PRICE"), Settings.getIntHatSetting("MAX_PRICE"));
                 double weight = dg.generatePriceWeight(Settings.getIntHatSetting("MIN_WEIGHT"), Settings.getIntHatSetting("MAX_WEIGHT"));
-                String colour = hatData.get("colours");
-                String size = hatData.get("sizes");
+                String colour = hatData.get("colour");
+                String size = hatData.get("size");
                 product = new Hat(id, ProductType.HAT, name, colour, size, price, weight);
                 break;
         }

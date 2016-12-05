@@ -72,8 +72,8 @@ public class DataGenerator {
         String size = (String)sizes.get(random.nextInt(sizes.size()));
 
         hatData.put("name", name);
-        hatData.put("colours", colour);
-        hatData.put("sizes", size);
+        hatData.put("colour", colour);
+        hatData.put("size", size);
         return hatData;
     }
 

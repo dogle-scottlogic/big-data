@@ -84,22 +84,19 @@ public class DataGeneratorTest {
     @Test
     public void getHatData() throws Exception {
         DataGenerator dg = new DataGenerator(this.random);
-        HashMap<String, ArrayList<String>> hatData = dg.getHatData();
+        HashMap<String, String> hatData = dg.getHatData();
 
         assertNotNull(hatData);
 
         assertTrue(hatData.containsKey("name"));
         assertNotNull(hatData.get("name"));
-        assertEquals(1, hatData.get("name").size());
 
 
-        assertTrue(hatData.containsKey("colours"));
-        assertNotNull(hatData.get("colours"));
-        assertTrue(hatData.get("colours").size() > 1);
+        assertTrue(hatData.containsKey("colour"));
+        assertNotNull(hatData.get("colour"));
 
-        assertTrue(hatData.containsKey("sizes"));
-        assertNotNull(hatData.get("sizes"));
-        assertTrue(hatData.get("sizes").size() > 1);
+        assertTrue(hatData.containsKey("size"));
+        assertNotNull(hatData.get("size"));
     }
 
     @Test

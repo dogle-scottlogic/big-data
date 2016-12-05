@@ -53,7 +53,7 @@ public class LineItemGeneratorTest {
         lg = new LineItemGenerator(random, pg, this.productList);
         ArrayList<LineItem> liList2 = lg.generateLineItems(5);
         for(int i = 0; i < liList.size(); i++) {
-            assertEquals(liList.get(i).getColor(), liList2.get(i).getColor());
+            assertEquals(liList.get(i).getQuantity(), liList2.get(i).getQuantity());
         }
     }
 
@@ -82,9 +82,7 @@ public class LineItemGeneratorTest {
         LineItem testLI = cg.generateLineItem(Enums.ProductType.HAT);
 
         assertNotNull(testLI.getProduct());
-        assertNotNull(testLI.getColor());
         assertNotNull(testLI.getQuantity());
         assertNotNull(testLI.getId());
-        assertNotNull(testLI.getSize());
     }
 }

@@ -76,10 +76,10 @@ public class ProductGeneratorTest {
         Hat testHat = (Hat)pg.generateProduct(Enums.ProductType.HAT);
 
         assertNotNull(testHat.getName());
-        assertNotNull(testHat.getAvailableColours());
+        assertNotNull(testHat.getColour());
         assertNotNull(testHat.getId());
         assertNotNull(testHat.getPrice());
-        assertNotNull(testHat.getAvailableSizes());
+        assertNotNull(testHat.getSize());
         assertNotNull(testHat.getWeight());
     }
 }
