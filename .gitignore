@@ -51,3 +51,5 @@ cassandra-vs-mariadb/build/
 cassandra-vs-mariadb/.idea/
 cassandra-vs-mariadb/data-generator/build/*
 cassandra-vs-mariadb/data-generator/.idea/*
+cassandra-vs-mariadb/mariadb-storer/build/*
+cassandra-vs-mariadb/mariadb-storer/.idea/*

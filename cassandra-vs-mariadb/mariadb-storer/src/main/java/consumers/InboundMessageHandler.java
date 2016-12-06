@@ -18,6 +18,7 @@ public abstract class InboundMessageHandler {
     private static Connection connection;
     private static Channel channel;
     private static Consumer consumer;
+    private static int i = 0;
 
     public static void initialise() {
         try {
@@ -38,10 +39,12 @@ public abstract class InboundMessageHandler {
                     String message = new String(body, "UTF-8");
 
                     Object obj = null;
+                    System.out.println(i++);
                     try {
                         obj = parser.parse(message);
                         JSONObject jsonObject = (JSONObject) obj;
                         // Pass To Storers
+//                        System.out.println(((JSONObject) obj).toJSONString());
                         storer.messageHandler(jsonObject);
 
                     } catch (ParseException e) {
