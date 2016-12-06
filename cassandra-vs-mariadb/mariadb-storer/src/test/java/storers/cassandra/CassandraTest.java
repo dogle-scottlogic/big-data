@@ -37,4 +37,26 @@ public class CassandraTest {
         test = this.cassandra.dropKeySpace("Test");
         assertTrue(test);
     }
+
+    @Test
+    public void createLineItemTable() throws Exception {
+        this.cassandra.connect();
+        boolean test = this.cassandra.createKeySpace("Test");
+        assertTrue(test);
+        test = this.cassandra.createLineItemTable();
+        assertTrue(test);
+        test = this.cassandra.dropKeySpace("Test");
+        assertTrue(test);
+    }
+
+    @Test
+    public void createOrdersTable() throws Exception {
+        this.cassandra.connect();
+        boolean test = this.cassandra.createKeySpace("Test");
+        assertTrue(test);
+        test = this.cassandra.createOrderTable();
+        assertTrue(test);
+        test = this.cassandra.dropKeySpace("Test");
+        assertTrue(test);
+    }
 }

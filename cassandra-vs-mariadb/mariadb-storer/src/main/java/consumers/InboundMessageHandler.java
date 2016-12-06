@@ -6,6 +6,8 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import storers.CassandraDBStorer;
 import storers.MariaDBStorer;
+import storers.cassandra.Cassandra;
+
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -20,8 +22,13 @@ public abstract class InboundMessageHandler {
     private static Channel channel;
     private static Consumer consumer;
 
+
+    private static Cassandra cassandra = new Cassandra("127.0.0.7");
+
+
     public static void initialise() {
         try {
+            cassandra.connect();
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
             connection = InboundMessageHandler.connectionFactory.newConnection();
@@ -32,7 +39,7 @@ public abstract class InboundMessageHandler {
 
                 // Init storers
                 MariaDBStorer mariaDBStorer = new MariaDBStorer();
-                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer();
+                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer(cassandra);
 
                 public void handleDelivery(
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body
