@@ -1,13 +1,16 @@
 package consumers;
 
 import com.rabbitmq.client.*;
-
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import storers.MariaDB.MariaDBStorer;
 import java.io.UnsupportedEncodingException;
 
 /**
  * Created by lcollingwood on 30/11/2016.
  */
-public class ConsoleLogger {
+public abstract class InboundMessageHandlerRabbitMQ {
     private final static String QUEUE_NAME = "event-queue";
     private final static String HOST_NAME = "localhost";
 
@@ -20,16 +23,33 @@ public class ConsoleLogger {
         try {
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
-            connection = ConsoleLogger.connectionFactory.newConnection();
+            connection = InboundMessageHandlerRabbitMQ.connectionFactory.newConnection();
             channel = connection.createChannel();
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             consumer = new DefaultConsumer(channel) {
+                JSONParser parser = new JSONParser();
+
+                // Init storers
+                MariaDBStorer storer = new MariaDBStorer();
+
                 public void handleDelivery(
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body
                 ) throws UnsupportedEncodingException {
                     String message = new String(body, "UTF-8");
-                    System.out.println("Received '" + message + "'");
+
+                    Object obj = null;
+                    try {
+                        obj = parser.parse(message);
+                        JSONObject jsonObject = (JSONObject) obj;
+                        // Pass To Storers
+//                        System.out.println(((JSONObject) obj).toJSONString());
+                        storer.messageHandler(jsonObject);
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
                 }
+
             };
         } catch (Exception e) {
             e.printStackTrace();
@@ -41,7 +61,7 @@ public class ConsoleLogger {
     }
 
     public static void on() {
-        ConsoleLogger.initialise();
+        InboundMessageHandlerRabbitMQ.initialise();
         System.out.println("Listening...");
 
         try {

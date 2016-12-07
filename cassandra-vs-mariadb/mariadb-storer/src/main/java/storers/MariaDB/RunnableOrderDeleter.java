@@ -1,55 +1,23 @@
 package storers.MariaDB;
 
-import org.json.simple.JSONObject;
+import storers.MariaDB.enums.DBEventType;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 /**
- * Created by lcollingwood on 06/12/2016.
+ * Delete Order and Associated Line Items
  */
-public class RunnableOrderDeleter implements Runnable {
-    private static final String ACTION_TYPE = "DELETE";
-
-    private Thread thread;
-    private Connection connection;
-    private String orderId;
-
-
+public class RunnableOrderDeleter extends RunnableDBQuery {
     public RunnableOrderDeleter(Connection connection, String orderId) {
-        this.orderId = orderId;
-        this.connection = connection;
-    }
-
-    public void start() {
-        thread = new Thread(this, ACTION_TYPE + ":" + orderId);
-        thread.start();
+        super(connection, orderId, DBEventType.DELETE);
     }
 
     public void run() {
-        deleteLineItemsByOrderId(orderId);
-        deleteOrder(orderId);
+        doQuery(deleteString("orders.`line_item`", "order_id", orderId));
+        doQuery(deleteString("orders.`order`", "id", orderId));
     }
 
-    private void doQuery(String query) {
-        try {
-            Statement s = connection.createStatement();
-            s.execute(query);
-            System.out.println(query);
-            connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void deleteOrder(String orderId) {
-        String query = "DELETE FROM orders.`order` WHERE id='" + orderId + "';";
-        doQuery("DELETE FROM orders.`order` WHERE id='" + orderId + "';");
-    }
-
-    private void deleteLineItemsByOrderId(String orderId) {
-        String query = "DELETE FROM orders.`line_item` WHERE order_id='" + orderId + "';";
-        doQuery("DELETE FROM orders.`line_item` WHERE order_id='" + orderId + "';");
+    private String deleteString(String table, String idField, String orderId) {
+        return "DELETE FROM " + table + " WHERE " + idField + "='" + orderId + "';";
     }
 }

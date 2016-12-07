@@ -2,33 +2,20 @@ package storers.MariaDB;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import storers.MariaDB.enums.DBEventType;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Iterator;
 
 /**
- * Created by lcollingwood on 06/12/2016.
+ * Update an Order or it's Line Items
  */
-public class RunnableOrderUpdater implements Runnable {
-    private static final String ACTION_TYPE = "UPDATE";
-
-    private Thread thread;
+public class RunnableOrderUpdater extends RunnableDBQuery {
     private JSONObject data;
-    private String orderId;
-    private Connection connection;
 
     public RunnableOrderUpdater(Connection connection, JSONObject data) {
+        super(connection, (String) data.get("id"), DBEventType.DELETE);
         this.data = data;
-        this.connection = connection;
-        this.orderId = (String) data.get("id");
-    }
-
-
-    public void start() {
-        thread = new Thread(this, ACTION_TYPE + ":" + orderId);
-        thread.start();
     }
 
     public void run() {
@@ -59,17 +46,6 @@ public class RunnableOrderUpdater implements Runnable {
                     "product_id='" + productId + "', " +
                     "quantity=" + Long.valueOf(quantity).toString() + " " +
                 "WHERE order_id='" + orderId + "';");
-        }
-    }
-
-    private void doQuery(String query) {
-        try {
-            Statement s = connection.createStatement();
-            s.execute(query);
-            System.out.println(query);
-            connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
     }
 }

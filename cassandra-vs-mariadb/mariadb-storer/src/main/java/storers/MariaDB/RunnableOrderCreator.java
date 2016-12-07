@@ -2,32 +2,20 @@ package storers.MariaDB;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import storers.MariaDB.enums.DBEventType;
 
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Iterator;
 
 /**
- * Created by lcollingwood on 06/12/2016.
+ * Create Order with Line Items in MariaDB
  */
-public class RunnableOrderCreator implements Runnable {
-    private static final String ACTION_TYPE = "CREATE";
-
-    private Thread thread;
-    private Connection connection;
-    private String orderId;
+public class RunnableOrderCreator extends RunnableDBQuery {
     private JSONObject data;
 
     public RunnableOrderCreator(Connection connection, JSONObject data){
-        this.connection = connection;
+        super(connection, (String) data.get("id"), DBEventType.CREATE);
         this.data = data;
-        this.orderId = (String) data.get("id");
-    }
-
-    public void start() {
-        thread = new Thread(this, ACTION_TYPE + ":" + orderId);
-        thread.start();
     }
 
     public void run() {
@@ -37,17 +25,6 @@ public class RunnableOrderCreator implements Runnable {
         doQuery("INSERT INTO orders.`order` VALUES('" + orderId + "', '" + clientId + "', '" + Long.valueOf(date).toString() + "');");
         JSONArray lineItems = (JSONArray) data.get("lineItems");
         createLineItems(orderId, lineItems);
-    }
-
-    private void doQuery(String query) {
-        try {
-            Statement s = connection.createStatement();
-            s.execute(query);
-            System.out.println(query);
-            connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 
     private void createLineItems(String orderId, JSONArray lineItems) {
