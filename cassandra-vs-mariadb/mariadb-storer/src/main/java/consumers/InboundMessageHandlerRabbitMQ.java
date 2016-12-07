@@ -5,15 +5,14 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import storers.CassandraDBStorer;
-import storers.MariaDBStorer;
 import storers.cassandra.Cassandra;
-
+import storers.MariaDB.MariaDBStorer;
 import java.io.UnsupportedEncodingException;
 
 /**
  * Created by lcollingwood on 30/11/2016.
  */
-public abstract class InboundMessageHandler {
+public abstract class InboundMessageHandlerRabbitMQ {
     private final static String QUEUE_NAME = "event-queue";
     private final static String HOST_NAME = "localhost";
 
@@ -31,7 +30,7 @@ public abstract class InboundMessageHandler {
             cassandra.connect();
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
-            connection = InboundMessageHandler.connectionFactory.newConnection();
+            connection = InboundMessageHandlerRabbitMQ.connectionFactory.newConnection();
             channel = connection.createChannel();
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             consumer = new DefaultConsumer(channel) {
@@ -69,7 +68,7 @@ public abstract class InboundMessageHandler {
     }
 
     public static void on() {
-        InboundMessageHandler.initialise();
+        InboundMessageHandlerRabbitMQ.initialise();
         System.out.println("Listening...");
 
         try {

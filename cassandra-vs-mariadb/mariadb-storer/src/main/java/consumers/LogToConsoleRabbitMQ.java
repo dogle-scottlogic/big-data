@@ -7,7 +7,7 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by lcollingwood on 30/11/2016.
  */
-public class ConsoleLogger {
+public class LogToConsoleRabbitMQ {
     private final static String QUEUE_NAME = "event-queue";
     private final static String HOST_NAME = "localhost";
 
@@ -20,7 +20,7 @@ public class ConsoleLogger {
         try {
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
-            connection = ConsoleLogger.connectionFactory.newConnection();
+            connection = LogToConsoleRabbitMQ.connectionFactory.newConnection();
             channel = connection.createChannel();
             channel.queueDeclare(QUEUE_NAME, false, false, false, null);
             consumer = new DefaultConsumer(channel) {
@@ -41,7 +41,7 @@ public class ConsoleLogger {
     }
 
     public static void on() {
-        ConsoleLogger.initialise();
+        LogToConsoleRabbitMQ.initialise();
         System.out.println("Listening...");
 
         try {
