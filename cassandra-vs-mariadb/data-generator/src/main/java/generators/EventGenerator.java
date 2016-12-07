@@ -7,6 +7,7 @@ import entities.Event;
 import entities.Order;
 import enums.Enums.ProductType;
 import enums.Enums.EventType;
+import org.apache.commons.lang3.ArrayUtils;
 import transmission.Emitter;
 
 import java.util.ArrayList;
@@ -44,11 +45,11 @@ public class EventGenerator implements Runnable {
                 if (eventGenMode.equals("fixed")) {
                     type = getFixedEventType(fixedEventTypeCount);
                     fixedEventCount++;
-                    if(fixedEventCount == numEvents) {
+                    if (fixedEventCount == numEvents) {
                         fixedEventTypeCount++;
                         fixedEventCount = 0;
                     }
-                    if(fixedEventTypeCount == EventType.values().length) fixedEventTypeCount = 0;
+                    if (fixedEventTypeCount == EventType.values().length) fixedEventTypeCount = 0;
                 }
                 if (eventGenMode.equals("random")) {
                     type = getRandomEventType();
@@ -69,9 +70,9 @@ public class EventGenerator implements Runnable {
     }
 
     private EventType getFixedEventType(int fixedEventTypeCount) {
-            EventType type = EventType.values()[fixedEventTypeCount];
-            return type;
-        }
+        EventType type = EventType.values()[fixedEventTypeCount];
+        return type;
+    }
 
     private Event generateEvents(EventType eventType) {
         Event newEvent = null;
@@ -79,6 +80,9 @@ public class EventGenerator implements Runnable {
         switch (eventType) {
             case CREATE:
                 newEvent = generateCreateEvent();
+                break;
+            case READ:
+                newEvent = generateReadEvent();
                 break;
             case UPDATE:
                 newEvent = generateUpdateEvent(EventType.UPDATE);
@@ -115,6 +119,19 @@ public class EventGenerator implements Runnable {
         return event;
     }
 
+    public Event generateReadEvent() {
+
+        Event event;
+
+        if (this.orderList.size() >= 1) {
+            String randomOrderId = this.orderList.keySet().toArray()[this.random.nextInt(this.orderList.keySet().toArray().length)].toString();
+            event = new Event(EventType.READ, randomOrderId);
+        } else { // If there have been no create events yet, raise a create event instead
+            event = generateCreateEvent();
+        }
+        return event;
+    }
+
     public Event generateUpdateEvent(EventType type) {
         /*
         Raise an update event
@@ -141,10 +158,7 @@ public class EventGenerator implements Runnable {
     }
 
     public Event generateDeleteEvent() {
-        /*
-        Raise an update event
-        Select a random order
-        */
+
         Event event;
 
         if (this.orderList.size() >= 1) {
@@ -189,6 +203,11 @@ public class EventGenerator implements Runnable {
     }
 
     private EventType getRandomEventType() {
-        return eventList[random.nextInt(eventList.length)];
+        // One in 5 chance of generating a delete event
+        int c = Settings.getIntSetting("DELETE_CHANCE");
+        int weight = this.random.nextInt(c) + 1;
+        if(weight == 1) return EventType.DELETE;
+        EventType[] reducedList = ArrayUtils.removeElement(this.eventList, EventType.DELETE);
+        return reducedList[random.nextInt(eventList.length -1)];
     }
 }
