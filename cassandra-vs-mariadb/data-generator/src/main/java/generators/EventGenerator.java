@@ -31,30 +31,33 @@ public class EventGenerator implements Runnable {
     }
 
     public void run() {
+        String eventGenMode = Settings.getStringSetting("EVENT_GEN_MODE");
+        int numEvents = Settings.getIntSetting("NUM_FIXED_EVENTS");
+        int fixedEventCount = 0;
+        int fixedEventTypeCount = 0;
+        EventType type = EventType.CREATE;
+
         boolean interrupted = false;
         while (!interrupted) {
-            Event newEvent = null;
-            // Get an event type
-            EventType type = getEventType();
-            switch (type) {
-                case CREATE:
-                    newEvent = generateCreateEvent();
-                    break;
-                case UPDATE:
-                    newEvent = generateUpdateEvent(EventType.UPDATE);
-                    break;
-                case UPDATE_STATUS:
-                    newEvent = generateUpdateEvent(EventType.UPDATE_STATUS);
-                    break;
-                case DELETE:
-                    newEvent = generateDeleteEvent();
-                    break;
-            }
             try {
+                // Check the mode
+                if (eventGenMode.equals("fixed")) {
+                    type = getFixedEventType(fixedEventTypeCount);
+                    fixedEventCount++;
+                    if(fixedEventCount == numEvents) {
+                        fixedEventTypeCount++;
+                        fixedEventCount = 0;
+                    }
+                    if(fixedEventTypeCount == EventType.values().length) fixedEventTypeCount = 0;
+                }
+                if (eventGenMode.equals("random")) {
+                    type = getRandomEventType();
+                }
+                Event newEvent = generateEvents(type);
                 // Emit event
                 Emitter.emitEvent(newEvent);
-                if(newEvent.getType() == EventType.CREATE) addOrderToList((Order) newEvent.getData());
-                if(newEvent.getType() == EventType.DELETE) removeOrderFromList((String) newEvent.getData());
+                if (newEvent.getType() == EventType.CREATE) addOrderToList((Order) newEvent.getData());
+                if (newEvent.getType() == EventType.DELETE) removeOrderFromList((String) newEvent.getData());
                 Thread.sleep(Settings.getIntSetting("SLEEP"));
             } catch (InterruptedException e) {
                 interrupted = true;
@@ -62,6 +65,32 @@ public class EventGenerator implements Runnable {
                 System.out.println(e.getMessage());
             }
         }
+
+    }
+
+    private EventType getFixedEventType(int fixedEventTypeCount) {
+            EventType type = EventType.values()[fixedEventTypeCount];
+            return type;
+        }
+
+    private Event generateEvents(EventType eventType) {
+        Event newEvent = null;
+
+        switch (eventType) {
+            case CREATE:
+                newEvent = generateCreateEvent();
+                break;
+            case UPDATE:
+                newEvent = generateUpdateEvent(EventType.UPDATE);
+                break;
+            case UPDATE_STATUS:
+                newEvent = generateUpdateEvent(EventType.UPDATE_STATUS);
+                break;
+            case DELETE:
+                newEvent = generateDeleteEvent();
+                break;
+        }
+        return newEvent;
     }
 
     private void removeOrderFromList(String id) {
@@ -98,10 +127,10 @@ public class EventGenerator implements Runnable {
             Order updateOrder = this.orderList.get(randomOrderId);
             OrderUpdater orderUpdater = new OrderUpdater(this.random);
             // Modify the order in some way
-            if(type == EventType.UPDATE) {
+            if (type == EventType.UPDATE) {
                 updateOrder = orderUpdater.updateOrder(updateOrder);
             }
-            if(type == EventType.UPDATE_STATUS) {
+            if (type == EventType.UPDATE_STATUS) {
                 updateOrder = orderUpdater.updateOrderStatus(updateOrder);
             }
             event = new Event(type, updateOrder);
@@ -149,9 +178,9 @@ public class EventGenerator implements Runnable {
         Date oldestDate = new Date();
 
         Object[] keyList = this.orderList.keySet().toArray();
-        for (Object key: keyList) {
+        for (Object key : keyList) {
             Order o = this.orderList.get(key.toString());
-            if(o.getDate().before(oldestDate)) {
+            if (o.getDate().before(oldestDate)) {
                 oldestOrder = o.getId();
                 oldestDate = o.getDate();
             }
@@ -159,7 +188,7 @@ public class EventGenerator implements Runnable {
         return oldestOrder;
     }
 
-    private EventType getEventType() {
+    private EventType getRandomEventType() {
         return eventList[random.nextInt(eventList.length)];
     }
 }
