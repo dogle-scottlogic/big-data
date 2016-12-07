@@ -6,4 +6,6 @@ echo "Starting RabbitMQ..."
 sudo docker run -d -p 5672:5672 rabbitmq
 echo "Starting Cassandra..."
 sudo docker run -d -p 7191:7191 -p 7001:7001 -p 9160:9160 -p 9042:9042 -e CASSANDRA_BROADCARST_ADDRESS=127.0.0.1 cassandra:latest
+echo "Starting MariaDB..."
+sudo docker run -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root -d mariadb
 #eof
