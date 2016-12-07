@@ -9,7 +9,7 @@ import storers.cassandra.Cassandra;
 public class CassandraDBStorer {
 
     private Cassandra cassandra;
-    private Thread create, update, update_status, delete;
+    private Thread create, read, update, update_status, delete;
     private Timer timer = new Timer();
 
     public CassandraDBStorer(Cassandra cassandra) {
@@ -27,6 +27,9 @@ public class CassandraDBStorer {
 
         if (type.equals("CREATE")) {
             create((JSONObject) message.get("data"));
+        }
+        if(type.equals("READ")) {
+            read(message);
         }
         if (type.equals("UPDATE")) {
             update((JSONObject) message.get("data"));
@@ -52,6 +55,19 @@ public class CassandraDBStorer {
         this.create.start();
     }
 
+    public void read(final JSONObject message) {
+        this.read = new Thread(new Runnable() {
+            public void run() {
+                timer.startTimer();
+                boolean success = cassandra.readOrder(message);
+                long time = timer.stopTimer();
+                System.out.println("Read Event completed in Cassandra: " + success);
+                System.out.println("Read Event in Cassandra took: " + time + " nanoseconds");
+            }
+        });
+        this.read.start();
+    }
+
     public void update(final JSONObject message) {
         this.update = new Thread(new Runnable() {
             public void run() {
@@ -75,6 +91,7 @@ public class CassandraDBStorer {
                 System.out.println("Update Order Status Event in Cassandra took: " + time + " nanoseconds");
             }
         });
+        this.update_status.start();
     }
 
     public void delete(final JSONObject message) {
