@@ -34,11 +34,10 @@ public class MariaDBStorer {
         connection.commit();
     }
 
-    private static boolean doQuery(SQLQuery query) throws SQLException {
+    private static void doQuery(SQLQuery query) throws SQLException {
         Statement statement = connection.createStatement();
-        boolean hasSucceeded = statement.execute(query.getQuery());
+        statement.execute(query.getQuery());
         statement.close();
-        return hasSucceeded;
     }
 
     public static void messageHandler(JSONObject message) {

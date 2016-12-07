@@ -11,9 +11,9 @@ import java.sql.Statement;
  * Created by lcollingwood on 06/12/2016.
  */
 public abstract class RunnableDBQuery implements Runnable {
-    private Timer timer = new Timer();
-    private long timeTaken = 0;
-    private boolean wasSuccessful = false;
+    private Timer timer;
+    private long timeTaken;
+    private boolean wasSuccessful;
 
     public DBEventType ACTION_TYPE;
     public Thread thread;
@@ -24,6 +24,9 @@ public abstract class RunnableDBQuery implements Runnable {
         this.connection = connection;
         this.orderId = orderId;
         this.ACTION_TYPE = eventType;
+        this.timer = new Timer();
+        this.timeTaken = 0;
+        this.wasSuccessful = false;
     }
 
     public void start() {
@@ -41,7 +44,6 @@ public abstract class RunnableDBQuery implements Runnable {
     public void doQuery(String query) {
         try {
             Statement statement = connection.createStatement();
-//            statement.setQueryTimeout(1);
             statement.execute(query);
             connection.commit();
             wasSuccessful = true;
