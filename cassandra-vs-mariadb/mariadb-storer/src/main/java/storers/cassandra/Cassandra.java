@@ -1,6 +1,7 @@
 package storers.cassandra;
 
 import com.datastax.driver.core.*;
+import javafx.scene.layout.BorderImage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -76,11 +77,16 @@ public class Cassandra {
             query = "DROP TABLE IF EXISTS lineItems;";
             this.session.execute(query);
             query = "CREATE TABLE IF NOT EXISTS " + this.keyspaceName + ".lineItems"
-                    + "( lineItem_id text PRIMARY KEY, "
+                    + "( lineItem_id text, "
+                    + "order_id text, "
                     + "product_id text, "
                     + "quantity int, "
-                    + "line_price double );";
+                    + "line_price double, "
+                    + "PRIMARY KEY (lineItem_id)"
+                    + ");";
             this.session.execute(query);
+            query = "CREATE INDEX order_ids ON " + this.keyspaceName + ".lineItems ( order_id );";
+            session.execute(query);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             return false;
@@ -111,6 +117,7 @@ public class Cassandra {
     public boolean addOrder(JSONObject order) {
         String query;
         try {
+            String orderId = (String) order.get("id");
             JSONArray lineItems = (JSONArray) order.get("lineItems");
             ArrayList<String> lineItemsIds = new ArrayList<String>();
             for (int i = 0; i < lineItems.size(); i++) {
@@ -120,15 +127,14 @@ public class Cassandra {
                 int quantity = new Integer(((Long) lineItem.get("quantity")).intValue());
                 double linePrice = (Double) lineItem.get("linePrice");
                 query = "INSERT INTO " + this.keyspaceName + ".lineItems" +
-                        "( lineItem_id, product_id, quantity, line_price ) " +
-                        "VALUES (?, ?, ?, ?) IF NOT EXISTS;";
+                        "( lineItem_id, order_id, product_id, quantity, line_price ) " +
+                        "VALUES (?, ?, ?, ?, ?) IF NOT EXISTS;";
                 PreparedStatement p = this.session.prepare(query);
-                BoundStatement b = p.bind(lineItemId, productId, quantity, linePrice);
+                BoundStatement b = p.bind(lineItemId, orderId, productId, quantity, linePrice);
                 session.execute(b);
                 lineItemsIds.add("'" + lineItemId + "'");
             }
             //Add Order
-            String orderId = (String) order.get("id");
             String clientId = (String) ((JSONObject) order.get("client")).get("id");
             Long dateLong = (Long) order.get("date");
             String created = new Date(dateLong).toString();
@@ -149,22 +155,23 @@ public class Cassandra {
 
     public boolean removeOrder(JSONObject order) {
         String orderId = (String) order.get("data");
-        String query;
         try {
+            PreparedStatement p = session.prepare("SELECT lineitem_ids FROM " + this.keyspaceName + ".orders WHERE order_id=?;");
+            BoundStatement b = p.bind(orderId);
             // Remove all lineItems
-            query = "SELECT lineitem_ids FROM " + this.keyspaceName + ".orders WHERE order_id='" + orderId + "';";
-            ResultSet lineItemIds = session.execute(query);
+            ResultSet lineItemIds = session.execute(b);
             List<String> results = lineItemIds.all().get(0).getList(0, String.class);
             for (String id : results) {
-                PreparedStatement p = session.prepare(
+                p = session.prepare(
                         "DELETE FROM " + this.keyspaceName + ".lineItems WHERE lineItem_id=? IF EXISTS;"
+
                 );
-                BoundStatement bound = p.bind(id);
-                session.execute(bound);
+                b = p.bind(id);
+                session.execute(b);
             }
-            PreparedStatement p = session.prepare("DELETE FROM " + this.keyspaceName + ".orders WHERE order_id=? IF EXISTS;");
-            BoundStatement bound = p.bind(orderId);
-            session.execute(bound);
+            p = session.prepare("DELETE FROM " + this.keyspaceName + ".orders WHERE order_id=? IF EXISTS;");
+            b = p.bind(orderId);
+            session.execute(b);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             return false;
@@ -206,7 +213,23 @@ public class Cassandra {
             String orderId = (String) order.get("id");
             String newStatus = (String) order.get("status");
             PreparedStatement p = session.prepare("UPDATE " + this.keyspaceName + ".orders SET status=? WHERE order_id=? IF EXISTS;");
-            BoundStatement b  = p.bind(newStatus, orderId);
+            BoundStatement b = p.bind(newStatus, orderId);
+            session.execute(b);
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+            return false;
+        }
+        return true;
+    }
+
+    public boolean readOrder(JSONObject order) {
+        String orderId = (String) order.get("data");
+        try {
+            PreparedStatement p = session.prepare("SELECT * FROM " + this.keyspaceName + ".lineItems WHERE order_id=?;");
+            BoundStatement b = p.bind(orderId);
+            session.execute(b);
+            p = session.prepare("SELECT * FROM " + this.keyspaceName + ".orders WHERE order_id=?;");
+            b = p.bind(orderId);
             session.execute(b);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
