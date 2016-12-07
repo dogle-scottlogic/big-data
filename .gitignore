@@ -74,3 +74,5 @@ cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__org_ow2_asm_asm_util
 cassandra-vs-mariadb/mariadb-storer/.idea/workspace.xml
 
 
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__log4j_log4j_1_2_17.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__org_slf4j_slf4j_log4j12_1_7_21.xml
