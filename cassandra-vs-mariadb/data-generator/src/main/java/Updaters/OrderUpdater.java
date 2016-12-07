@@ -4,6 +4,7 @@ import Updaters.Products.HatUpdater;
 import entities.Client;
 import entities.LineItem;
 import entities.Order;
+import enums.Enums;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -52,5 +53,10 @@ public class OrderUpdater {
             lineItems.set(lineItemToAmendIndex, lineItemUpdater.updateRandomLineItemField(lineItemToAmend));
         }
         return lineItems;
+    }
+
+    public Order updateOrderStatus(Order updateOrder) {
+        updateOrder.setStatus(Enums.OrderStatus.values()[this.random.nextInt(Enums.OrderStatus.values().length)]);
+        return updateOrder;
     }
 }

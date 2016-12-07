@@ -41,7 +41,10 @@ public class EventGenerator implements Runnable {
                     newEvent = generateCreateEvent();
                     break;
                 case UPDATE:
-                    newEvent = generateUpdateEvent();
+                    newEvent = generateUpdateEvent(EventType.UPDATE);
+                    break;
+                case UPDATE_STATUS:
+                    newEvent = generateUpdateEvent(EventType.UPDATE_STATUS);
                     break;
                 case DELETE:
                     newEvent = generateDeleteEvent();
@@ -83,7 +86,7 @@ public class EventGenerator implements Runnable {
         return event;
     }
 
-    public Event generateUpdateEvent() {
+    public Event generateUpdateEvent(EventType type) {
         /*
         Raise an update event
         Select a random order
@@ -95,8 +98,13 @@ public class EventGenerator implements Runnable {
             Order updateOrder = this.orderList.get(randomOrderId);
             OrderUpdater orderUpdater = new OrderUpdater(this.random);
             // Modify the order in some way
-            updateOrder = orderUpdater.updateOrder(updateOrder);
-            event = new Event(EventType.UPDATE, updateOrder);
+            if(type == EventType.UPDATE) {
+                updateOrder = orderUpdater.updateOrder(updateOrder);
+            }
+            if(type == EventType.UPDATE_STATUS) {
+                updateOrder = orderUpdater.updateOrderStatus(updateOrder);
+            }
+            event = new Event(type, updateOrder);
         } else { // If there have been no create events yet, raise a create event instead
             event = generateCreateEvent();
         }

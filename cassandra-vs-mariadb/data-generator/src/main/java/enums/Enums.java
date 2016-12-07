@@ -6,7 +6,7 @@ package enums;
 public class Enums {
 
     public enum EventType {
-        CREATE, UPDATE, DELETE
+        CREATE, UPDATE, DELETE, UPDATE_STATUS
     }
 
     public enum ProductType {
