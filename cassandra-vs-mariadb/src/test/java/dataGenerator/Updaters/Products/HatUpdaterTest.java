@@ -9,6 +9,8 @@ import org.junit.Test;
 import java.util.Random;
 import java.util.UUID;
 
+import static org.junit.Assert.assertNotEquals;
+
 /**
  * Created by dogle on 05/12/2016.
  */
