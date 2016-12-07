@@ -7,6 +7,7 @@ import org.json.simple.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.StringTokenizer;
 
 /**
  * Created by dogle on 05/12/2016.
@@ -46,7 +47,7 @@ public class Cassandra {
         try {
             int replication = 1;
             String query = "CREATE KEYSPACE IF NOT EXISTS " + name + " WITH replication "
-                    + "= {'class':'SimpleStrategy', 'replication_factor':"+replication+"}; ";
+                    + "= {'class':'SimpleStrategy', 'replication_factor':" + replication + "}; ";
             dropKeySpace(name);
             this.session.execute(query);
             this.session.execute("USE " + name);
@@ -97,6 +98,7 @@ public class Cassandra {
                     + "lineItem_ids list<text>, "
                     + "client_id text, "
                     + "date_created text, "
+                    + "status text, "
                     + "order_subTotal double );";
             this.session.execute(query);
         } catch (Exception e) {
@@ -130,12 +132,13 @@ public class Cassandra {
             String clientId = (String) ((JSONObject) order.get("client")).get("id");
             Long dateLong = (Long) order.get("date");
             String created = new Date(dateLong).toString();
+            String status = (String) order.get("status");
             Double subTotal = (Double) order.get("subTotal");
-            query = "INSERT INTO "+this.keyspaceName+".orders"
-                    + "( order_id, lineItem_ids, client_id, date_created, order_subTotal ) "
-                    + "VALUES (?, ?, ?, ?, ?) IF NOT EXISTS;";
+            query = "INSERT INTO " + this.keyspaceName + ".orders"
+                    + "( order_id, lineItem_ids, client_id, date_created, status, order_subTotal ) "
+                    + "VALUES (?, ?, ?, ?, ?, ?) IF NOT EXISTS;";
             PreparedStatement p = this.session.prepare(query);
-            BoundStatement b = p.bind(orderId, lineItemsIds, clientId, created, subTotal);
+            BoundStatement b = p.bind(orderId, lineItemsIds, clientId, created, status, subTotal);
             session.execute(b);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
@@ -186,10 +189,25 @@ public class Cassandra {
             }
             Long dateLong = (Long) order.get("date");
             String created = new Date(dateLong).toString();
+            String status = (String) order.get("status");
             Double subTotal = (Double) order.get("subTotal");
-            PreparedStatement p = session.prepare("UPDATE " + this.keyspaceName + ".orders SET date_created=?, order_subTotal=? WHERE order_id=? IF EXISTS;");
-            BoundStatement bound = p.bind(created, subTotal, orderId);
+            PreparedStatement p = session.prepare("UPDATE " + this.keyspaceName + ".orders SET date_created=?, status=?, order_subTotal=? WHERE order_id=? IF EXISTS;");
+            BoundStatement bound = p.bind(created, status, subTotal, orderId);
             session.execute(bound);
+        } catch (Exception e) {
+            System.out.println(e.fillInStackTrace());
+            return false;
+        }
+        return true;
+    }
+
+    public boolean updateOrderStatus(JSONObject order) {
+        try {
+            String orderId = (String) order.get("id");
+            String newStatus = (String) order.get("status");
+            PreparedStatement p = session.prepare("UPDATE " + this.keyspaceName + ".orders SET status=? WHERE order_id=? IF EXISTS;");
+            BoundStatement b  = p.bind(newStatus, orderId);
+            session.execute(b);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             return false;

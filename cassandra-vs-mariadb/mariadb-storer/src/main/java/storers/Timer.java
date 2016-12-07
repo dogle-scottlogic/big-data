@@ -5,13 +5,13 @@ package storers;
  */
 public class Timer {
 
-    private static long startTime = 0;
+    private long startTime = 0;
 
     /**
      * Start the time
      * @return the time started
      */
-    public static long startTimer() {
+    public long startTimer() {
         return startTime = System.nanoTime();
     }
 
@@ -19,7 +19,7 @@ public class Timer {
      * Stop the timer
      * @return the time elapsed since timer was started
      */
-    public static long stopTimer() {
+    public long stopTimer() {
         long timeElapsed = System.nanoTime() - startTime;
         startTime = 0;
         return timeElapsed;

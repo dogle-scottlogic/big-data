@@ -9,7 +9,8 @@ import storers.cassandra.Cassandra;
 public class CassandraDBStorer {
 
     private Cassandra cassandra;
-    private Thread create, update, delete;
+    private Thread create, update, update_status, delete;
+    private Timer timer = new Timer();
 
     public CassandraDBStorer(Cassandra cassandra) {
         boolean success;
@@ -24,14 +25,15 @@ public class CassandraDBStorer {
 
         String type = (String) message.get("type");
 
-        if (type.equals("UPDATE")) {
-            update((JSONObject) message.get("data"));
-        }
-
         if (type.equals("CREATE")) {
             create((JSONObject) message.get("data"));
         }
-
+        if (type.equals("UPDATE")) {
+            update((JSONObject) message.get("data"));
+        }
+        if (type.equals("UPDATE_STATUS")) {
+            updateStatus((JSONObject) message.get("data"));
+        }
         if (type.equals("DELETE")) {
             delete(message);
         }
@@ -40,9 +42,9 @@ public class CassandraDBStorer {
     public void create(final JSONObject message) {
         this.create = new Thread(new Runnable() {
             public void run() {
-                Timer.startTimer();
+                timer.startTimer();
                 boolean success = cassandra.addOrder(message);
-                long time = Timer.stopTimer();
+                long time = timer.stopTimer();
                 System.out.println("Create Event completed in Cassandra: " + success);
                 System.out.println("Create Event in Cassandra took: " + time + " nanoseconds");
             }
@@ -53,9 +55,9 @@ public class CassandraDBStorer {
     public void update(final JSONObject message) {
         this.update = new Thread(new Runnable() {
             public void run() {
-                Timer.startTimer();
+                timer.startTimer();
                 boolean success = cassandra.updateOrder(message);
-                long time = Timer.stopTimer();
+                long time = timer.stopTimer();
                 System.out.println("Update Event completed in Cassandra: " + success);
                 System.out.println("Update Event in Cassandra took: " + time + " nanoseconds");
             }
@@ -63,12 +65,24 @@ public class CassandraDBStorer {
         this.update.start();
     }
 
+    private void updateStatus(final JSONObject message) {
+        this.update_status = new Thread(new Runnable() {
+            public  void run() {
+                timer.startTimer();
+                boolean success = cassandra.updateOrderStatus(message);
+                long time = timer.stopTimer();
+                System.out.println("Update Order Status Event completed in Cassandra: " + success);
+                System.out.println("Update Order Status Event in Cassandra took: " + time + " nanoseconds");
+            }
+        });
+    }
+
     public void delete(final JSONObject message) {
         this.delete = new Thread(new Runnable() {
             public void run() {
-                Timer.startTimer();
+                timer.startTimer();
                 boolean success = cassandra.removeOrder(message);
-                long time = Timer.stopTimer();
+                long time = timer.stopTimer();
                 System.out.println("Delete Event completed in Cassandra: " + success);
                 System.out.println("Delete Event in Cassandra took: " + time + " nanoseconds");
             }
