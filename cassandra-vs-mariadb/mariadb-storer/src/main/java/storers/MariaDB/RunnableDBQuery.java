@@ -26,14 +26,24 @@ public abstract class RunnableDBQuery implements Runnable {
         thread.start();
    }
 
-    public void doQuery(String query) {
+    public boolean doQuery(String query) {
+        boolean wasSuccessful = false;
         try {
-            Statement s = connection.createStatement();
-            s.execute(query);
-            System.out.println(query);
+            Statement statement = connection.createStatement();
+            statement.setQueryTimeout(1);
+            statement.execute(query);
             connection.commit();
+            wasSuccessful = true;
         } catch (SQLException e) {
             e.printStackTrace();
+            wasSuccessful = false;
+        } finally {
+            if (wasSuccessful) {
+                System.out.println("SUCCESS: " + query);
+            } else {
+                System.out.println("FAILED: " + query);
+            }
+            return wasSuccessful;
         }
     }
 }
