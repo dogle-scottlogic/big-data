@@ -4,6 +4,8 @@ import data_handlers.Settings;
 import entities.Client;
 import entities.LineItem;
 import entities.Order;
+import enums.Enums.OrderStatus;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
@@ -33,8 +35,9 @@ public class OrderGenerator {
         int nLineItems = this.random.nextInt(this.maxLineItems) + 1;
         UUID id = UUID.randomUUID();
         ArrayList<LineItem> lineItems = this.lineItemGenerator.generateLineItems(nLineItems);
+        OrderStatus status = OrderStatus.values()[this.random.nextInt(OrderStatus.values().length)];
 
-        return new Order(id, lineItems, this.client);
+        return new Order(id, lineItems, this.client, status);
     }
     
     public ArrayList<Order> generateOrders(int n) {

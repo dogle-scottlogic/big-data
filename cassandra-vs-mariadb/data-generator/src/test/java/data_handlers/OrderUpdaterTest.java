@@ -35,17 +35,15 @@ public class OrderUpdaterTest {
     }
 
     @Test
-    public void updateOrder() throws Exception {
-
-    }
-
-    @Test
-    public void updateClient() {
+    public void updateOrderStatus() throws Exception {
         OrderUpdater ou = new OrderUpdater(this.random);
         ClientGenerator cg = new ClientGenerator(this.random);
         ProductGenerator pg = new ProductGenerator(this.random);
         LineItemGenerator lig = new LineItemGenerator(this.random, pg, Enums.ProductType.values());
         OrderGenerator og = new OrderGenerator(this.random, lig, cg.generateClient());
-        ou.updateOrder(og.generateOrder());
+        Order order = ou.updateOrder(og.generateOrder());
+        Enums.OrderStatus status = order.getStatus();
+        order = ou.updateOrderStatus(order);
+        assertNotEquals(order.getStatus(), status);
     }
 }

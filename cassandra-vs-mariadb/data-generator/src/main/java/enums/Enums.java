@@ -6,11 +6,15 @@ package enums;
 public class Enums {
 
     public enum EventType {
-        CREATE, UPDATE, DELETE
+        CREATE, UPDATE, UPDATE_STATUS, DELETE
     }
 
     public enum ProductType {
         HAT
+    }
+
+    public enum OrderStatus {
+        ORDERED, PROCESSING, DISPATCHED, DELIVERED
     }
 
     public static String[] getEventTypes(){

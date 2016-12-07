@@ -1,11 +1,12 @@
 package entities;
 
+import enums.Enums.OrderStatus;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
 
 /**
- *
  * @author lcollingwood
  */
 public class Order {
@@ -13,13 +14,15 @@ public class Order {
     private ArrayList<LineItem> lineItems;
     private Client client;
     private Date created;
+    private OrderStatus status;
     private double subTotal;
 
-    public Order(UUID id, ArrayList<LineItem> lineItems, Client client) {
+    public Order(UUID id, ArrayList<LineItem> lineItems, Client client, OrderStatus status) {
         this.id = id.toString();
         this.lineItems = lineItems;
         this.client = client;
         this.created = new Date();
+        this.status = status;
     }
 
     public double getSubTotal() {
@@ -29,7 +32,7 @@ public class Order {
         }
         return subTotal;
     }
-    
+
     public String getId() {
         return id;
     }
@@ -56,6 +59,14 @@ public class Order {
 
     public Date getDate() {
         return this.created;
+    }
+
+    public void setStatus(OrderStatus status) {
+        this.status = status;
+    }
+
+    public OrderStatus getStatus() {
+        return this.status;
     }
 
     public void setSubTotal(double subTotal) {
