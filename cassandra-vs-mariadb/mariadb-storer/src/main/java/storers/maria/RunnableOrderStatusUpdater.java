@@ -12,11 +12,12 @@ public class RunnableOrderStatusUpdater extends RunnableDBQuery {
     private JSONObject data;
 
     public RunnableOrderStatusUpdater(Connection connection, JSONObject data) {
-        super(connection, (String) data.get("id"), DBEventType.ORDER_STATUS_UPDATE);
+        super(connection, (String) data.get("id"), DBEventType.UPDATE_STATUS);
         this.data = data;
     }
 
     public void run() {
-        doQuery("UPDATE orders.`order` SET status='" + (String) data.get("status") + "WHERE id='" + orderId + "';");
+        doQuery("UPDATE orders.`order` SET status='" + (String) data.get("status") + "' WHERE id='" + orderId + "';");
+        end();
     }
 }

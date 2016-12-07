@@ -1,5 +1,6 @@
 package storers.maria;
 
+import storers.Timer;
 import storers.maria.enums.DBEventType;
 
 import java.sql.Connection;
@@ -10,6 +11,10 @@ import java.sql.Statement;
  * Created by lcollingwood on 06/12/2016.
  */
 public abstract class RunnableDBQuery implements Runnable {
+    private Timer timer = new Timer();
+    private long timeTaken = 0;
+    private boolean wasSuccessful = false;
+
     public DBEventType ACTION_TYPE;
     public Thread thread;
     public Connection connection;
@@ -24,26 +29,25 @@ public abstract class RunnableDBQuery implements Runnable {
     public void start() {
         thread = new Thread(this, ACTION_TYPE.toString() + ":" + orderId);
         thread.start();
-   }
+        timer.startTimer();
+    }
 
-    public boolean doQuery(String query) {
-        boolean wasSuccessful = false;
+    public void end() {
+        timeTaken = timer.stopTimer();
+        System.out.println(ACTION_TYPE.toString() + " Event (Order: " + orderId + ") completed in MariaDB: " + wasSuccessful);
+        System.out.println(ACTION_TYPE.toString() + " Event in MariaDB took: " + timeTaken + " nanoseconds");
+    }
+
+    public void doQuery(String query) {
         try {
             Statement statement = connection.createStatement();
-            statement.setQueryTimeout(1);
+//            statement.setQueryTimeout(1);
             statement.execute(query);
             connection.commit();
             wasSuccessful = true;
         } catch (SQLException e) {
             e.printStackTrace();
             wasSuccessful = false;
-        } finally {
-            if (wasSuccessful) {
-                System.out.println("SUCCESS: " + query);
-            } else {
-                System.out.println("FAILED: " + query);
-            }
-            return wasSuccessful;
         }
     }
 }

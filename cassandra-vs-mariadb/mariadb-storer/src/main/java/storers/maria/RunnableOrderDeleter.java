@@ -15,6 +15,7 @@ public class RunnableOrderDeleter extends RunnableDBQuery {
     public void run() {
         doQuery(deleteString("orders.`line_item`", "order_id", orderId));
         doQuery(deleteString("orders.`order`", "id", orderId));
+        end();
     }
 
     private String deleteString(String table, String idField, String orderId) {

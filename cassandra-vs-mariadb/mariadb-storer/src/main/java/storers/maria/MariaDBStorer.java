@@ -43,6 +43,7 @@ public class MariaDBStorer {
 
     public static void messageHandler(JSONObject message) {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
+
         switch (eventType) {
             case CREATE:
                 new RunnableOrderCreator(connection, (JSONObject) message.get("data")).start();
@@ -50,11 +51,14 @@ public class MariaDBStorer {
             case UPDATE:
                 new RunnableOrderUpdater(connection, (JSONObject) message.get("data")).start();
                 break;
-            case ORDER_STATUS_UPDATE:
+            case UPDATE_STATUS:
                 new RunnableOrderStatusUpdater(connection, (JSONObject) message.get("data")).start();
                 break;
             case DELETE:
                 new RunnableOrderDeleter(connection, (String) message.get("data")).start();
+                break;
+            case READ:
+                new RunnableOrderByIdReader(connection, (String) message.get("data")).start();
                 break;
         }
     }

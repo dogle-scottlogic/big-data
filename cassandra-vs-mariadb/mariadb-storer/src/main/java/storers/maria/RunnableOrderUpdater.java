@@ -29,6 +29,7 @@ public class RunnableOrderUpdater extends RunnableDBQuery {
                 "WHERE id='" + orderId + "';");
         JSONArray lineItems = (JSONArray) data.get("lineItems");
         updateLineItems(orderId, lineItems);
+        end();
     }
 
     private void updateLineItems(String orderId, JSONArray lineItems) {

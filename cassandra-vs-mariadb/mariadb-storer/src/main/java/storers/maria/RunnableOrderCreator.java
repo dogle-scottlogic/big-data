@@ -26,6 +26,7 @@ public class RunnableOrderCreator extends RunnableDBQuery {
         doQuery("INSERT INTO orders.`order` VALUES('" + orderId + "', '" + clientId + "', '" + Long.valueOf(date).toString() + "', '" + status + "');");
         JSONArray lineItems = (JSONArray) data.get("lineItems");
         createLineItems(orderId, lineItems);
+        end();
     }
 
     private void createLineItems(String orderId, JSONArray lineItems) {
