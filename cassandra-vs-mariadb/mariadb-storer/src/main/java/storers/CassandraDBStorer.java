@@ -40,8 +40,11 @@ public class CassandraDBStorer {
     public void create(final JSONObject message) {
         this.create = new Thread(new Runnable() {
             public void run() {
+                Timer.startTimer();
                 boolean success = cassandra.addOrder(message);
+                long time = Timer.stopTimer();
                 System.out.println("Create Event completed in Cassandra: " + success);
+                System.out.println("Create Event in Cassandra took: " + time + " nanoseconds");
             }
         });
         this.create.start();
@@ -50,8 +53,11 @@ public class CassandraDBStorer {
     public void update(final JSONObject message) {
         this.update = new Thread(new Runnable() {
             public void run() {
+                Timer.startTimer();
                 boolean success = cassandra.updateOrder(message);
+                long time = Timer.stopTimer();
                 System.out.println("Update Event completed in Cassandra: " + success);
+                System.out.println("Update Event in Cassandra took: " + time + " nanoseconds");
             }
         });
         this.update.start();
@@ -60,8 +66,11 @@ public class CassandraDBStorer {
     public void delete(final JSONObject message) {
         this.delete = new Thread(new Runnable() {
             public void run() {
+                Timer.startTimer();
                 boolean success = cassandra.removeOrder(message);
+                long time = Timer.stopTimer();
                 System.out.println("Delete Event completed in Cassandra: " + success);
+                System.out.println("Delete Event in Cassandra took: " + time + " nanoseconds");
             }
         });
         this.delete.start();
