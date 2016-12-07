@@ -1,4 +1,4 @@
-package storers.MariaDB.enums;
+package storers.maria.enums;
 
 /**
  * Created by lcollingwood on 06/12/2016.
@@ -15,7 +15,8 @@ public enum SQLQuery {
             "id VARCHAR(40) NOT NULL, " +
             "client_id VARCHAR(40) NOT NULL, " +
             "created VARCHAR(40) NOT NULL, " +
-        "PRIMARY KEY (id))"
+            "status VARCHAR(40) NOT NULL, " +
+            "PRIMARY KEY (id))"
     ),
 
     CREATE_LINE_ITEM_TABLE(

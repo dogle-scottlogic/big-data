@@ -6,7 +6,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import storers.CassandraDBStorer;
 import storers.cassandra.Cassandra;
-import storers.MariaDB.MariaDBStorer;
+import storers.maria.MariaDBStorer;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -56,7 +56,6 @@ public abstract class InboundMessageHandlerRabbitMQ {
                         e.printStackTrace();
                     }
                 }
-
             };
         } catch (Exception e) {
             e.printStackTrace();

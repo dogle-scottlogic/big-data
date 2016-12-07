@@ -1,8 +1,8 @@
-package storers.MariaDB;
+package storers.maria;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import storers.MariaDB.enums.DBEventType;
+import storers.maria.enums.DBEventType;
 
 import java.sql.Connection;
 import java.util.Iterator;
@@ -23,10 +23,10 @@ public class RunnableOrderUpdater extends RunnableDBQuery {
         String clientId = (String) client.get("id");
         Long date = (Long) data.get("date");
         doQuery("UPDATE orders.`order` " +
-            "SET " +
+                "SET " +
                 "client_id='" + clientId + "', " +
                 "created='" + Long.valueOf(date).toString() + "' " +
-            "WHERE id='" + orderId + "';");
+                "WHERE id='" + orderId + "';");
         JSONArray lineItems = (JSONArray) data.get("lineItems");
         updateLineItems(orderId, lineItems);
     }
@@ -41,11 +41,11 @@ public class RunnableOrderUpdater extends RunnableDBQuery {
             Long quantity = (Long) nextLineItem.get("quantity");
 
             doQuery("UPDATE orders.line_item " +
-                "SET " +
+                    "SET " +
                     "order_id='" + orderId + "', " +
                     "product_id='" + productId + "', " +
                     "quantity=" + Long.valueOf(quantity).toString() + " " +
-                "WHERE order_id='" + orderId + "';");
+                    "WHERE order_id='" + orderId + "';");
         }
     }
 }

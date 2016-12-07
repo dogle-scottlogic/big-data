@@ -1,6 +1,6 @@
-package storers.MariaDB;
+package storers.maria;
 
-import storers.MariaDB.enums.DBEventType;
+import storers.maria.enums.DBEventType;
 
 import java.sql.Connection;
 import java.sql.SQLException;

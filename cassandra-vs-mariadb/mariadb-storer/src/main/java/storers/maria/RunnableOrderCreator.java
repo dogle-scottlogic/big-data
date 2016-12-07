@@ -1,19 +1,19 @@
-package storers.MariaDB;
+package storers.maria;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import storers.MariaDB.enums.DBEventType;
+import storers.maria.enums.DBEventType;
 
 import java.sql.Connection;
 import java.util.Iterator;
 
 /**
- * Create Order with Line Items in MariaDB
+ * Create Order with Line Items in maria
  */
 public class RunnableOrderCreator extends RunnableDBQuery {
     private JSONObject data;
 
-    public RunnableOrderCreator(Connection connection, JSONObject data){
+    public RunnableOrderCreator(Connection connection, JSONObject data) {
         super(connection, (String) data.get("id"), DBEventType.CREATE);
         this.data = data;
     }
@@ -22,7 +22,8 @@ public class RunnableOrderCreator extends RunnableDBQuery {
         JSONObject client = (JSONObject) data.get("client");
         String clientId = (String) client.get("id");
         Long date = (Long) data.get("date");
-        doQuery("INSERT INTO orders.`order` VALUES('" + orderId + "', '" + clientId + "', '" + Long.valueOf(date).toString() + "');");
+        String status = (String) data.get("status");
+        doQuery("INSERT INTO orders.`order` VALUES('" + orderId + "', '" + clientId + "', '" + Long.valueOf(date).toString() + "', '" + status + "');");
         JSONArray lineItems = (JSONArray) data.get("lineItems");
         createLineItems(orderId, lineItems);
     }
@@ -36,7 +37,7 @@ public class RunnableOrderCreator extends RunnableDBQuery {
             query = query.concat(createLineItemPartialQuery(orderId, nextLineItem)).concat(", ");
         }
         // Chop last comma
-        query = query.substring(0, query.length() -2);
+        query = query.substring(0, query.length() - 2);
         doQuery(query);
     }
 
