@@ -13,6 +13,10 @@ public class Enums {
         HAT
     }
 
+    public enum OrderStatus {
+        ORDERED, PROCESSING, DISPATCHED, DELIVERED
+    }
+
     public static String[] getEventTypes(){
         EventType[] eventTypes = EventType.values();
         String[] eventNames = new String[eventTypes.length];
