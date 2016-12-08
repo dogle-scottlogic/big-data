@@ -43,7 +43,8 @@ public class EventGenerator implements Runnable {
     public void run() {
         int eventCounter = 1;
         String eventGenMode = Settings.getStringSetting("EVENT_GEN_MODE");
-        int numEvents = Settings.getIntSetting("NUM_FIXED_EVENTS");
+        int numFixedEvents = Settings.getIntSetting("NUM_FIXED_EVENTS");
+
         int fixedEventCount = 0;
         int fixedEventTypeCount = 0;
         EventType type = EventType.CREATE;
@@ -54,10 +55,10 @@ public class EventGenerator implements Runnable {
                 // Check the mode
                 if (eventGenMode.equals("fixed")) {
                     int eventListLength = this.eventList.length;
-                    if(this.events.length > 0) eventListLength = this.events.length;
+                    if (this.events.length > 0) eventListLength = this.events.length;
                     type = getFixedEventType(fixedEventTypeCount);
                     fixedEventCount++;
-                    if (fixedEventCount == numEvents) {
+                    if (fixedEventCount == numFixedEvents) {
                         fixedEventTypeCount++;
                         fixedEventCount = 0;
                     }
@@ -212,7 +213,7 @@ public class EventGenerator implements Runnable {
 
     private EventType getFixedEventType(int fixedEventTypeCount) {
         EventType[] events = this.eventList;
-        if(this.events.length > 0) events = this.events;
+        if (this.events.length > 0) events = this.events;
         EventType type = events[fixedEventTypeCount];
         return type;
     }
@@ -220,11 +221,11 @@ public class EventGenerator implements Runnable {
     private EventType getRandomEventType() {
         // One in 5 chance of generating a delete event
         EventType[] events = this.eventList;
-        if(this.events.length > 0) events = this.events;
+        if (this.events.length > 0) events = this.events;
         int c = Settings.getIntSetting("DELETE_CHANCE");
         int weight = this.random.nextInt(c) + 1;
-        if(weight == 1 && ArrayUtils.contains(events, EventType.DELETE)) return EventType.DELETE;
+        if (weight == 1 && ArrayUtils.contains(events, EventType.DELETE)) return EventType.DELETE;
         EventType[] reducedList = ArrayUtils.removeElement(events, EventType.DELETE);
-        return reducedList[random.nextInt(events.length -1)];
+        return reducedList[random.nextInt(events.length - 1)];
     }
 }

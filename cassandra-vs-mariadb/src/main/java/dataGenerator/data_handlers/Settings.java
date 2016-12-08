@@ -15,6 +15,24 @@ public class Settings {
         return conf.getString(path.concat(setting));
     }
 
+    public static boolean setStringSetting(String setting, String value) {
+        try {
+            conf = conf.withValue(path.concat(setting), ConfigValueFactory.fromAnyRef(value));
+            return true;
+        } catch (Exception e){
+            return false;
+        }
+    }
+
+    public static boolean setIntSetting(String setting, int value) {
+        try {
+            conf = conf.withValue(path.concat(setting), ConfigValueFactory.fromAnyRef(value));
+            return true;
+        } catch (Exception e){
+            return false;
+        }
+    }
+
     public static int getIntSetting(String setting) {
         return conf.getInt(path.concat(setting));
     }

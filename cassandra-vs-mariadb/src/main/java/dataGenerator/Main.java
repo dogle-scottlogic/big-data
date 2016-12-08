@@ -21,7 +21,6 @@ public class Main {
     private static Thread thread = null;
     private static final int seed = Settings.getIntSetting("SEED");
     private static Random random = new Random(seed);
-
     private static ArrayList<Client> clients = new ArrayList<Client>();
     private static final dataGenerator.generators.ClientGenerator clientGen = new dataGenerator.generators.ClientGenerator(random);
     private static final int numClients = Settings.getIntSetting("NUM_CLIENTS");

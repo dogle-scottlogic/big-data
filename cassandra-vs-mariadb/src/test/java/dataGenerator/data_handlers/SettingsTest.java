@@ -9,6 +9,12 @@ import static org.junit.Assert.*;
  */
 public class SettingsTest {
 
+    @Test
+    public void setStringSetting() throws Exception {
+        String mode = "random";
+        Settings.setStringSetting("EVENT_GEN_MODE", mode);
+        assertEquals("random", Settings.getStringSetting("EVENT_GEN_MODE"));
+    }
 
     @Test
     public void getIntSetting() throws Exception {
