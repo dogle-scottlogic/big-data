@@ -28,12 +28,9 @@ public class JsonLoader {
         JSONParser parser = new JSONParser();
 
         try {
-
             Object obj = parser.parse(new FileReader(absPath));
-
             JSONObject jsonObject = (JSONObject) obj;
             return jsonObject;
-
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

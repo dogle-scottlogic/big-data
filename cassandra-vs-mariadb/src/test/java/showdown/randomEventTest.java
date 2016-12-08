@@ -17,16 +17,8 @@ import java.util.Random;
  */
 public class randomEventTest {
 
-    private  static int seed = Settings.getIntSetting("SEED");
-    private static Random random;
-    private static ArrayList<Client> clients;
-    private static dataGenerator.generators.ClientGenerator clientGen;
-
     @Before
     public void setUp() throws Exception {
-        random = new Random(seed);
-        clients = new ArrayList<Client>();
-        clientGen = new dataGenerator.generators.ClientGenerator(random);
     }
 
     @After
@@ -41,11 +33,11 @@ public class randomEventTest {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.processEvents(numOfEvents, new Enums.EventType[]{}, cdbs);
+        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{}, cdbs, "fiveHundredRandomEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.processEvents(numOfEvents, new Enums.EventType[]{}, mdbs);
+        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{}, mdbs, "fiveHundredRandomEventsMariaDB");
 
     }
 

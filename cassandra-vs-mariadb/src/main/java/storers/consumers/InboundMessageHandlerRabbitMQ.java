@@ -27,8 +27,6 @@ public class InboundMessageHandlerRabbitMQ {
 
     public static void initialise() {
         try {
-            logger = new CSVLogger("C:\\dev\\big-data-bench-projects\\cassandra-vs-mariadb\\testLogs");
-            mariaLogger = new CSVLogger("C:\\dev\\big-data-bench-projects\\cassandra-vs-mariadb\\testLogs");
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
             connection = InboundMessageHandlerRabbitMQ.connectionFactory.newConnection();

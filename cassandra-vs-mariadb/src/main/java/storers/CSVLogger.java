@@ -10,22 +10,22 @@ import java.util.UUID;
  */
 public class CSVLogger {
 
-    private String fileName;
+    private String folderName;
     private String[] headers;
     private BufferedWriter bufferedWriter = null;
     private FileWriter fileWriter = null;
-    private String testID;
+    private String fileName;
 
-    public CSVLogger(String filename) throws IOException {
+    public CSVLogger(String folderName, String fileName) throws IOException {
         this.headers = new String[]{"TestID", "DatabaseType", "EventType", "TimeTaken", "Success", "ErrorMessage"};
-        this.fileName = filename;
-        this.testID = UUID.randomUUID().toString();
+        this.folderName = folderName;
+        this.fileName = fileName;
         setUpLogFile();
     }
 
     public void logEvent(String[] eventData, boolean header) {
         try {
-            this.fileWriter = new FileWriter(this.fileName + "/" + this.testID  + ".csv", true);
+            this.fileWriter = new FileWriter(this.folderName + "/" + this.fileName  + ".csv", true);
             this.bufferedWriter = new BufferedWriter(fileWriter);
             String logLine = eventDataToLogLine(eventData, header);
             this.bufferedWriter.write(logLine);
@@ -47,7 +47,7 @@ public class CSVLogger {
 
     private String eventDataToLogLine(String[] eventData, boolean header) {
         String logLine = "";
-        if(!header) logLine = this.testID + ", ";
+        if(!header) logLine = this.fileName + ", ";
         for (String eventDatum : eventData) {
             logLine = logLine + eventDatum + ", ";
         }
