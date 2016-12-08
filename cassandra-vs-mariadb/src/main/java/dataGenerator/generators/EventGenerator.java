@@ -25,13 +25,23 @@ public class EventGenerator implements Runnable {
     private ArrayList<Client> clientList;
     private Random random;
     private final int totalStoredOrders = Settings.getIntSetting("ORDER_CACHE_SIZE");
+    private int numOfEvents = 0;
+    private EventType[] events = {};
 
     public EventGenerator(ArrayList<Client> clientList, Random random) {
         this.clientList = clientList;
         this.random = random;
     }
 
+    public EventGenerator(ArrayList<Client> clientList, Random random, int numOfEvents, EventType[] events) {
+        this.clientList = clientList;
+        this.random = random;
+        this.numOfEvents = numOfEvents;
+        this.events = events;
+    }
+
     public void run() {
+        int eventCounter = 1;
         String eventGenMode = Settings.getStringSetting("EVENT_GEN_MODE");
         int numEvents = Settings.getIntSetting("NUM_FIXED_EVENTS");
         int fixedEventCount = 0;
@@ -39,24 +49,27 @@ public class EventGenerator implements Runnable {
         EventType type = EventType.CREATE;
 
         boolean interrupted = false;
-        while (!interrupted) {
+        while (!interrupted && eventCounter != this.numOfEvents) {
             try {
                 // Check the mode
                 if (eventGenMode.equals("fixed")) {
+                    int eventListLength = this.eventList.length;
+                    if(this.events.length > 0) eventListLength = this.events.length;
                     type = getFixedEventType(fixedEventTypeCount);
                     fixedEventCount++;
                     if (fixedEventCount == numEvents) {
                         fixedEventTypeCount++;
                         fixedEventCount = 0;
                     }
-                    if (fixedEventTypeCount == EventType.values().length) fixedEventTypeCount = 0;
+                    if (fixedEventTypeCount == eventListLength) fixedEventTypeCount = 0;
                 }
                 if (eventGenMode.equals("random")) {
                     type = getRandomEventType();
                 }
                 Event newEvent = generateEvents(type);
                 // Emit event
-                Emitter.emitEvent(newEvent);
+                System.out.println(eventCounter + ":" + Emitter.emitEvent(newEvent));
+                eventCounter++;
                 if (newEvent.getType() == EventType.CREATE) addOrderToList((Order) newEvent.getData());
                 if (newEvent.getType() == EventType.DELETE) removeOrderFromList((String) newEvent.getData());
                 Thread.sleep(Settings.getIntSetting("SLEEP"));
@@ -67,11 +80,6 @@ public class EventGenerator implements Runnable {
             }
         }
 
-    }
-
-    private EventType getFixedEventType(int fixedEventTypeCount) {
-        EventType type = EventType.values()[fixedEventTypeCount];
-        return type;
     }
 
     private Event generateEvents(EventType eventType) {
@@ -202,12 +210,21 @@ public class EventGenerator implements Runnable {
         return oldestOrder;
     }
 
+    private EventType getFixedEventType(int fixedEventTypeCount) {
+        EventType[] events = this.eventList;
+        if(this.events.length > 0) events = this.events;
+        EventType type = events[fixedEventTypeCount];
+        return type;
+    }
+
     private EventType getRandomEventType() {
         // One in 5 chance of generating a delete event
+        EventType[] events = this.eventList;
+        if(this.events.length > 0) events = this.events;
         int c = Settings.getIntSetting("DELETE_CHANCE");
         int weight = this.random.nextInt(c) + 1;
-        if(weight == 1) return EventType.DELETE;
-        EventType[] reducedList = ArrayUtils.removeElement(this.eventList, EventType.DELETE);
-        return reducedList[random.nextInt(eventList.length -1)];
+        if(weight == 1 && ArrayUtils.contains(events, EventType.DELETE)) return EventType.DELETE;
+        EventType[] reducedList = ArrayUtils.removeElement(events, EventType.DELETE);
+        return reducedList[random.nextInt(events.length -1)];
     }
 }

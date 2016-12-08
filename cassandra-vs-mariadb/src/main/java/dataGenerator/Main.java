@@ -2,6 +2,7 @@ package dataGenerator;
 
 import dataGenerator.data_handlers.Settings;
 import dataGenerator.entities.Client;
+import dataGenerator.enums.Enums;
 import dataGenerator.transmission.Emitter;
 
 import java.io.BufferedReader;
@@ -27,19 +28,13 @@ public class Main {
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) throws IOException {
-
-        // Create a list of clients
-        run();
-    }
-
-    public static void run() throws IOException {
         String input = "";
         clients = clientGen.getClients(numClients);
         dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random);
         thread = new Thread(eg);
 
         out.println("Data Generator 1.0");
-        while(!input.equals("exit")) {
+        while (!input.equals("exit")) {
             System.out.print(">");
             input = br.readLine();
             if (input.equals("run")) {
@@ -52,5 +47,13 @@ public class Main {
                 thread = new Thread(eg);
             }
         }
+    }
+
+    public static void run(int numberOfEvents, Enums.EventType[] events) throws IOException {
+        clients = clientGen.getClients(numClients);
+        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random, numberOfEvents, events);
+        thread = new Thread(eg);
+        Emitter.initialize();
+        thread.start();
     }
 }

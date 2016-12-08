@@ -45,12 +45,11 @@ public class Emitter {
         }
     }
 
-    public static void emitEvent(Event e) {
+    public static String emitEvent(Event e) {
         String jsonOrder = Serializer.Serialize(e);
-        System.out.println(" SENT: " + jsonOrder);
-
         try {
             channel.basicPublish(Settings.getStringQueueSetting("EXCHANGE"), QUEUE_NAME, null, jsonOrder.getBytes());
+            return " SENT: " + jsonOrder;
         } catch (IOException e1) {
             e1.printStackTrace();
         }
@@ -58,5 +57,6 @@ public class Emitter {
            System.out.println(npe.getMessage());
            System.out.println("Exception: The queue may not be running.");
         }
+        return "";
     }
 }
