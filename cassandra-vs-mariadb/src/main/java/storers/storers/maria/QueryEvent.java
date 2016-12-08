@@ -42,7 +42,7 @@ public abstract class QueryEvent {
         System.out.println(ACTION_TYPE.toString() + " Event (Order: " + orderId + ") completed in MariaDB: " + wasSuccessful);
         System.out.println(ACTION_TYPE.toString() + " Event in MariaDB took: " + timeTaken + " nanoseconds");
         String timeTakenString = Long.valueOf(timeTaken).toString();
-        return new String[]{String.valueOf(System.nanoTime()), "MariaDB", ACTION_TYPE.toString(), timeTakenString, Boolean.toString(wasSuccessful), errorMessage};
+        return new String[]{"MariaDB", ACTION_TYPE.toString(), timeTakenString, Boolean.toString(wasSuccessful), errorMessage, String.valueOf(System.nanoTime())};
     }
 
     public void doQuery(String query) {
