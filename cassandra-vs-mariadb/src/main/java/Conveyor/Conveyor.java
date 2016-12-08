@@ -24,7 +24,7 @@ public class Conveyor {
 
     private static int seed = Settings.getIntSetting("SEED");
     private static int numClients = Settings.getIntSetting("NUM_CLIENTS");
-    private static Random random = new Random(seed);
+    private static Random random;
     private static ArrayList<Client> clients = new ArrayList<Client>();
     private static dataGenerator.generators.ClientGenerator clientGen;
     private static String filePath = "\\testLogs";
@@ -50,6 +50,7 @@ public class Conveyor {
 
 
     private static void processEvents(int numberOfEventsToProcess, Enums.EventType[] events, Storer storer, boolean log) throws IOException, ParseException {
+        random = new Random(seed);
         String absPath = new File("").getAbsolutePath().concat(filePath);
         CSVLogger logger = null;
         if(log) logger = new CSVLogger(absPath, logName);
