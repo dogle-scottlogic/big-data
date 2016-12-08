@@ -30,7 +30,6 @@ public class Conveyor {
     private static String filePath = "\\testLogs";
     private static String logName = "";
 
-
     public static void processEventsWithLog(int numberOfEventsToProcess, Enums.EventType[] events, Storer storer, String logFileName) {
         try {
             logName = logFileName;

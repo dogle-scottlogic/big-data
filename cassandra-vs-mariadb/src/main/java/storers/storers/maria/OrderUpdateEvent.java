@@ -14,7 +14,7 @@ public class OrderUpdateEvent extends QueryEvent {
     private JSONObject data;
 
     public OrderUpdateEvent(Connection connection, JSONObject data) {
-        super(connection, (String) data.get("id"), DBEventType.DELETE);
+        super(connection, (String) data.get("id"), DBEventType.UPDATE);
         this.data = data;
     }
 
