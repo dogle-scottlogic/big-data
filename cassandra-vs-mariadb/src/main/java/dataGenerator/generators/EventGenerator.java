@@ -50,7 +50,7 @@ public class EventGenerator implements Runnable {
         EventType type = EventType.CREATE;
 
         boolean interrupted = false;
-        while (!interrupted && eventCounter != this.numOfEvents) {
+        while (!interrupted && eventCounter != this.numOfEvents + 1) {
             try {
                 // Check the mode
                 if (eventGenMode.equals("fixed")) {
