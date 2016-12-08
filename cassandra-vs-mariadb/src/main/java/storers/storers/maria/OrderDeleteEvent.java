@@ -12,10 +12,10 @@ public class OrderDeleteEvent extends QueryEvent {
         super(connection, orderId, DBEventType.DELETE);
     }
 
-    public void runQuery() {
+    public String[] runQuery() {
         doQuery(deleteString("orders.`line_item`", "order_id", orderId));
         doQuery(deleteString("orders.`order`", "id", orderId));
-        end();
+        return end();
     }
 
     private String deleteString(String table, String idField, String orderId) {

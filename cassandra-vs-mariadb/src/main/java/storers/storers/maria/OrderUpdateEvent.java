@@ -18,7 +18,7 @@ public class OrderUpdateEvent extends QueryEvent {
         this.data = data;
     }
 
-    public void runQuery() {
+    public String[] runQuery() {
         JSONObject client = (JSONObject) data.get("client");
         String clientId = (String) client.get("id");
         Long date = (Long) data.get("date");
@@ -29,7 +29,7 @@ public class OrderUpdateEvent extends QueryEvent {
                 "WHERE id='" + orderId + "';");
         JSONArray lineItems = (JSONArray) data.get("lineItems");
         updateLineItems(orderId, lineItems);
-        end();
+        return end();
     }
 
     private void updateLineItems(String orderId, JSONArray lineItems) {
