@@ -1,6 +1,7 @@
-package storers.storers.maria;
+package storers.storers;
 
 import org.json.simple.JSONObject;
+import storers.storers.maria.*;
 import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.SQLQuery;
 
@@ -13,7 +14,7 @@ import java.sql.Statement;
  * maria Storer.
  * Takes as input events from The Hat Shop as JSON data and as appropriate Creates, Updates and Deletes Order data.
  */
-public class MariaDBStorer {
+public class MariaDBStorer implements Storer{
     private static Connection connection;
 
     public MariaDBStorer() throws SQLException {
@@ -40,7 +41,7 @@ public class MariaDBStorer {
         statement.close();
     }
 
-    public static String[] messageHandler(JSONObject message) {
+    public String[] messageHandler(JSONObject message) {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
 
         switch (eventType) {

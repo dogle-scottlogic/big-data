@@ -7,7 +7,7 @@ import org.json.simple.parser.ParseException;
 import storers.CSVLogger;
 import storers.storers.CassandraDBStorer;
 import storers.storers.cassandra.Cassandra;
-import storers.storers.maria.MariaDBStorer;
+import storers.storers.MariaDBStorer;
 
 import java.io.UnsupportedEncodingException;
 
@@ -25,15 +25,10 @@ public class InboundMessageHandlerRabbitMQ {
     private static CSVLogger logger;
     private static CSVLogger mariaLogger;
 
-
-    private static Cassandra cassandra = new Cassandra("127.0.0.7");
-
-
     public static void initialise() {
         try {
             logger = new CSVLogger("C:\\dev\\big-data-bench-projects\\cassandra-vs-mariadb\\testLogs");
             mariaLogger = new CSVLogger("C:\\dev\\big-data-bench-projects\\cassandra-vs-mariadb\\testLogs");
-            cassandra.connect();
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
             connection = InboundMessageHandlerRabbitMQ.connectionFactory.newConnection();
@@ -44,7 +39,7 @@ public class InboundMessageHandlerRabbitMQ {
 
                 // Init storers
                 MariaDBStorer mariaDBStorer = new MariaDBStorer();
-                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer(cassandra);
+                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer();
 
                 public void handleDelivery(
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body

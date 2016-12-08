@@ -14,8 +14,10 @@ public class CassandraDBStorer implements Storer{
     private Cassandra cassandra;
     private Timer timer = new Timer();
 
-    public CassandraDBStorer(Cassandra cassandra) {
+    public CassandraDBStorer() {
         boolean success;
+        this.cassandra = new Cassandra("127.0.0.7");
+        cassandra.connect();
         success = cassandra.createKeySpace("orders");
         if (success) success = cassandra.createLineItemTable();
         if (success) success = cassandra.createOrderTable();

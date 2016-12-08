@@ -1,13 +1,14 @@
 package showdown;
 
+import Conveyor.Conveyor;
 import dataGenerator.data_handlers.Settings;
 import dataGenerator.entities.Client;
 import dataGenerator.enums.Enums;
-import dataGenerator.transmission.Emitter;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
+import storers.storers.CassandraDBStorer;
+import storers.storers.MariaDBStorer;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -35,15 +36,17 @@ public class randomEventTest {
 
     @Test
     public void FiveHundredTotalRandomEvents() throws Exception {
-//        int numClients = Settings.getIntSetting("NUM_CLIENTS");
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
-//        clients = clientGen.getClients(numClients);
         int numOfEvents = 500;
-        Conveyor.Conveyor.processEvents(numOfEvents, new Enums.EventType[]{});
-//        storers.consumers.InboundMessageHandlerRabbitMQ.on();
-//        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random, numOfEvents, new Enums.EventType[]{});
-//        Emitter.initialize();
-//        eg.run();
+
+        // Cassandra
+        CassandraDBStorer cdbs = new CassandraDBStorer();
+        Conveyor.processEvents(numOfEvents, new Enums.EventType[]{}, cdbs);
+
+        //Maria
+        MariaDBStorer mdbs = new MariaDBStorer();
+        Conveyor.processEvents(numOfEvents, new Enums.EventType[]{}, mdbs);
+
     }
 
     @Test
