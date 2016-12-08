@@ -47,12 +47,4 @@ public class Main {
             }
         }
     }
-
-    public static void run(int numberOfEvents, Enums.EventType[] events) throws IOException {
-//        clients = clientGen.getClients(numClients);
-//        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random, numberOfEvents, events);
-//        thread = new Thread(eg);
-//        Emitter.initialize();
-//        thread.start();
-    }
 }

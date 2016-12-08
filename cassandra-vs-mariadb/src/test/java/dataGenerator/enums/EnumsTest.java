@@ -23,7 +23,7 @@ public class EnumsTest {
     @Test
     public void getEventTypes() throws Exception {
         String[] enumList = Enums.getEventTypes();
-        assertEquals(4, enumList.length);
+        assertEquals(5, enumList.length);
         assertEquals("CREATE", enumList[0]);
     }
 

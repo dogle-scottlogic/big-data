@@ -38,10 +38,11 @@ public class randomEventTest {
     }
 
     @Test
-    public void FiveHundredCreateEvents() throws Exception {
+    public void FiveTotalFixedEvents() throws Exception {
         Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
-        Settings.setIntSetting("ORDER_CACHE_SIZE", 1000);
-        int numOfEvents = 5000;
+        Settings.setIntSetting("ORDER_CACHE_SIZE", 2500);
+        Settings.setIntSetting("NUM_FIXED_EVENTS", 500);
+        int numOfEvents = 2500;
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
