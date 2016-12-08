@@ -51,7 +51,7 @@ public class InboundMessageHandlerRabbitMQ {
                         JSONObject jsonObject = (JSONObject) obj;
                         // Pass To Storers
                         mariaDBStorer.messageHandler(jsonObject);
-                        cassandraDBStorer.messageHandler(jsonObject);
+                        String[] log = cassandraDBStorer.messageHandler(jsonObject);
 
                     } catch (ParseException e) {
                         e.printStackTrace();
