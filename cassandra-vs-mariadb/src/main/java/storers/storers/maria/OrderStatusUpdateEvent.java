@@ -8,15 +8,15 @@ import java.sql.Connection;
 /**
  * Update Order Status
  */
-public class RunnableOrderStatusUpdater extends RunnableDBQuery {
+public class OrderStatusUpdateEvent extends QueryEvent {
     private JSONObject data;
 
-    public RunnableOrderStatusUpdater(Connection connection, JSONObject data) {
+    public OrderStatusUpdateEvent(Connection connection, JSONObject data) {
         super(connection, (String) data.get("id"), DBEventType.UPDATE_STATUS);
         this.data = data;
     }
 
-    public void run() {
+    public void runQuery() {
         doQuery("UPDATE orders.`order` SET status='" + (String) data.get("status") + "' WHERE id='" + orderId + "';");
         end();
     }

@@ -10,15 +10,15 @@ import java.util.Iterator;
 /**
  * Create Order with Line Items in maria
  */
-public class RunnableOrderCreator extends RunnableDBQuery {
+public class OrderCreateEvent extends QueryEvent {
     private JSONObject data;
 
-    public RunnableOrderCreator(Connection connection, JSONObject data) {
+    public OrderCreateEvent(Connection connection, JSONObject data) {
         super(connection, (String) data.get("id"), DBEventType.CREATE);
         this.data = data;
     }
 
-    public void run() {
+    public void runQuery() {
         JSONObject client = (JSONObject) data.get("client");
         String clientId = (String) client.get("id");
         Long date = (Long) data.get("date");

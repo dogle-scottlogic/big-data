@@ -45,19 +45,19 @@ public class MariaDBStorer {
 
         switch (eventType) {
             case CREATE:
-                new RunnableOrderCreator(connection, (JSONObject) message.get("data")).start();
+                new OrderCreateEvent(connection, (JSONObject) message.get("data")).start();
                 break;
             case UPDATE:
-                new RunnableOrderUpdater(connection, (JSONObject) message.get("data")).start();
+                new OrderUpdateEvent(connection, (JSONObject) message.get("data")).start();
                 break;
             case UPDATE_STATUS:
-                new RunnableOrderStatusUpdater(connection, (JSONObject) message.get("data")).start();
+                new OrderStatusUpdateEvent(connection, (JSONObject) message.get("data")).start();
                 break;
             case DELETE:
-                new RunnableOrderDeleter(connection, (String) message.get("data")).start();
+                new OrderDeleteEvent(connection, (String) message.get("data")).start();
                 break;
             case READ:
-                new RunnableOrderByIdReader(connection, (String) message.get("data")).start();
+                new OrderReadByIdEvent(connection, (String) message.get("data")).start();
                 break;
         }
     }

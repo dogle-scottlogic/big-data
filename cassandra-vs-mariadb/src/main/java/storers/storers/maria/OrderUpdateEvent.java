@@ -10,15 +10,15 @@ import java.util.Iterator;
 /**
  * Update an Order or it's Line Items
  */
-public class RunnableOrderUpdater extends RunnableDBQuery {
+public class OrderUpdateEvent extends QueryEvent {
     private JSONObject data;
 
-    public RunnableOrderUpdater(Connection connection, JSONObject data) {
+    public OrderUpdateEvent(Connection connection, JSONObject data) {
         super(connection, (String) data.get("id"), DBEventType.DELETE);
         this.data = data;
     }
 
-    public void run() {
+    public void runQuery() {
         JSONObject client = (JSONObject) data.get("client");
         String clientId = (String) client.get("id");
         Long date = (Long) data.get("date");
