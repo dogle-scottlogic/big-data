@@ -35,26 +35,27 @@ public class randomEventTest {
 
     @Test
     public void FiveHundredTotalRandomEvents() throws Exception {
-        int numClients = Settings.getIntSetting("NUM_CLIENTS");
+//        int numClients = Settings.getIntSetting("NUM_CLIENTS");
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
-        clients = clientGen.getClients(numClients);
+//        clients = clientGen.getClients(numClients);
         int numOfEvents = 500;
-        storers.consumers.InboundMessageHandlerRabbitMQ.on();
-        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random, numOfEvents, new Enums.EventType[]{});
-        Emitter.initialize();
-        eg.run();
+        Conveyor.Conveyor.processEvents(numOfEvents, new Enums.EventType[]{});
+//        storers.consumers.InboundMessageHandlerRabbitMQ.on();
+//        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random, numOfEvents, new Enums.EventType[]{});
+//        Emitter.initialize();
+//        eg.run();
     }
 
     @Test
     public void FiveHundredCreateEvents() throws Exception {
-        int numClients = Settings.getIntSetting("NUM_CLIENTS");
-        clients = clientGen.getClients(numClients);
-        int numOfEvents = 500;
-        storers.consumers.InboundMessageHandlerRabbitMQ.on();
-        Enums.EventType[] events = {Enums.EventType.CREATE};
-        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random, numOfEvents, events);
-        Emitter.initialize();
-        eg.run();
+//        int numClients = Settings.getIntSetting("NUM_CLIENTS");
+//        clients = clientGen.getClients(numClients);
+//        int numOfEvents = 500;
+//        storers.consumers.InboundMessageHandlerRabbitMQ.on();
+//        Enums.EventType[] events = {Enums.EventType.CREATE};
+//        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random, numOfEvents, events);
+//        Emitter.initialize();
+//        eg.run();
     }
 
 }

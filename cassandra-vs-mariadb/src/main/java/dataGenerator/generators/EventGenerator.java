@@ -24,33 +24,31 @@ public class EventGenerator implements Runnable {
     private HashMap<String, Order> orderList = new HashMap<String, Order>();
     private ArrayList<Client> clientList;
     private Random random;
+
     private final int totalStoredOrders = Settings.getIntSetting("ORDER_CACHE_SIZE");
-    private int numOfEvents = 0;
+    private String eventGenMode = Settings.getStringSetting("EVENT_GEN_MODE");
+    private int numFixedEvents = Settings.getIntSetting("NUM_FIXED_EVENTS");
+
     private EventType[] events = {};
+    private int eventCounter = 1;
+    private int fixedEventCount = 0;
+    private int fixedEventTypeCount = 0;
 
     public EventGenerator(ArrayList<Client> clientList, Random random) {
         this.clientList = clientList;
         this.random = random;
     }
 
-    public EventGenerator(ArrayList<Client> clientList, Random random, int numOfEvents, EventType[] events) {
+    public EventGenerator(ArrayList<Client> clientList, Random random, EventType[] events) {
         this.clientList = clientList;
         this.random = random;
-        this.numOfEvents = numOfEvents;
         this.events = events;
     }
 
     public void run() {
-        int eventCounter = 1;
-        String eventGenMode = Settings.getStringSetting("EVENT_GEN_MODE");
-        int numFixedEvents = Settings.getIntSetting("NUM_FIXED_EVENTS");
-
-        int fixedEventCount = 0;
-        int fixedEventTypeCount = 0;
         EventType type = EventType.CREATE;
-
         boolean interrupted = false;
-        while (!interrupted && eventCounter != this.numOfEvents + 1) {
+        while (!interrupted) {
             try {
                 // Check the mode
                 if (eventGenMode.equals("fixed")) {
@@ -80,7 +78,30 @@ public class EventGenerator implements Runnable {
                 System.out.println(e.getMessage());
             }
         }
+    }
 
+    public Event getNextEvent() {
+        EventType type = EventType.CREATE;
+        // Check the mode
+        if (eventGenMode.equals("fixed")) {
+            int eventListLength = this.eventList.length;
+            if (this.events.length > 0) eventListLength = this.events.length;
+            type = getFixedEventType(fixedEventTypeCount);
+            fixedEventCount++;
+            if (fixedEventCount == numFixedEvents) {
+                fixedEventTypeCount++;
+                fixedEventCount = 0;
+            }
+            if (fixedEventTypeCount == eventListLength) fixedEventTypeCount = 0;
+        }
+        if (eventGenMode.equals("random")) {
+            type = getRandomEventType();
+        }
+        Event newEvent = generateEvents(type);
+        eventCounter++;
+        if (newEvent.getType() == EventType.CREATE) addOrderToList((Order) newEvent.getData());
+        if (newEvent.getType() == EventType.DELETE) removeOrderFromList((String) newEvent.getData());
+        return newEvent;
     }
 
     private Event generateEvents(EventType eventType) {

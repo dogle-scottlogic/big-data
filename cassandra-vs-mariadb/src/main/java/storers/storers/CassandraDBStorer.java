@@ -9,7 +9,7 @@ import java.util.Arrays;
 /**
  * Created by dogle on 05/12/2016.
  */
-public class CassandraDBStorer {
+public class CassandraDBStorer implements Storer{
 
     private Cassandra cassandra;
     private Timer timer = new Timer();
