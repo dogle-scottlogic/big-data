@@ -14,6 +14,7 @@ public abstract class QueryEvent {
     private Timer timer;
     private long timeTaken;
     private boolean wasSuccessful;
+    private String errorMessage;
 
     public DBEventType ACTION_TYPE;
     public Connection connection;
@@ -26,19 +27,22 @@ public abstract class QueryEvent {
         this.timer = new Timer();
         this.timeTaken = 0;
         this.wasSuccessful = false;
+        this.errorMessage = "No Error";
     }
 
-    public abstract void runQuery();
+    public abstract String[] runQuery();
 
-    public void start() {
+    public String[] start() {
         timer.startTimer();
-        runQuery();
+        return runQuery();
     }
 
-    public void end() {
+    public String[] end() {
         timeTaken = timer.stopTimer();
         System.out.println(ACTION_TYPE.toString() + " Event (Order: " + orderId + ") completed in MariaDB: " + wasSuccessful);
         System.out.println(ACTION_TYPE.toString() + " Event in MariaDB took: " + timeTaken + " nanoseconds");
+        String timeTakenString = Long.valueOf(timeTaken).toString();
+        return new String[]{"MariaDB", ACTION_TYPE.toString(), timeTakenString, Boolean.toString(wasSuccessful), errorMessage};
     }
 
     public void doQuery(String query) {
@@ -50,6 +54,7 @@ public abstract class QueryEvent {
         } catch (SQLException e) {
             e.printStackTrace();
             wasSuccessful = false;
+            errorMessage = e.getMessage();
         }
     }
 }

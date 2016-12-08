@@ -12,9 +12,9 @@ public class OrderReadByIdEvent extends QueryEvent {
         super(connection, orderId, DBEventType.READ);
     }
 
-    public void runQuery() {
+    public String[] runQuery() {
         doQuery("SELECT * FROM orders.`order` WHERE id='" + orderId + "';");
         doQuery("SELECT * FROM orders.`line_item` WHERE order_id='" + orderId + "';");
-        end();
+        return end();
     }
 }

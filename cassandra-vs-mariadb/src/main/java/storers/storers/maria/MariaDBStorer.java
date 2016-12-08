@@ -40,25 +40,22 @@ public class MariaDBStorer {
         statement.close();
     }
 
-    public static void messageHandler(JSONObject message) {
+    public static String[] messageHandler(JSONObject message) {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
 
         switch (eventType) {
             case CREATE:
-                new OrderCreateEvent(connection, (JSONObject) message.get("data")).start();
-                break;
+                return new OrderCreateEvent(connection, (JSONObject) message.get("data")).start();
             case UPDATE:
-                new OrderUpdateEvent(connection, (JSONObject) message.get("data")).start();
-                break;
+                return new OrderUpdateEvent(connection, (JSONObject) message.get("data")).start();
             case UPDATE_STATUS:
-                new OrderStatusUpdateEvent(connection, (JSONObject) message.get("data")).start();
-                break;
+                return new OrderStatusUpdateEvent(connection, (JSONObject) message.get("data")).start();
             case DELETE:
-                new OrderDeleteEvent(connection, (String) message.get("data")).start();
-                break;
+                return new OrderDeleteEvent(connection, (String) message.get("data")).start();
             case READ:
-                new OrderReadByIdEvent(connection, (String) message.get("data")).start();
-                break;
+                return new OrderReadByIdEvent(connection, (String) message.get("data")).start();
+            default:
+                return new String[]{};
         }
     }
 }
