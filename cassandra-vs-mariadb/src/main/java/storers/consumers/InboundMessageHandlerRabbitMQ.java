@@ -4,6 +4,7 @@ import com.rabbitmq.client.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import storers.CSVLogger;
 import storers.storers.CassandraDBStorer;
 import storers.storers.cassandra.Cassandra;
 import storers.storers.maria.MariaDBStorer;
@@ -21,6 +22,7 @@ public class InboundMessageHandlerRabbitMQ {
     private static Connection connection;
     private static Channel channel;
     private static Consumer consumer;
+    private static CSVLogger logger;
 
 
     private static Cassandra cassandra = new Cassandra("127.0.0.7");
@@ -28,6 +30,7 @@ public class InboundMessageHandlerRabbitMQ {
 
     public static void initialise() {
         try {
+            logger = new CSVLogger("C:\\dev\\big-data-bench\\cassandra-vs-mariadb\\testLogs");
             cassandra.connect();
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
@@ -51,7 +54,7 @@ public class InboundMessageHandlerRabbitMQ {
                         JSONObject jsonObject = (JSONObject) obj;
                         // Pass To Storers
                         mariaDBStorer.messageHandler(jsonObject);
-                        String[] log = cassandraDBStorer.messageHandler(jsonObject);
+                        logger.logEvent(cassandraDBStorer.messageHandler(jsonObject), false);
 
                     } catch (ParseException e) {
                         e.printStackTrace();
