@@ -63,7 +63,8 @@ public class Conveyor {
             String jsonStringOrder = Serializer.Serialize(event);
             JSONParser parser = new JSONParser();
             JSONObject jsonOrder = (JSONObject) parser.parse(jsonStringOrder);
-            if (log) logger.logEvent(storer.messageHandler(jsonOrder), false);
+            String[] results = storer.messageHandler(jsonOrder);
+            if (log) logger.logEvent(results, false);
         }
     }
 }

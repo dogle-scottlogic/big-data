@@ -17,7 +17,7 @@ public class CSVLogger {
     private String fileName;
 
     public CSVLogger(String folderName, String fileName) throws IOException {
-        this.headers = new String[]{"TestID", "DatabaseType", "EventType", "TimeTaken", "Success", "ErrorMessage"};
+        this.headers = new String[]{"TestID", "DatabaseType", "EventType", "TimeTaken", "Success", "ErrorMessage", "TimeStamp"};
         this.folderName = folderName;
         this.fileName = fileName;
         setUpLogFile();

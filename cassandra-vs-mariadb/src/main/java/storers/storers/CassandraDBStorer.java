@@ -54,7 +54,7 @@ public class CassandraDBStorer implements Storer{
             errorMessage = exception.getMessage();
         }
         // Return Database type, eventType, time Taken, success, errorMessage
-        String [] log = new String[] {"Cassandra", type, String.valueOf(timeTaken), String.valueOf(success), errorMessage};
+        String [] log = new String[] {String.valueOf(System.nanoTime()), "Cassandra", type, String.valueOf(timeTaken), String.valueOf(success), errorMessage};
         System.out.println(Arrays.toString(log));
         return log;
     }
