@@ -7,12 +7,12 @@ import java.sql.Connection;
 /**
  * Read Order & it's Line Items by Order Id
  */
-public class RunnableOrderByIdReader extends RunnableDBQuery {
-    public RunnableOrderByIdReader(Connection connection, String orderId) {
+public class OrderReadByIdEvent extends QueryEvent {
+    public OrderReadByIdEvent(Connection connection, String orderId) {
         super(connection, orderId, DBEventType.READ);
     }
 
-    public void run() {
+    public void runQuery() {
         doQuery("SELECT * FROM orders.`order` WHERE id='" + orderId + "';");
         doQuery("SELECT * FROM orders.`line_item` WHERE order_id='" + orderId + "';");
         end();

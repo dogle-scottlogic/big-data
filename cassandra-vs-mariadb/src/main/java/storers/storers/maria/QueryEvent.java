@@ -10,17 +10,16 @@ import java.sql.Statement;
 /**
  * Created by lcollingwood on 06/12/2016.
  */
-public abstract class RunnableDBQuery implements Runnable {
+public abstract class QueryEvent {
     private Timer timer;
     private long timeTaken;
     private boolean wasSuccessful;
 
     public DBEventType ACTION_TYPE;
-    public Thread thread;
     public Connection connection;
     public String orderId;
 
-    public RunnableDBQuery(Connection connection, String orderId, DBEventType eventType) {
+    public QueryEvent(Connection connection, String orderId, DBEventType eventType) {
         this.connection = connection;
         this.orderId = orderId;
         this.ACTION_TYPE = eventType;
@@ -29,10 +28,11 @@ public abstract class RunnableDBQuery implements Runnable {
         this.wasSuccessful = false;
     }
 
+    public abstract void runQuery();
+
     public void start() {
-        thread = new Thread(this, ACTION_TYPE.toString() + ":" + orderId);
-        thread.start();
         timer.startTimer();
+        runQuery();
     }
 
     public void end() {
