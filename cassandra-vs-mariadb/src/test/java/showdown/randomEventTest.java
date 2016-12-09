@@ -56,18 +56,27 @@ public class RandomEventTest {
         Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
         Settings.setIntSetting("ORDER_CACHE_SIZE", 1000);
 
-        CassandraDBStorer cassandra = new CassandraDBStorer();
-        MariaDBStorer maria = new MariaDBStorer();
+        CassandraDBStorer cassandra;
+        MariaDBStorer maria;
 
         // Not pre-seeded
+        cassandra = new CassandraDBStorer();
+        maria = new MariaDBStorer();
+
         nEventsWithNPreseeded("Maria", maria, 10000, 0);
         nEventsWithNPreseeded("Cassandra", cassandra, 10000, 0);
 
         // Pre Seeded with 10,000 events
+        cassandra = new CassandraDBStorer();
+        maria = new MariaDBStorer();
+
         nEventsWithNPreseeded("Maria", maria, 10000, 10000);
         nEventsWithNPreseeded("Cassandra", cassandra, 10000, 10000);
 
         // Pre Seeded with 20,000 events
+        cassandra = new CassandraDBStorer();
+        maria = new MariaDBStorer();
+
         nEventsWithNPreseeded("Maria", maria, 10000, 20000);
         nEventsWithNPreseeded("Cassandra", cassandra, 10000, 20000);
 

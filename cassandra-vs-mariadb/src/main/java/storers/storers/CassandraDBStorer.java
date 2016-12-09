@@ -16,7 +16,7 @@ public class CassandraDBStorer implements Storer{
 
     public CassandraDBStorer() {
         boolean success;
-        this.cassandra = new Cassandra("localhost");
+        this.cassandra = new Cassandra("127.0.0.7");
         cassandra.connect();
         success = cassandra.createKeySpace("orders");
         if (success) success = cassandra.createLineItemTable();
@@ -54,6 +54,7 @@ public class CassandraDBStorer implements Storer{
         }
         // Return Database type, eventType, time Taken, success, errorMessage
         String [] log = new String[] {"Cassandra", type, String.valueOf(timeTaken), String.valueOf(success), errorMessage, String.valueOf(System.nanoTime())};
+        // System.out.println(Arrays.toString(log));
         // System.out.println(Arrays.toString(log));
         return log;
     }
