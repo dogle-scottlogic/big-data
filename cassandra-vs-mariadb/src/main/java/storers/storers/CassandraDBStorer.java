@@ -16,7 +16,7 @@ public class CassandraDBStorer implements Storer{
 
     public CassandraDBStorer() {
         boolean success;
-        this.cassandra = new Cassandra("127.0.0.7");
+        this.cassandra = new Cassandra("localhost");
         cassandra.connect();
         success = cassandra.createKeySpace("orders");
         if (success) success = cassandra.createLineItemTable();

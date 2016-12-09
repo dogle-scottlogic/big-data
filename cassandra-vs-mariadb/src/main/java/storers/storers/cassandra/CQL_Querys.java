@@ -22,13 +22,13 @@ public class CQL_Querys {
     }
 
     public static String createLineItemTable(String keyspaceName) {
-        String query = "CREATE TABLE IF NOT EXISTS " + keyspaceName + ".lineItems"
-                + "( lineItem_id text, "
-                + "order_id text, "
+        String query = "CREATE TABLE IF NOT EXISTS " + keyspaceName + ".lineItems_by_orderId"
+                + "( order_id text, "
+                + "lineItem_id text, "
                 + "product_id text, "
                 + "quantity int, "
                 + "line_price double, "
-                + "PRIMARY KEY (lineItem_id)"
+                + "PRIMARY KEY (order_id, lineItem_id)"
                 + ");";
         return query;
     }
@@ -47,8 +47,8 @@ public class CQL_Querys {
     }
 
     public static String addLineItem(String keyspaceName) {
-        String query = "INSERT INTO " + keyspaceName + ".lineItems" +
-                "( lineItem_id, order_id, product_id, quantity, line_price ) " +
+        String query = "INSERT INTO " + keyspaceName + ".lineItems_by_orderId" +
+                "( order_id, lineItem_id, product_id, quantity, line_price ) " +
                 "VALUES (?, ?, ?, ?, ?);";
         return query;
     }
@@ -61,7 +61,7 @@ public class CQL_Querys {
     }
 
     public static String updateLineItem(String keyspaceName) {
-        return "UPDATE " + keyspaceName + ".lineItems SET quantity=?, line_price=? WHERE lineItem_id=?;";
+        return "UPDATE " + keyspaceName + ".lineItems_by_orderId SET quantity=?, line_price=? WHERE lineItem_id=? AND order_id=?;";
     }
 
     public static String updateOrder(String keyspaceName) {
@@ -73,7 +73,8 @@ public class CQL_Querys {
     }
 
     public static String deleteLineItem(String keyspaceName) {
-        return "DELETE FROM " + keyspaceName + ".lineItems WHERE lineItem_id=?;";
+        return "DELETE FROM " + keyspaceName + ".lineItems_by_orderId WHERE order_id=?;";
+        // return "DELETE FROM " + keyspaceName + ".lineItems WHERE lineItem_id=?;";
     }
 
     public static String deleteOrder(String keyspaceName) {
@@ -85,7 +86,7 @@ public class CQL_Querys {
     }
 
     public static String selectAllLineItems(String keyspaceName) {
-        return "SELECT * FROM " + keyspaceName + ".lineItems WHERE order_id=?;";
+        return "SELECT * FROM " + keyspaceName + ".lineItems_by_orderId WHERE order_id=?;";
     }
 
     public static String selectAllOrders(String keyspaceName) {

@@ -70,10 +70,10 @@ public class Cassandra {
     public boolean createLineItemTable() {
         try {
             String query;
-            this.session.execute(CQL_Querys.dropTable("lineItems"));
+            this.session.execute(CQL_Querys.dropTable("lineItems_by_orderId"));
             this.session.execute(CQL_Querys.createLineItemTable(this.keyspaceName));
-            query = "CREATE INDEX order_ids ON " + this.keyspaceName + ".lineItems ( order_id );";
-            session.execute(query);
+            // query = "CREATE INDEX order_ids ON " + this.keyspaceName + ".lineItems ( order_id );";
+            // session.execute(query);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             return false;
@@ -108,7 +108,7 @@ public class Cassandra {
 
             // Add prepared statement to batch
             PreparedStatement p = this.session.prepare(CQL_Querys.addLineItem(this.keyspaceName));
-            batch.add(p.bind(lineItemId, orderId, productId, quantity, linePrice));
+            batch.add(p.bind(orderId, lineItemId, productId, quantity, linePrice));
             lineItemsIds.add("'" + lineItemId + "'");
         }
         session.execute(batch);
@@ -126,20 +126,9 @@ public class Cassandra {
     }
 
     public void removeOrder(JSONObject order) {
-        BatchStatement batch = new BatchStatement();
         String orderId = (String) order.get("data");
-        PreparedStatement p = session.prepare(CQL_Querys.selectAllLineItemIDs(this.keyspaceName));
+        PreparedStatement p = session.prepare(CQL_Querys.deleteOrder(this.keyspaceName));
         BoundStatement b = p.bind(orderId);
-        // Remove all lineItems
-        ResultSet lineItemIds = session.execute(b);
-        List<String> results = lineItemIds.all().get(0).getList(0, String.class);
-        for (String id : results) {
-            p = session.prepare(CQL_Querys.deleteLineItem(this.keyspaceName));
-            batch.add(p.bind(id));
-        }
-        session.execute(batch);
-        p = session.prepare(CQL_Querys.deleteOrder(this.keyspaceName));
-        b = p.bind(orderId);
         session.execute(b);
     }
 
@@ -153,7 +142,7 @@ public class Cassandra {
             int quantity = new Integer(((Long) lineItem.get("quantity")).intValue());
             double linePrice = (Double) lineItem.get("linePrice");
             PreparedStatement p = session.prepare(CQL_Querys.updateLineItem(this.keyspaceName));
-            batchStatement.add(p.bind(quantity, linePrice, lineItemId));
+            batchStatement.add(p.bind(quantity, linePrice, lineItemId, orderId));
         }
         session.execute(batchStatement);
         Long dateLong = (Long) order.get("date");
