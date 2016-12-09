@@ -74,7 +74,6 @@ public class CQL_Querys {
 
     public static String deleteLineItem(String keyspaceName) {
         return "DELETE FROM " + keyspaceName + ".lineItems_by_orderId WHERE order_id=?;";
-        // return "DELETE FROM " + keyspaceName + ".lineItems WHERE lineItem_id=?;";
     }
 
     public static String deleteOrder(String keyspaceName) {

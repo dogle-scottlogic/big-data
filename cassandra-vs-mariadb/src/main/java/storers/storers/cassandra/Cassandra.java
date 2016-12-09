@@ -127,8 +127,10 @@ public class Cassandra {
 
     public void removeOrder(JSONObject order) {
         String orderId = (String) order.get("data");
-        PreparedStatement p = session.prepare(CQL_Querys.deleteOrder(this.keyspaceName));
+        PreparedStatement p = session.prepare(CQL_Querys.deleteLineItem(this.keyspaceName));
         BoundStatement b = p.bind(orderId);
+        p = session.prepare(CQL_Querys.deleteOrder(this.keyspaceName));
+        b = p.bind(orderId);
         session.execute(b);
     }
 
