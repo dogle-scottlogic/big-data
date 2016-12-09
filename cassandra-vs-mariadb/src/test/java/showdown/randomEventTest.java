@@ -13,7 +13,7 @@ import storers.storers.Storer;
 /**
  * Created by dogle on 08/12/2016.
  */
-public class randomEventTest {
+public class RandomEventTest {
     // Helpers
     public void nRandomEvents(int n, Storer storer, String logName) {
         Conveyor.processEventsWithLog(n, new Enums.EventType[]{}, storer, logName);
