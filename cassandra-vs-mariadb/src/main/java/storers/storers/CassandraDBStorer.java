@@ -22,7 +22,6 @@ public class CassandraDBStorer implements Storer{
         if (success) success = cassandra.createLineItemTable();
         if (success) success = cassandra.createOrderTable();
         if (!success) System.out.println("An error occurred setting up the database");
-        this.cassandra = cassandra;
     }
 
     public String[] messageHandler(JSONObject message) {
