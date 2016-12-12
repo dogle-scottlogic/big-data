@@ -48,13 +48,13 @@ public class RandomEventTest {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.setEvents(new Enums.EventType[]{});
         Conveyor.initialiseEventsGenerator();
         Conveyor.processEventsWithLog(numOfEvents, cdbs, "TenThousandRandomEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.setEvents(new Enums.EventType[]{});
         Conveyor.initialiseEventsGenerator();
         Conveyor.processEventsWithLog(numOfEvents, mdbs, "TenThousandRandomEventsMariaDB");
     }
@@ -92,5 +92,4 @@ public class RandomEventTest {
         nEventsWithNPreseeded("Maria", maria, 10000, 30000);
         nEventsWithNPreseeded("Cassandra", cassandra, 10000, 30000);
     }
-
 }

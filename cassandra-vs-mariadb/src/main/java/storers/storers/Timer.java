@@ -12,7 +12,8 @@ public class Timer {
      * @return the time started
      */
     public long startTimer() {
-        return startTime = System.nanoTime();
+        this.startTime = System.nanoTime();
+        return this.startTime;
     }
 
     /**
@@ -20,8 +21,8 @@ public class Timer {
      * @return the time elapsed since timer was started
      */
     public long stopTimer() {
-        long timeElapsed = System.nanoTime() - startTime;
-        startTime = 0;
+        long timeElapsed = System.nanoTime() - this.startTime;
+        this.startTime = 0;
         return timeElapsed;
     }
 
