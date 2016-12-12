@@ -3,6 +3,8 @@ package storers.storers.cassandra;
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -69,11 +71,8 @@ public class Cassandra {
 
     public boolean createLineItemTable() {
         try {
-            String query;
             this.session.execute(CQL_Querys.dropTable("lineItems_by_orderId"));
             this.session.execute(CQL_Querys.createLineItemTable(this.keyspaceName));
-            // query = "CREATE INDEX order_ids ON " + this.keyspaceName + ".lineItems ( order_id );";
-            // session.execute(query);
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             return false;
@@ -92,6 +91,7 @@ public class Cassandra {
         return true;
     }
 
+    // CRUD
     public void addOrder(JSONObject order) {
         String orderId = (String) order.get("id");
         JSONArray lineItems = (JSONArray) order.get("lineItems");
@@ -111,7 +111,9 @@ public class Cassandra {
             batch.add(p.bind(orderId, lineItemId, productId, quantity, linePrice));
             lineItemsIds.add("'" + lineItemId + "'");
         }
-        session.execute(batch);
+        ResultSetFuture futureLineItems = session.executeAsync(batch);
+        handleError(futureLineItems);
+
         //Add Order
         String clientId = (String) ((JSONObject) order.get("client")).get("id");
         Long dateLong = (Long) order.get("date");
@@ -122,16 +124,20 @@ public class Cassandra {
         // Add prepared statement to batch
         PreparedStatement p = this.session.prepare(CQL_Querys.addOrder(this.keyspaceName));
         BoundStatement b = p.bind(orderId, lineItemsIds, clientId, created, status, subTotal);
-        session.execute(b);
+        ResultSetFuture futureOrders = session.executeAsync(b);
+        handleError(futureOrders);
     }
 
     public void removeOrder(JSONObject order) {
         String orderId = (String) order.get("data");
         PreparedStatement p = session.prepare(CQL_Querys.deleteLineItem(this.keyspaceName));
         BoundStatement b = p.bind(orderId);
+        ResultSetFuture fli = session.executeAsync(b);
+        handleError(fli);
         p = session.prepare(CQL_Querys.deleteOrder(this.keyspaceName));
         b = p.bind(orderId);
-        session.execute(b);
+        ResultSetFuture fo = session.executeAsync(b);
+        handleError(fo);
     }
 
     public void updateOrder(JSONObject order) {
@@ -146,14 +152,17 @@ public class Cassandra {
             PreparedStatement p = session.prepare(CQL_Querys.updateLineItem(this.keyspaceName));
             batchStatement.add(p.bind(quantity, linePrice, lineItemId, orderId));
         }
-        session.execute(batchStatement);
+        ResultSetFuture fli = session.executeAsync(batchStatement);
+        handleError(fli);
         Long dateLong = (Long) order.get("date");
         String created = new Date(dateLong).toString();
         String status = (String) order.get("status");
         Double subTotal = (Double) order.get("subTotal");
         PreparedStatement p = session.prepare(CQL_Querys.updateOrder(this.keyspaceName));
         BoundStatement bound = p.bind(created, status, subTotal, orderId);
-        session.execute(bound);
+        ResultSetFuture fo = session.executeAsync(bound);
+        handleError(fo);
+
     }
 
     public void updateOrderStatus(JSONObject order) {
@@ -161,16 +170,33 @@ public class Cassandra {
         String newStatus = (String) order.get("status");
         PreparedStatement p = session.prepare(CQL_Querys.updateOrderStatus(this.keyspaceName));
         BoundStatement b = p.bind(newStatus, orderId);
-        session.execute(b);
+        ResultSetFuture fo = session.executeAsync(b);
+        handleError(fo);
     }
 
     public void readOrder(JSONObject order) {
         String orderId = (String) order.get("data");
         PreparedStatement p = session.prepare(CQL_Querys.selectAllLineItems(this.keyspaceName));
         BoundStatement b = p.bind(orderId);
-        session.execute(b);
+        ResultSetFuture fli = session.executeAsync(b);
+        handleError(fli);
         p = session.prepare(CQL_Querys.selectAllOrders(this.keyspaceName));
         b = p.bind(orderId);
-        session.execute(b);
+        ResultSetFuture fo = session.executeAsync(b);
+        handleError(fo);
+    }
+
+    private void handleError(ResultSetFuture futureLineItems) {
+        Futures.addCallback(futureLineItems, new FutureCallback<ResultSet>() {
+            public void onSuccess(ResultSet result) {
+            }
+            public void onFailure(Throwable t) {
+                try {
+                    throw t;
+                } catch (Throwable throwable) {
+                    throwable.printStackTrace();
+                }
+            }
+        });
     }
 }
