@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  */
 public class avgResponseTimesByUpdateVolumeTest {
     public void avgResponseTimesByUpdateVolumeTestHelper(int nUpdates, Enums.EventType updateType) throws Exception {
-        int nCreates = 1000;
+        int nCreates = 5000;
 
         storers.storers.Timer timer = new storers.storers.Timer();
 
@@ -27,28 +27,24 @@ public class avgResponseTimesByUpdateVolumeTest {
         Conveyor.initialiseEventsGenerator();
         Conveyor.processEventsWithoutLog(nCreates, cdbs);
 
-        timer.startTimer();
         Conveyor.setEvents(new Enums.EventType[]{updateType});
-        Conveyor.processEventsWithoutLog(nUpdates, cdbs);
-        System.out.println("Cassandra Avg Update-Status Time of " + nUpdates + " Updates: " + timer.stopTimer() / nUpdates);
+        Conveyor.processEventsWithLog(nUpdates, cdbs,  nUpdates +"UpdatesAgainst5000Records");
 
         //Maria
-        mdbs = new MariaDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithoutLog(nCreates, mdbs);
-
-        timer.startTimer();
-        Conveyor.setEvents(new Enums.EventType[]{updateType});
-        Conveyor.processEventsWithoutLog(nUpdates, mdbs);
-        System.out.println("MariaDB Avg Update-Status Time: " + timer.stopTimer() / nUpdates);
+//        mdbs = new MariaDBStorer();
+//        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+//        Conveyor.initialiseEventsGenerator();
+//        Conveyor.processEventsWithoutLog(nCreates, mdbs);
+//
+//        Conveyor.setEvents(new Enums.EventType[]{updateType});
+//        Conveyor.processEventsWithLog(nUpdates, mdbs, nUpdates +"UpdatesAgainst5000Records");
     }
 
     public void testAllVolumes(Enums.EventType updateType) throws Exception {
-        avgResponseTimesByUpdateVolumeTestHelper(10000, updateType);
-        avgResponseTimesByUpdateVolumeTestHelper(20000, updateType);
-        avgResponseTimesByUpdateVolumeTestHelper(30000, updateType);
-        avgResponseTimesByUpdateVolumeTestHelper(40000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(1000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(2000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(3000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(4000, updateType);
     }
 
     @Test

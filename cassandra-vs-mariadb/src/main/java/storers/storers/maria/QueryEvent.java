@@ -39,6 +39,13 @@ public abstract class QueryEvent {
 
     public String[] end() {
         timeTaken = timer.stopTimer();
+
+        try {
+            connection.commit();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 //        System.out.println(ACTION_TYPE.toString() + " Event (Order: " + orderId + ") completed in MariaDB: " + wasSuccessful);
 //        System.out.println(ACTION_TYPE.toString() + " Event in MariaDB took: " + timeTaken + " nanoseconds");
         String timeTakenString = Long.valueOf(timeTaken).toString();
