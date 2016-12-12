@@ -16,11 +16,15 @@ import storers.storers.Storer;
 public class RandomEventTest {
     // Helpers
     public void nRandomEvents(int n, Storer storer, String logName) {
-        Conveyor.processEventsWithLog(n, new Enums.EventType[]{}, storer, logName);
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(n, storer, logName);
     }
 
     public void preSeed(int n, Storer storer) {
-        Conveyor.processEventsWithoutLog(n, new Enums.EventType[]{ Enums.EventType.CREATE }, storer);
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithoutLog(n, storer);
     }
 
     public void nEventsWithNPreseeded(String label, Storer storer, int nEvents, int nPreseeded) {
@@ -44,11 +48,15 @@ public class RandomEventTest {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{}, cdbs, "TenThousandRandomEventsCassandra");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, cdbs, "TenThousandRandomEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{}, mdbs, "TenThousandRandomEventsMariaDB");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, mdbs, "TenThousandRandomEventsMariaDB");
     }
 
     @Test

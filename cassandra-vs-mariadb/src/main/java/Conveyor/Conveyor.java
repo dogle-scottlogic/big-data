@@ -29,33 +29,41 @@ public class Conveyor {
     private static dataGenerator.generators.ClientGenerator clientGen;
     private static String filePath = "\\testLogs";
     private static String logName = "";
+    private static EventGenerator eventGenerator;
+    private static Enums.EventType[] events;
 
-    public static void processEventsWithLog(int numberOfEventsToProcess, Enums.EventType[] events, Storer storer, String logFileName) {
+    public static void setEvents(Enums.EventType[] events) {
+        Conveyor.events = events;
+    }
+
+    public static void initialiseEventsGenerator() {
+        random = new Random(seed);
+        clientGen = new dataGenerator.generators.ClientGenerator(random);
+        clients = clientGen.getClients(numClients);
+        eventGenerator = new EventGenerator(clients, random, events);
+    }
+
+    public static void processEventsWithLog(int numberOfEventsToProcess, Storer storer, String logFileName) {
         try {
             logName = logFileName;
-            processEvents(numberOfEventsToProcess, events, storer, true);
+            processEvents(numberOfEventsToProcess, storer, true);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static void processEventsWithoutLog(int numberOfEventsToProcess, Enums.EventType[] events, Storer storer) {
+    public static void processEventsWithoutLog(int numberOfEventsToProcess, Storer storer) {
         try {
-            processEvents(numberOfEventsToProcess, events, storer, false);
+            processEvents(numberOfEventsToProcess, storer, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-
-    private static void processEvents(int numberOfEventsToProcess, Enums.EventType[] events, Storer storer, boolean log) throws IOException, ParseException {
-        random = new Random(seed);
+    private static void processEvents(int numberOfEventsToProcess,Storer storer, boolean log) throws IOException, ParseException {
         String absPath = new File("").getAbsolutePath().concat(filePath);
         CSVLogger logger = null;
         if(log) logger = new CSVLogger(absPath, logName);
-        clientGen = new dataGenerator.generators.ClientGenerator(random);
-        clients = clientGen.getClients(numClients);
-        EventGenerator eventGenerator = new EventGenerator(clients, random, events);
 
         for (int i = 0; i < numberOfEventsToProcess; i++) {
             Event event = eventGenerator.getNextEvent();

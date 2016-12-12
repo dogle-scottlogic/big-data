@@ -31,11 +31,15 @@ public class CreateEvent {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, cdbs, "fiveHundredCreateEventsCassandra");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, cdbs, "fiveHundredCreateEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, mdbs, "fiveHundredCreateEventsMariaDB");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, mdbs, "fiveHundredCreateEventsMariaDB");
     }
 
     @Test
@@ -45,11 +49,15 @@ public class CreateEvent {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, cdbs, "OneThousandCreateEventsCassandra");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, cdbs, "OneThousandCreateEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, mdbs, "OneThousandCreateEventsMariaDB");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, mdbs, "OneThousandCreateEventsMariaDB");
     }
 
     @Test
@@ -59,10 +67,14 @@ public class CreateEvent {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, cdbs, "TenThousandCreateEventsCassandra");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, cdbs, "TenThousandCreateEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, mdbs, "TenThousandCreateEventsMariaDB");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, mdbs, "TenThousandCreateEventsMariaDB");
     }
 }

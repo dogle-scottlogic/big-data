@@ -30,14 +30,18 @@ public class StartToEnd {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.processEventsWithoutLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, cdbs);
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithoutLog(numOfEvents, cdbs);
 
         System.out.println("Cassandra: " + timer.stopTimer());
         timer.startTimer();
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.processEventsWithoutLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, mdbs);
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithoutLog(numOfEvents, mdbs);
         System.out.println("MariaDB " + timer.stopTimer());
     }
 
@@ -53,7 +57,9 @@ public class StartToEnd {
         // Cassandra
         timer.startTimer();
         cdbs = new CassandraDBStorer();
-        Conveyor.processEventsWithoutLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, cdbs);
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithoutLog(numOfEvents, cdbs);
 
         long cassandraUnlogged = timer.stopTimer();
         System.out.println("Cassandra Unlogged Time: " + cassandraUnlogged);
@@ -61,7 +67,9 @@ public class StartToEnd {
         //Maria
         timer.startTimer();
         mdbs = new MariaDBStorer();
-        Conveyor.processEventsWithoutLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, mdbs);
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithoutLog(numOfEvents, mdbs);
         long mariaUnlogged = timer.stopTimer();
         System.out.println("MariaDB Unlogged Time: " + mariaUnlogged);
 
@@ -69,14 +77,18 @@ public class StartToEnd {
         // Cassandra
         timer.startTimer();
         cdbs = new CassandraDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, cdbs, "timingTestCassandra");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, cdbs, "timingTestCassandra");
         long cassandraLogged = timer.stopTimer();
         System.out.println("Cassandra Logged Time: " + cassandraLogged);
 
         //Maria
         timer.startTimer();
         mdbs = new MariaDBStorer();
-        Conveyor.processEventsWithLog(numOfEvents, new Enums.EventType[]{Enums.EventType.CREATE}, mdbs, "timingTestMaria");
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithLog(numOfEvents, mdbs, "timingTestMaria");
         long mariaLogged = timer.stopTimer();
         System.out.println("MariaDB Logged Time:" + mariaLogged);
 
