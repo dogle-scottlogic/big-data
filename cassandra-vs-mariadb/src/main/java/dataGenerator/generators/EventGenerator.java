@@ -20,7 +20,7 @@ import java.util.Random;
  */
 public class EventGenerator implements Runnable {
 
-    private final EventType[] eventList = EventType.values();
+    private EventType[] eventList = EventType.values();
     private HashMap<String, Order> orderList = new HashMap<String, Order>();
     private ArrayList<Client> clientList;
     private Random random;
@@ -230,6 +230,10 @@ public class EventGenerator implements Runnable {
             }
         }
         return oldestOrder;
+    }
+
+    public void setEvents(EventType[] events) {
+        this.events = events;
     }
 
     private EventType getFixedEventType(int fixedEventTypeCount) {

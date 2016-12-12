@@ -34,6 +34,9 @@ public class Conveyor {
 
     public static void setEvents(Enums.EventType[] events) {
         Conveyor.events = events;
+        if (eventGenerator != null) {
+            eventGenerator.setEvents(events);
+        }
     }
 
     public static void initialiseEventsGenerator() {

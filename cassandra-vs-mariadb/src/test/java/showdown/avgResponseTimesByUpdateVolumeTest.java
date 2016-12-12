@@ -31,13 +31,13 @@ public class avgResponseTimesByUpdateVolumeTest {
         Conveyor.processEventsWithLog(nUpdates, cdbs,  nUpdates +"UpdatesAgainst5000Records");
 
         //Maria
-//        mdbs = new MariaDBStorer();
-//        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-//        Conveyor.initialiseEventsGenerator();
-//        Conveyor.processEventsWithoutLog(nCreates, mdbs);
-//
-//        Conveyor.setEvents(new Enums.EventType[]{updateType});
-//        Conveyor.processEventsWithLog(nUpdates, mdbs, nUpdates +"UpdatesAgainst5000Records");
+        mdbs = new MariaDBStorer();
+        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.initialiseEventsGenerator();
+        Conveyor.processEventsWithoutLog(nCreates, mdbs);
+
+        Conveyor.setEvents(new Enums.EventType[]{updateType});
+        Conveyor.processEventsWithLog(nUpdates, mdbs, nUpdates +"UpdatesAgainst5000Records");
     }
 
     public void testAllVolumes(Enums.EventType updateType) throws Exception {
