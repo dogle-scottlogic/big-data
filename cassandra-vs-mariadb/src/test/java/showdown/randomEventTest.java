@@ -3,6 +3,7 @@ package showdown;
 import Conveyor.Conveyor;
 import dataGenerator.data_handlers.Settings;
 import dataGenerator.enums.Enums;
+import dataGenerator.generators.EventGenerator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,15 +17,13 @@ import storers.storers.Storer;
 public class RandomEventTest {
     // Helpers
     public void nRandomEvents(int n, Storer storer, String logName) {
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(n, storer, logName);
+        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(n, storer, eventGenerator, logName);
     }
 
     public void preSeed(int n, Storer storer) {
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithoutLog(n, storer);
+        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(n, storer, eventGenerator);
     }
 
     public void nEventsWithNPreseeded(String label, Storer storer, int nEvents, int nPreseeded) {
@@ -48,15 +47,13 @@ public class RandomEventTest {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(numOfEvents, cdbs, "TenThousandRandomEventsCassandra");
+        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
+        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "TenThousandRandomEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(numOfEvents, mdbs, "TenThousandRandomEventsMariaDB");
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
+        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "TenThousandRandomEventsMariaDB");
     }
 
     @Test

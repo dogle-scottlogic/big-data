@@ -2,11 +2,10 @@ package showdown;
 
 import Conveyor.Conveyor;
 import dataGenerator.enums.Enums;
+import dataGenerator.generators.EventGenerator;
 import org.junit.Test;
 import storers.storers.CassandraDBStorer;
 import storers.storers.MariaDBStorer;
-
-import static org.junit.Assert.*;
 
 /**
  * Created by lcollingwood on 12/12/2016.
@@ -23,21 +22,20 @@ public class avgResponseTimesByUpdateVolumeTest {
         // Do not log
         // Cassandra
         cdbs = new CassandraDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithoutLog(nCreates, cdbs);
+        //Conveyor.setEvents();
+        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(nCreates, cdbs, eventGenerator);
 
-        Conveyor.setEvents(new Enums.EventType[]{updateType});
-        Conveyor.processEventsWithLog(nUpdates, cdbs,  nUpdates +"UpdatesAgainst5000Records");
+        eventGenerator.setEvents(new Enums.EventType[]{updateType});
+        Conveyor.processEvents(nUpdates, cdbs, eventGenerator, nUpdates +"UpdatesAgainst5000Records");
 
         //Maria
         mdbs = new MariaDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithoutLog(nCreates, mdbs);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(nCreates, mdbs, eventGenerator);
 
-        Conveyor.setEvents(new Enums.EventType[]{updateType});
-        Conveyor.processEventsWithLog(nUpdates, mdbs, nUpdates +"UpdatesAgainst5000Records");
+        eventGenerator.setEvents(new Enums.EventType[]{updateType});
+        Conveyor.processEvents(nUpdates, mdbs, eventGenerator, nUpdates +"UpdatesAgainst5000Records");
     }
 
     public void testAllVolumes(Enums.EventType updateType) throws Exception {

@@ -20,11 +20,11 @@ import java.util.Random;
  */
 public class EventGenerator implements Runnable {
 
-    private EventType[] eventList = EventType.values();
     private HashMap<String, Order> orderList = new HashMap<String, Order>();
     private ArrayList<Client> clientList;
     private Random random;
 
+    private int numClients = Settings.getIntSetting("NUM_CLIENTS");
     private final int totalStoredOrders = Settings.getIntSetting("ORDER_CACHE_SIZE");
     private String eventGenMode = Settings.getStringSetting("EVENT_GEN_MODE");
     private int numFixedEvents = Settings.getIntSetting("NUM_FIXED_EVENTS");
@@ -34,13 +34,15 @@ public class EventGenerator implements Runnable {
     private int fixedEventCount = 0;
     private int fixedEventTypeCount = 0;
 
-    public EventGenerator(ArrayList<Client> clientList, Random random) {
-        this.clientList = clientList;
+    public EventGenerator(Random random) {
+        ClientGenerator clientGen = new dataGenerator.generators.ClientGenerator(random);
+        this.clientList = clientGen.getClients(this.numClients);
         this.random = random;
     }
 
-    public EventGenerator(ArrayList<Client> clientList, Random random, EventType[] events) {
-        this.clientList = clientList;
+    public EventGenerator(Random random, EventType[] events) {
+        ClientGenerator clientGen = new dataGenerator.generators.ClientGenerator(random);
+        this.clientList = clientGen.getClients(this.numClients);
         this.random = random;
         this.events = events;
     }
@@ -52,7 +54,7 @@ public class EventGenerator implements Runnable {
             try {
                 // Check the mode
                 if (eventGenMode.equals("fixed")) {
-                    int eventListLength = this.eventList.length;
+                    int eventListLength =  EventType.values().length;
                     if (this.events.length > 0) eventListLength = this.events.length;
                     type = getFixedEventType(fixedEventTypeCount);
                     fixedEventCount++;
@@ -84,7 +86,7 @@ public class EventGenerator implements Runnable {
         EventType type = EventType.CREATE;
         // Check the mode
         if (eventGenMode.equals("fixed")) {
-            int eventListLength = this.eventList.length;
+            int eventListLength = EventType.values().length;
             if (this.events.length > 0) eventListLength = this.events.length;
             type = getFixedEventType(fixedEventTypeCount);
             fixedEventCount++;
@@ -236,8 +238,12 @@ public class EventGenerator implements Runnable {
         this.events = events;
     }
 
+    public void setClientNumber(int numClients) {
+        this.numClients = numClients;
+    }
+
     private EventType getFixedEventType(int fixedEventTypeCount) {
-        EventType[] events = this.eventList;
+        EventType[] events =  EventType.values();
         if (this.events.length > 0) events = this.events;
         EventType type = events[fixedEventTypeCount];
         return type;
@@ -245,7 +251,7 @@ public class EventGenerator implements Runnable {
 
     private EventType getRandomEventType() {
         // One in 5 chance of generating a delete event
-        EventType[] events = this.eventList;
+        EventType[] events =  EventType.values();
         if (this.events.length > 0) events = this.events;
         int c = Settings.getIntSetting("DELETE_CHANCE");
         int weight = this.random.nextInt(c) + 1;

@@ -3,6 +3,7 @@ package showdown;
 import Conveyor.Conveyor;
 import dataGenerator.data_handlers.Settings;
 import dataGenerator.enums.Enums;
+import dataGenerator.generators.EventGenerator;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,15 +32,13 @@ public class CreateEvent {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(numOfEvents, cdbs, "fiveHundredCreateEventsCassandra");
+        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "fiveHundredCreateEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(numOfEvents, mdbs, "fiveHundredCreateEventsMariaDB");
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "fiveHundredCreateEventsMariaDB");
     }
 
     @Test
@@ -49,15 +48,13 @@ public class CreateEvent {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(numOfEvents, cdbs, "OneThousandCreateEventsCassandra");
+        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "OneThousandCreateEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(numOfEvents, mdbs, "OneThousandCreateEventsMariaDB");
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "OneThousandCreateEventsMariaDB");
     }
 
     @Test
@@ -67,14 +64,12 @@ public class CreateEvent {
 
         // Cassandra
         CassandraDBStorer cdbs = new CassandraDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(numOfEvents, cdbs, "TenThousandCreateEventsCassandra");
+        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "TenThousandCreateEventsCassandra");
 
         //Maria
         MariaDBStorer mdbs = new MariaDBStorer();
-        Conveyor.setEvents(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.initialiseEventsGenerator();
-        Conveyor.processEventsWithLog(numOfEvents, mdbs, "TenThousandCreateEventsMariaDB");
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "TenThousandCreateEventsMariaDB");
     }
 }

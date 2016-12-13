@@ -21,15 +21,11 @@ public class Main {
     private static Thread thread = null;
     private static final int seed = Settings.getIntSetting("SEED");
     private static Random random = new Random(seed);
-    private static ArrayList<Client> clients = new ArrayList<Client>();
-    private static final dataGenerator.generators.ClientGenerator clientGen = new dataGenerator.generators.ClientGenerator(random);
-    private static final int numClients = Settings.getIntSetting("NUM_CLIENTS");
     private static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
     public static void main(String[] args) throws IOException {
         String input = "";
-        clients = clientGen.getClients(numClients);
-        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(clients, random);
+        dataGenerator.generators.EventGenerator eg = new dataGenerator.generators.EventGenerator(random);
         thread = new Thread(eg);
 
         out.println("Data Generator 1.0");

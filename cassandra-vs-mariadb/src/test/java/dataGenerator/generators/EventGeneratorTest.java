@@ -53,7 +53,7 @@ public class EventGeneratorTest {
 
     @Test
     public void generateCreateEvent() throws Exception {
-        EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
+        EventGenerator eg = new EventGenerator(this.random);
         Event newEvent = eg.generateCreateEvent();
 
         Assert.assertNotNull(newEvent);
@@ -66,7 +66,7 @@ public class EventGeneratorTest {
 
     @Test
     public void addOrderToList() {
-        EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
+        EventGenerator eg = new EventGenerator(this.random);
 
         for(int i = 0; i < eg.getTotalStoredOrders(); i++) {
             Event newEvent = eg.generateCreateEvent();
@@ -81,7 +81,7 @@ public class EventGeneratorTest {
 
     @Test
     public void generateUpdateEvent_NoCreatedOrders() throws Exception {
-        EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
+        EventGenerator eg = new EventGenerator(this.random);
         Event newEvent = eg.generateUpdateEvent(Enums.EventType.UPDATE);
 
         Assert.assertNotNull(newEvent);
@@ -94,7 +94,7 @@ public class EventGeneratorTest {
 
     @Test
     public void generateUpdateEvent_CreatedOrders() throws Exception {
-        EventGenerator eg = new EventGenerator(cg.getClients(5), this.random);
+        EventGenerator eg = new EventGenerator(this.random);
         Event newEvent = eg.generateUpdateEvent(Enums.EventType.UPDATE);
 
         Assert.assertNotNull(newEvent);
