@@ -10,6 +10,7 @@ import java.util.UUID;
  */
 public class CSVLogger {
 
+    private boolean doNotLog;
     private String folderName;
     private String[] headers;
     private BufferedWriter bufferedWriter = null;
@@ -23,24 +24,30 @@ public class CSVLogger {
         setUpLogFile();
     }
 
+    public CSVLogger(boolean doNotLog) throws IOException {
+        this.doNotLog = doNotLog;
+    }
+
     public void logEvent(String[] eventData, boolean header) {
-        try {
-            this.fileWriter = new FileWriter(this.folderName + "/" + this.fileName  + ".csv", true);
-            this.bufferedWriter = new BufferedWriter(fileWriter);
-            String logLine = eventDataToLogLine(eventData, header);
-            this.bufferedWriter.write(logLine);
-        } catch (IOException e) {
-            System.out.println("Failed to write log line");
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        } finally {
+        if (!doNotLog) {
             try {
-                if(this.bufferedWriter != null) bufferedWriter.close();
-                if(this.fileWriter != null) fileWriter.close();
+                this.fileWriter = new FileWriter(this.folderName + "/" + this.fileName  + ".csv", true);
+                this.bufferedWriter = new BufferedWriter(fileWriter);
+                String logLine = eventDataToLogLine(eventData, header);
+                this.bufferedWriter.write(logLine);
             } catch (IOException e) {
-                System.out.println("Failed to close writers");
+                System.out.println("Failed to write log line");
                 System.out.println(e.getMessage());
                 e.printStackTrace();
+            } finally {
+                try {
+                    if(this.bufferedWriter != null) bufferedWriter.close();
+                    if(this.fileWriter != null) fileWriter.close();
+                } catch (IOException e) {
+                    System.out.println("Failed to close writers");
+                    System.out.println(e.getMessage());
+                    e.printStackTrace();
+                }
             }
         }
     }

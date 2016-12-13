@@ -25,51 +25,51 @@ public class CreateEvent {
 
     }
 
-    @Test
-    public void Create500() throws SQLException {
-        Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
-        int numOfEvents = 500;
-
-        // Cassandra
-        CassandraDBStorer cdbs = new CassandraDBStorer();
-        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "fiveHundredCreateEventsCassandra");
-
-        //Maria
-        MariaDBStorer mdbs = new MariaDBStorer();
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "fiveHundredCreateEventsMariaDB");
-    }
-
-    @Test
-    public void Create1000() throws SQLException {
-        Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
-        int numOfEvents = 1000;
-
-        // Cassandra
-        CassandraDBStorer cdbs = new CassandraDBStorer();
-        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "OneThousandCreateEventsCassandra");
-
-        //Maria
-        MariaDBStorer mdbs = new MariaDBStorer();
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "OneThousandCreateEventsMariaDB");
-    }
-
-    @Test
-    public void Create10000() throws SQLException {
-        Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
-        int numOfEvents = 10000;
-
-        // Cassandra
-        CassandraDBStorer cdbs = new CassandraDBStorer();
-        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "TenThousandCreateEventsCassandra");
-
-        //Maria
-        MariaDBStorer mdbs = new MariaDBStorer();
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "TenThousandCreateEventsMariaDB");
-    }
+//    @Test
+//    public void Create500() throws SQLException {
+//        Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
+//        int numOfEvents = 500;
+//
+//        // Cassandra
+//        CassandraDBStorer cdbs = new CassandraDBStorer();
+//        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+//        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "fiveHundredCreateEventsCassandra");
+//
+//        //Maria
+//        MariaDBStorer mdbs = new MariaDBStorer(true, "\\testLogs", "testtestest");
+//        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+//        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "fiveHundredCreateEventsMariaDB");
+//    }
+//
+//    @Test
+//    public void Create1000() throws SQLException {
+//        Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
+//        int numOfEvents = 1000;
+//
+//        // Cassandra
+//        CassandraDBStorer cdbs = new CassandraDBStorer();
+//        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+//        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "OneThousandCreateEventsCassandra");
+//
+//        //Maria
+//        MariaDBStorer mdbs = new MariaDBStorer(true, "\\testLogs", "testtestest");
+//        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+//        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "OneThousandCreateEventsMariaDB");
+//    }
+//
+//    @Test
+//    public void Create10000() throws SQLException {
+//        Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
+//        int numOfEvents = 10000;
+//
+//        // Cassandra
+//        CassandraDBStorer cdbs = new CassandraDBStorer();
+//        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+//        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "TenThousandCreateEventsCassandra");
+//
+//        //Maria
+//        MariaDBStorer mdbs = new MariaDBStorer(true, "\\testLogs", "testtestest");
+//        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+//        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "TenThousandCreateEventsMariaDB");
+//    }
 }

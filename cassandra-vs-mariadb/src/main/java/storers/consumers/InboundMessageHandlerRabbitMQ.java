@@ -9,6 +9,7 @@ import storers.storers.CassandraDBStorer;
 import storers.storers.cassandra.Cassandra;
 import storers.storers.MariaDBStorer;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -36,8 +37,11 @@ public class InboundMessageHandlerRabbitMQ {
                 JSONParser parser = new JSONParser();
 
                 // Init storers
-                MariaDBStorer mariaDBStorer = new MariaDBStorer();
-                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer(logger);
+                CSVLogger mariaLogger = new CSVLogger(true);
+                CSVLogger cassandraLogger = new CSVLogger(true);
+
+                MariaDBStorer mariaDBStorer = new MariaDBStorer(true, mariaLogger);
+                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer(cassandraLogger);
 
                 public void handleDelivery(
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body
@@ -48,9 +52,8 @@ public class InboundMessageHandlerRabbitMQ {
                         obj = parser.parse(message);
                         JSONObject jsonObject = (JSONObject) obj;
                         // Pass To Storers
-                        mariaLogger.logEvent(mariaDBStorer.messageHandler(jsonObject), false);
-                        logger.logEvent(cassandraDBStorer.messageHandler(jsonObject), false);
-
+                        mariaDBStorer.messageHandler(jsonObject);
+                        cassandraDBStorer.messageHandler(jsonObject);
                     } catch (ParseException e) {
                         e.printStackTrace();
                     }

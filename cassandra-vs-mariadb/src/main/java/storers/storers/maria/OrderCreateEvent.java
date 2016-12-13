@@ -2,6 +2,7 @@ package storers.storers.maria;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import storers.CSVLogger;
 import storers.storers.maria.enums.DBEventType;
 
 import java.sql.Connection;
@@ -13,12 +14,12 @@ import java.util.Iterator;
 public class OrderCreateEvent extends QueryEvent {
     private JSONObject data;
 
-    public OrderCreateEvent(Connection connection, JSONObject data) {
-        super(connection, (String) data.get("id"), DBEventType.CREATE);
+    public OrderCreateEvent(boolean useASync, Connection connection, JSONObject data, CSVLogger csvLogger) {
+        super(useASync, connection, (String) data.get("id"), DBEventType.CREATE, csvLogger);
         this.data = data;
     }
 
-    public String[] runQuery() {
+    public void runQuery() {
         JSONObject client = (JSONObject) data.get("client");
         String clientId = (String) client.get("id");
         Long date = (Long) data.get("date");
@@ -26,7 +27,7 @@ public class OrderCreateEvent extends QueryEvent {
         doQuery("INSERT INTO orders.`order` VALUES('" + orderId + "', '" + clientId + "', '" + Long.valueOf(date).toString() + "', '" + status + "');");
         JSONArray lineItems = (JSONArray) data.get("lineItems");
         createLineItems(orderId, lineItems);
-        return end();
+        end();
     }
 
     private void createLineItems(String orderId, JSONArray lineItems) {

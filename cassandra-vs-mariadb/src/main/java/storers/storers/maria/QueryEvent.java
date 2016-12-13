@@ -1,55 +1,73 @@
 package storers.storers.maria;
 
+import storers.CSVLogger;
 import storers.storers.Timer;
 import storers.storers.maria.enums.DBEventType;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Arrays;
 
 /**
  * Created by lcollingwood on 06/12/2016.
  */
-public abstract class QueryEvent {
+public abstract class QueryEvent implements Runnable {
     private Timer timer;
-    private long timeTaken;
     private boolean wasSuccessful;
     private String errorMessage;
+    private boolean useASync;
+    private CSVLogger csvLogger;
+
 
     public DBEventType ACTION_TYPE;
     public Connection connection;
     public String orderId;
 
-    public QueryEvent(Connection connection, String orderId, DBEventType eventType) {
+    public QueryEvent(boolean useASync, Connection connection, String orderId, DBEventType eventType, CSVLogger csvLogger) {
+        this.useASync = useASync;
         this.connection = connection;
         this.orderId = orderId;
         this.ACTION_TYPE = eventType;
+        this.csvLogger = csvLogger;
         this.timer = new Timer();
-        this.timeTaken = 0;
         this.wasSuccessful = false;
         this.errorMessage = "No Error";
     }
 
-    public abstract String[] runQuery();
+    public abstract void runQuery();
 
-    public String[] start() {
+    public void start() {
         timer.startTimer();
-        return runQuery();
+        if (useASync) {
+            Thread t = new Thread(this);
+            t.start();
+        } else {
+            runQuery();
+        }
     }
 
-    public String[] end() {
-        timeTaken = timer.stopTimer();
-
+    public void end() {
         try {
             connection.commit();
-            connection.close();
+            if (useASync) {
+                connection.close();
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-//        System.out.println(ACTION_TYPE.toString() + " Event (Order: " + orderId + ") completed in MariaDB: " + wasSuccessful);
-//        System.out.println(ACTION_TYPE.toString() + " Event in MariaDB took: " + timeTaken + " nanoseconds");
-        String timeTakenString = Long.valueOf(timeTaken).toString();
-        return new String[]{"MariaDB", ACTION_TYPE.toString(), timeTakenString, Boolean.toString(wasSuccessful), errorMessage, String.valueOf(System.nanoTime())};
+        String[] logLine = new String[] {
+            "MariaDB", ACTION_TYPE.toString(),
+            Long.valueOf(timer.stopTimer()).toString(),
+            Boolean.toString(wasSuccessful),
+            errorMessage, String.valueOf(System.nanoTime())
+        };
+//        System.out.println(Arrays.toString(logLine));
+        csvLogger.logEvent(logLine, false);
+    }
+
+    public void run() {
+        runQuery();
     }
 
     public void doQuery(String query) {
@@ -64,4 +82,5 @@ public abstract class QueryEvent {
             errorMessage = e.getMessage();
         }
     }
+
 }

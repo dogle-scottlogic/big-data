@@ -24,10 +24,6 @@ public class Conveyor {
 
     private static int seed = Settings.getIntSetting("SEED");
     private static Random random;
-    private static ArrayList<Client> clients = new ArrayList<Client>();
-    private static dataGenerator.generators.ClientGenerator clientGen;
-    private static String filePath = "\\testLogs";
-    private static String logName = "";
     private static EventGenerator eventGenerator;
 
     public static EventGenerator initialiseEventsGenerator(Enums.EventType[] events) {
@@ -36,35 +32,13 @@ public class Conveyor {
         return eventGenerator;
     }
 
-    public static void processEvents(int numberOfEventsToProcess, Storer storer, EventGenerator eventGenerator, String logFileName) {
-        try {
-            logName = logFileName;
-            processEvents(numberOfEventsToProcess, storer, eventGenerator, true);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void processEvents(int numberOfEventsToProcess, Storer storer, EventGenerator eventGenerator) {
-        try {
-            processEvents(numberOfEventsToProcess, storer, eventGenerator, false);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void processEvents(int numberOfEventsToProcess,Storer storer, EventGenerator eventGenerator, boolean log) throws IOException, ParseException {
-        String absPath = new File("").getAbsolutePath().concat(filePath);
-        CSVLogger logger = null;
-        if(log) logger = new CSVLogger(absPath, logName);
-
+    public static void processEvents(int numberOfEventsToProcess,Storer storer, EventGenerator eventGenerator) throws IOException, ParseException {
         for (int i = 0; i < numberOfEventsToProcess; i++) {
             Event event = eventGenerator.getNextEvent();
             String jsonStringOrder = Serializer.Serialize(event);
             JSONParser parser = new JSONParser();
             JSONObject jsonOrder = (JSONObject) parser.parse(jsonStringOrder);
-            String[] results = storer.messageHandler(jsonOrder);
-            if (log) logger.logEvent(results, false);
+            storer.messageHandler(jsonOrder);
         }
     }
 }
