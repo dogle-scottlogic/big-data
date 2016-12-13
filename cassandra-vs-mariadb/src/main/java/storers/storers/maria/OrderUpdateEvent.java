@@ -6,6 +6,8 @@ import storers.CSVLogger;
 import storers.storers.maria.enums.DBEventType;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Iterator;
 
 /**
@@ -23,31 +25,74 @@ public class OrderUpdateEvent extends QueryEvent {
         JSONObject client = (JSONObject) data.get("client");
         String clientId = (String) client.get("id");
         Long date = (Long) data.get("date");
-        doQuery("UPDATE orders.`order` " +
+        JSONArray lineItems = (JSONArray) data.get("lineItems");
+
+
+//        doQuery("UPDATE orders.`order` " +
+//                "SET " +
+//                "client_id='" + clientId + "', " +
+//                "created='" + Long.valueOf(date).toString() + "' " +
+//                "WHERE id='" + orderId + "';");
+//        updateLineItems(orderId, lineItems);
+
+        String orderUpdateQuery = "UPDATE orders.`order` " +
                 "SET " +
                 "client_id='" + clientId + "', " +
                 "created='" + Long.valueOf(date).toString() + "' " +
-                "WHERE id='" + orderId + "';");
-        JSONArray lineItems = (JSONArray) data.get("lineItems");
-        updateLineItems(orderId, lineItems);
-        end();
-    }
+                "WHERE id='" + orderId + "';";
 
-    private void updateLineItems(String orderId, JSONArray lineItems) {
-        Iterator lineItemsIterator = lineItems.iterator();
+        try {
+            Statement stmt = connection.createStatement();
+            // Update Order
+            stmt.addBatch(orderUpdateQuery);
 
-        while (lineItemsIterator.hasNext()) {
-            JSONObject nextLineItem = (JSONObject) lineItemsIterator.next();
-            JSONObject product = (JSONObject) nextLineItem.get("product");
-            String productId = (String) product.get("id");
-            Long quantity = (Long) nextLineItem.get("quantity");
+            // Add each lineItem query
+            Iterator lineItemsIterator = lineItems.iterator();
 
-            doQuery("UPDATE orders.line_item " +
-                    "SET " +
-                    "order_id='" + orderId + "', " +
-                    "product_id='" + productId + "', " +
-                    "quantity=" + Long.valueOf(quantity).toString() + " " +
-                    "WHERE order_id='" + orderId + "';");
+            while (lineItemsIterator.hasNext()) {
+                JSONObject nextLineItem = (JSONObject) lineItemsIterator.next();
+                JSONObject product = (JSONObject) nextLineItem.get("product");
+                String productId = (String) product.get("id");
+                Long quantity = (Long) nextLineItem.get("quantity");
+
+                stmt.addBatch("UPDATE orders.line_item " +
+                        "SET " +
+                        "order_id='" + orderId + "', " +
+                        "product_id='" + productId + "', " +
+                        "quantity=" + Long.valueOf(quantity).toString() + " " +
+                        "WHERE order_id='" + orderId + "';");
+
+            }
+
+            stmt.executeBatch();
+            connection.commit();
+            wasSuccessful = true;
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            wasSuccessful = false;
+            errorMessage = e.getMessage();
         }
+        end();
+
     }
+
+//    private void updateLineItems(String orderId, JSONArray lineItems) {
+//        Iterator lineItemsIterator = lineItems.iterator();
+//
+//        while (lineItemsIterator.hasNext()) {
+//            JSONObject nextLineItem = (JSONObject) lineItemsIterator.next();
+//            JSONObject product = (JSONObject) nextLineItem.get("product");
+//            String productId = (String) product.get("id");
+//            Long quantity = (Long) nextLineItem.get("quantity");
+//
+//            doQuery("UPDATE orders.line_item " +
+//                    "SET " +
+//                    "order_id='" + orderId + "', " +
+//                    "product_id='" + productId + "', " +
+//                    "quantity=" + Long.valueOf(quantity).toString() + " " +
+//                    "WHERE order_id='" + orderId + "';");
+//        }
+//    }
 }

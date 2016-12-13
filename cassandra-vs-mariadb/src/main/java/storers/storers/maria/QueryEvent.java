@@ -14,11 +14,11 @@ import java.util.Arrays;
  */
 public abstract class QueryEvent implements Runnable {
     private Timer timer;
-    private boolean wasSuccessful;
-    private String errorMessage;
     private boolean useASync;
     private CSVLogger csvLogger;
 
+    public boolean wasSuccessful;
+    public String errorMessage;
 
     public DBEventType ACTION_TYPE;
     public Connection connection;
