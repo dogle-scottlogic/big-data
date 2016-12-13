@@ -1,24 +1,37 @@
 package storers.storers;
 
 import org.json.simple.JSONObject;
+import storers.CSVLogger;
 import storers.DatabaseEventFailedException;
 import storers.storers.cassandra.Cassandra;
 
-import java.util.Arrays;
+import java.sql.Struct;
+import java.util.EventListener;
 
 /**
  * Created by dogle on 05/12/2016.
  */
-public class CassandraDBStorer implements Storer{
+public class CassandraDBStorer implements Storer {
 
     private Cassandra cassandra;
-    private Timer timer = new Timer();
+    private CSVLogger logger;
 
-    public CassandraDBStorer() {
+    public CassandraDBStorer() { //TODO remove
         boolean success;
         this.cassandra = new Cassandra("127.0.0.7");
         cassandra.connect();
         success = cassandra.createKeySpace("orders");
+        if (success) success = cassandra.createLineItemTable();
+        if (success) success = cassandra.createOrderTable();
+        if (!success) System.out.println("An error occurred setting up the database");
+    }
+
+    public CassandraDBStorer(CSVLogger logger) {
+        boolean success;
+        this.cassandra = new Cassandra("127.0.0.7", logger);
+        cassandra.connect();
+        success = cassandra.createKeySpace("orders");
+        this.logger = logger;
         if (success) success = cassandra.createLineItemTable();
         if (success) success = cassandra.createOrderTable();
         if (!success) System.out.println("An error occurred setting up the database");
@@ -52,60 +65,57 @@ public class CassandraDBStorer implements Storer{
             success = false;
             errorMessage = exception.getMessage();
         }
-        // Return Database type, eventType, time Taken, success, errorMessage
-        String [] log = new String[] {"Cassandra", type, String.valueOf(timeTaken), String.valueOf(success), errorMessage, String.valueOf(System.nanoTime())};
-        // System.out.println(Arrays.toString(log));
-        // System.out.println(Arrays.toString(log));
+        String[] log = new String[]{"Cassandra", type, String.valueOf(timeTaken), String.valueOf(success), errorMessage, String.valueOf(System.nanoTime())};
         return log;
     }
 
     public long create(final JSONObject message) throws DatabaseEventFailedException {
-        timer.startTimer();
+        Timer timer = new Timer();
         try {
-            cassandra.addOrder(message);
+            cassandra.addOrder(message, timer);
         } catch (Exception e) {
             throw new DatabaseEventFailedException(e.getMessage());
         }
-        return timer.stopTimer();
+        return 1;
     }
 
     public long read(final JSONObject message) throws DatabaseEventFailedException {
-        timer.startTimer();
+        Timer timer = new Timer();
         try {
-            cassandra.readOrder(message);
+            cassandra.readOrder(message, timer);
         } catch (Exception e) {
             throw new DatabaseEventFailedException(e.getMessage());
         }
-        return timer.stopTimer();
+        return 1;
     }
 
     public long update(final JSONObject message) throws DatabaseEventFailedException {
-        timer.startTimer();
+        Timer timer = new Timer();
         try {
-            cassandra.updateOrder(message);
+            cassandra.updateOrder(message, timer);
         } catch (Exception e) {
             throw new DatabaseEventFailedException(e.getMessage());
         }
-        return timer.stopTimer();
+        return 1;
     }
 
     public long updateStatus(final JSONObject message) throws DatabaseEventFailedException {
-        timer.startTimer();
+        Timer timer = new Timer();
         try {
-            cassandra.updateOrderStatus(message);
+            cassandra.updateOrderStatus(message, timer);
         } catch (Exception e) {
             throw new DatabaseEventFailedException(e.getMessage());
         }
-        return timer.stopTimer();
+        return 1;
     }
 
     public long delete(final JSONObject message) throws DatabaseEventFailedException {
-        timer.startTimer();
+        Timer timer = new Timer();
         try {
-            cassandra.removeOrder(message);
+            cassandra.deleteOrder(message, timer);
         } catch (Exception e) {
             throw new DatabaseEventFailedException(e.getMessage());
         }
-        return timer.stopTimer();
+        return 1;
     }
 }

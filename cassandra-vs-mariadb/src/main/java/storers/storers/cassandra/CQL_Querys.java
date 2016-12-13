@@ -56,7 +56,7 @@ public class CQL_Querys {
     public static String addOrder(String keyspaceName) {
         String query = "INSERT INTO " + keyspaceName + ".orders"
                 + "( order_id, lineItem_ids, client_id, date_created, status, order_subTotal ) "
-                + "VALUES (?, ?, ?, ?, ?, ?) IF NOT EXISTS;";
+                + "VALUES (?, ?, ?, ?, ?, ?);";
         return query;
     }
 
@@ -65,7 +65,7 @@ public class CQL_Querys {
     }
 
     public static String updateOrder(String keyspaceName) {
-        return "UPDATE " + keyspaceName + ".orders SET date_created=?, status=?, order_subTotal=? WHERE order_id=? IF EXISTS;";
+        return "UPDATE " + keyspaceName + ".orders SET date_created=?, status=?, order_subTotal=? WHERE order_id=?;";
     }
 
     public static String selectAllLineItemIDs(String keyspaceName) {
@@ -77,7 +77,7 @@ public class CQL_Querys {
     }
 
     public static String deleteOrder(String keyspaceName) {
-        return "DELETE FROM " + keyspaceName + ".orders WHERE order_id=? IF EXISTS;";
+        return "DELETE FROM " + keyspaceName + ".orders WHERE order_id=?;";
     }
 
     public static String updateOrderStatus(String keyspaceName) {

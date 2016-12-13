@@ -1,7 +1,6 @@
 package storers.storers.cassandra;
 
 import com.datastax.driver.core.*;
-import com.datastax.driver.core.policies.DCAwareRoundRobinPolicy;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
@@ -10,7 +9,9 @@ import org.json.simple.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+
+import storers.CSVLogger;
+import storers.storers.Timer;
 
 /**
  * Created by dogle on 05/12/2016.
@@ -20,9 +21,16 @@ public class Cassandra {
     private Cluster cluster;
     private Session session;
     private String keyspaceName = "";
+    private final boolean readEventHappened[] = {false};
+    private CSVLogger logger;
 
-    public Cassandra(String host) {
-        cluster = Cluster.builder().addContactPoint(host).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
+    public Cassandra(String host) { //TODO remove this
+        this.cluster = Cluster.builder().addContactPoint(host).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
+    }
+
+    public Cassandra(String host, CSVLogger logger) {
+        this.cluster = Cluster.builder().addContactPoint(host).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
+        this.logger = logger;
     }
 
     public boolean connect() {
@@ -92,7 +100,7 @@ public class Cassandra {
     }
 
     // CRUD
-    public void addOrder(JSONObject order) {
+    public void addOrder(JSONObject order, Timer timer) {
         String orderId = (String) order.get("id");
         JSONArray lineItems = (JSONArray) order.get("lineItems");
         ArrayList<String> lineItemsIds = new ArrayList<String>();
@@ -111,8 +119,6 @@ public class Cassandra {
             batch.add(p.bind(orderId, lineItemId, productId, quantity, linePrice));
             lineItemsIds.add("'" + lineItemId + "'");
         }
-        ResultSetFuture futureLineItems = session.executeAsync(batch);
-        handleError(futureLineItems);
 
         //Add Order
         String clientId = (String) ((JSONObject) order.get("client")).get("id");
@@ -123,24 +129,25 @@ public class Cassandra {
 
         // Add prepared statement to batch
         PreparedStatement p = this.session.prepare(CQL_Querys.addOrder(this.keyspaceName));
-        BoundStatement b = p.bind(orderId, lineItemsIds, clientId, created, status, subTotal);
-        ResultSetFuture futureOrders = session.executeAsync(b);
-        handleError(futureOrders);
+        batch.add(p.bind(orderId, lineItemsIds, clientId, created, status, subTotal));
+        timer.startTimer();
+        ResultSetFuture futureOrders = session.executeAsync(batch);
+        queryHandler(futureOrders, "CREATE", timer);
     }
 
-    public void removeOrder(JSONObject order) {
+    public void deleteOrder(JSONObject order, Timer timer) {
+        BatchStatement batch = new BatchStatement();
         String orderId = (String) order.get("data");
         PreparedStatement p = session.prepare(CQL_Querys.deleteLineItem(this.keyspaceName));
-        BoundStatement b = p.bind(orderId);
-        ResultSetFuture fli = session.executeAsync(b);
-        handleError(fli);
+        batch.add(p.bind(orderId));
         p = session.prepare(CQL_Querys.deleteOrder(this.keyspaceName));
-        b = p.bind(orderId);
-        ResultSetFuture fo = session.executeAsync(b);
-        handleError(fo);
+        batch.add(p.bind(orderId));
+        timer.startTimer();
+        ResultSetFuture fo = session.executeAsync(batch);
+        queryHandler(fo, "DELETE", timer);
     }
 
-    public void updateOrder(JSONObject order) {
+    public void updateOrder(JSONObject order, Timer timer) {
         BatchStatement batchStatement = new BatchStatement();
         String orderId = (String) order.get("id");
         JSONArray lineItems = (JSONArray) order.get("lineItems");
@@ -152,50 +159,72 @@ public class Cassandra {
             PreparedStatement p = session.prepare(CQL_Querys.updateLineItem(this.keyspaceName));
             batchStatement.add(p.bind(quantity, linePrice, lineItemId, orderId));
         }
-        ResultSetFuture fli = session.executeAsync(batchStatement);
-        handleError(fli);
+        // ResultSetFuture fli = session.executeAsync(batchStatement);
+        // queryHandler(fli);
         Long dateLong = (Long) order.get("date");
         String created = new Date(dateLong).toString();
         String status = (String) order.get("status");
         Double subTotal = (Double) order.get("subTotal");
         PreparedStatement p = session.prepare(CQL_Querys.updateOrder(this.keyspaceName));
-        BoundStatement bound = p.bind(created, status, subTotal, orderId);
-        ResultSetFuture fo = session.executeAsync(bound);
-        handleError(fo);
+        batchStatement.add(p.bind(created, status, subTotal, orderId));
+        timer.startTimer();
+        ResultSetFuture fo = session.executeAsync(batchStatement);
+        queryHandler(fo, "UPDATE", timer);
 
     }
 
-    public void updateOrderStatus(JSONObject order) {
+    public void updateOrderStatus(JSONObject order, Timer timer) {
         String orderId = (String) order.get("id");
         String newStatus = (String) order.get("status");
         PreparedStatement p = session.prepare(CQL_Querys.updateOrderStatus(this.keyspaceName));
         BoundStatement b = p.bind(newStatus, orderId);
+        timer.startTimer();
         ResultSetFuture fo = session.executeAsync(b);
-        handleError(fo);
+        queryHandler(fo, "UPDATE_STATUS", timer);
     }
 
-    public void readOrder(JSONObject order) {
+    public void readOrder(JSONObject order, Timer timer) {
         String orderId = (String) order.get("data");
         PreparedStatement p = session.prepare(CQL_Querys.selectAllLineItems(this.keyspaceName));
         BoundStatement b = p.bind(orderId);
-        ResultSetFuture fli = session.executeAsync(b);
-        handleError(fli);
+        ResultSetFuture fo = session.executeAsync(b);
+        readHandler(fo, "READ", timer);
         p = session.prepare(CQL_Querys.selectAllOrders(this.keyspaceName));
         b = p.bind(orderId);
-        ResultSetFuture fo = session.executeAsync(b);
-        handleError(fo);
+        timer.startTimer();
+        fo = session.executeAsync(b);
+        readHandler(fo, "READ", timer);
     }
 
-    private void handleError(ResultSetFuture futureLineItems) {
-        Futures.addCallback(futureLineItems, new FutureCallback<ResultSet>() {
+    private void readHandler(ResultSetFuture future, final String type, final Timer timer) {
+        Futures.addCallback(future, new FutureCallback<ResultSet>() {
             public void onSuccess(ResultSet result) {
-            }
-            public void onFailure(Throwable t) {
-                try {
-                    throw t;
-                } catch (Throwable throwable) {
-                    throwable.printStackTrace();
+                if (readEventHappened[0]) {
+                    readEventHappened[0] = false;
+                    String[] log = new String[]{"Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(true), "No Error", String.valueOf(System.nanoTime())};
+                    logger.logEvent(log, false);
+                } else {
+                    readEventHappened[0] = true;
                 }
+            }
+
+            public void onFailure(Throwable t) {
+                String[] log = new String[]{"Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(false), t.getMessage(), String.valueOf(System.nanoTime())};
+                logger.logEvent(log, false);
+            }
+        });
+    }
+
+    private void queryHandler(ResultSetFuture future, final String type, final Timer timer) {
+        Futures.addCallback(future, new FutureCallback<ResultSet>() {
+            public void onSuccess(ResultSet result) {
+                String[] log = new String[]{"Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(true), "No Error", String.valueOf(System.nanoTime())};
+                logger.logEvent(log, false);
+            }
+
+            public void onFailure(Throwable t) {
+                String[] log = new String[]{"Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(false), t.getMessage(), String.valueOf(System.nanoTime())};
+                logger.logEvent(log, false);
             }
         });
     }

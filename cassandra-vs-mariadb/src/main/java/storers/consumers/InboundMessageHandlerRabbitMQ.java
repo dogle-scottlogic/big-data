@@ -37,7 +37,7 @@ public class InboundMessageHandlerRabbitMQ {
 
                 // Init storers
                 MariaDBStorer mariaDBStorer = new MariaDBStorer();
-                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer();
+                CassandraDBStorer cassandraDBStorer = new CassandraDBStorer(logger);
 
                 public void handleDelivery(
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body
