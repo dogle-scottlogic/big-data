@@ -14,6 +14,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by lcollingwood on 14/12/2016.
@@ -26,6 +28,7 @@ public class Combo implements Storer {
     private Session session;
     private String keyspaceName = "";
     private String host = "127.0.0.7";
+    private ExecutorService cachedPool = Executors.newCachedThreadPool();
     // private final boolean readEventHappened[] = {false};
 
     public Combo(CSVLogger logger) {
@@ -42,18 +45,16 @@ public class Combo implements Storer {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
 
 
-
         switch (eventType) {
             case CREATE:
                 try {
-                    new Thread(
-                            new Create(session, mariaConnection, logger, (JSONObject) message.get("data"))
-                    ).start();
+                    this.cachedPool.submit(new Create(session, mariaConnection, logger, (JSONObject) message.get("data")));
+//                    new Thread(
+//                            new Create(session, mariaConnection, logger, (JSONObject) message.get("data"))
+//                    ).start();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
-//                new OrderCreateEvent(useASync, queryConnection, (JSONObject) message.get("data"), csvLogger).start();
                 break;
             case UPDATE:
 //                new OrderUpdateEvent(useASync, queryConnection, (JSONObject) message.get("data"), csvLogger).start();
