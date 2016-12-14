@@ -26,17 +26,17 @@ public class RandomEventTest {
 
         EventGenerator eventGenerator;
 
-        // Cassandra
-        CSVLogger cassandraLogger = new CSVLogger(absPath, "TenThousandRandomEventsCassandra");
-        CassandraDBStorer cdbs = new CassandraDBStorer(cassandraLogger);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
-        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator);
-
         //Maria
         boolean useASync = false;
         CSVLogger mariaLogger = new CSVLogger(absPath, "TenThousandRandomEventsMaria");
         MariaDBStorer mdbs = new MariaDBStorer(useASync, mariaLogger);
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
         Conveyor.processEvents(numOfEvents, mdbs, eventGenerator);
+
+        // Cassandra
+        CSVLogger cassandraLogger = new CSVLogger(absPath, "TenThousandRandomEventsCassandra");
+        CassandraDBStorer cdbs = new CassandraDBStorer(cassandraLogger);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
+        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator);
     }
 }

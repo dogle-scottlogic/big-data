@@ -14,8 +14,8 @@ public class OrderReadByIdEvent extends QueryEvent {
     }
 
     public void runQuery() {
-        doQuery("SELECT * FROM orders.`order` WHERE id='" + orderId + "';");
-        doQuery("SELECT * FROM orders.`line_item` WHERE order_id='" + orderId + "';");
+        doQueryNoBatch("SELECT * FROM orders.`order` WHERE id='" + orderId + "';");
+        doQueryNoBatch("SELECT * FROM orders.`line_item` WHERE order_id='" + orderId + "';");
         end();
     }
 }
