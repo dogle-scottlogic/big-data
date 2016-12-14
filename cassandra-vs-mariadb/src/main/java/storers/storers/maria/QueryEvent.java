@@ -62,7 +62,6 @@ public abstract class QueryEvent implements Runnable {
             Boolean.toString(wasSuccessful),
             errorMessage, String.valueOf(System.nanoTime())
         };
-//        System.out.println(Arrays.toString(logLine));
         csvLogger.logEvent(logLine, false);
     }
 

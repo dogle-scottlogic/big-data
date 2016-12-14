@@ -24,10 +24,6 @@ public class Cassandra {
     private final boolean readEventHappened[] = {false};
     private CSVLogger logger;
 
-    public Cassandra(String host) { //TODO remove this
-        this.cluster = Cluster.builder().addContactPoint(host).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
-    }
-
     public Cassandra(String host, CSVLogger logger) {
         this.cluster = Cluster.builder().addContactPoint(host).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
         this.logger = logger;
@@ -159,8 +155,6 @@ public class Cassandra {
             PreparedStatement p = session.prepare(CQL_Querys.updateLineItem(this.keyspaceName));
             batchStatement.add(p.bind(quantity, linePrice, lineItemId, orderId));
         }
-        // ResultSetFuture fli = session.executeAsync(batchStatement);
-        // queryHandler(fli);
         Long dateLong = (Long) order.get("date");
         String created = new Date(dateLong).toString();
         String status = (String) order.get("status");
@@ -227,5 +221,9 @@ public class Cassandra {
                 logger.logEvent(log, false);
             }
         });
+    }
+
+    public void setLogger(CSVLogger logger) {
+        this.logger = logger;
     }
 }

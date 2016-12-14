@@ -20,7 +20,7 @@ import java.sql.Statement;
 public class MariaDBStorer implements Storer{
     private static Connection synchronisedConnection;
     private static final HikariDataSource hikariDataSource = new HikariDataSource();
-    private static CSVLogger csvLogger;
+    private CSVLogger csvLogger;
 
     private boolean useASync;
 
@@ -103,5 +103,9 @@ public class MariaDBStorer implements Storer{
             default:
                 break;
         }
+    }
+
+    public void setLogger(CSVLogger logger) {
+        this.csvLogger = logger;
     }
 }

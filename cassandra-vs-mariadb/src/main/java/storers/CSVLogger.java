@@ -29,24 +29,20 @@ public class CSVLogger {
     }
 
     public void logEvent(String[] eventData, boolean header) {
-        if (!doNotLog) {
-            try {
-                this.fileWriter = new FileWriter(this.folderName + "/" + this.fileName  + ".csv", true);
-                this.bufferedWriter = new BufferedWriter(fileWriter);
-                String logLine = eventDataToLogLine(eventData, header);
-                this.bufferedWriter.write(logLine);
-            } catch (IOException e) {
-                System.out.println("Failed to write log line");
-                System.out.println(e.getMessage());
-                e.printStackTrace();
-            } finally {
+        String logLine = "";
+        synchronized (this) {
+            if (!doNotLog) {
                 try {
-                    if(this.bufferedWriter != null) bufferedWriter.close();
-                    if(this.fileWriter != null) fileWriter.close();
+                    this.fileWriter = new FileWriter(this.folderName + "/" + this.fileName + ".csv", true);
+                    this.bufferedWriter = new BufferedWriter(fileWriter);
+                    logLine = eventDataToLogLine(eventData, header);
+                    this.bufferedWriter.write(logLine);
                 } catch (IOException e) {
-                    System.out.println("Failed to close writers");
+                    System.out.println("Failed to write log line");
                     System.out.println(e.getMessage());
                     e.printStackTrace();
+                } finally {
+                    closeLog();
                 }
             }
         }
@@ -54,19 +50,26 @@ public class CSVLogger {
 
     private String eventDataToLogLine(String[] eventData, boolean header) {
         String logLine = "";
-        if(!header) logLine = this.fileName + ", ";
+        if (!header) logLine = this.fileName + ", ";
         for (String eventDatum : eventData) {
             logLine = logLine + eventDatum + ", ";
         }
         return logLine + "\n";
     }
 
-    public void closeLog() throws IOException {
-        bufferedWriter.close();
-        fileWriter.close();
+    public void closeLog() {
+        try {
+            if (this.bufferedWriter != null) this.bufferedWriter.close();
+            if (this.fileWriter != null) this.fileWriter.close();
+        } catch (IOException e) {
+            System.out.println("Failed to close writers");
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void setUpLogFile() {
         logEvent(this.headers, true);
+
     }
 }

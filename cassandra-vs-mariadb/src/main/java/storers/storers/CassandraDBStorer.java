@@ -5,23 +5,18 @@ import storers.CSVLogger;
 import storers.DatabaseEventFailedException;
 import storers.storers.cassandra.Cassandra;
 
-import java.sql.Struct;
-import java.util.EventListener;
-
 /**
  * Created by dogle on 05/12/2016.
  */
 public class CassandraDBStorer implements Storer {
 
     private Cassandra cassandra;
-    private CSVLogger logger;
 
     public CassandraDBStorer(CSVLogger logger) {
         boolean success;
         this.cassandra = new Cassandra("127.0.0.7", logger);
         cassandra.connect();
         success = cassandra.createKeySpace("orders");
-        this.logger = logger;
         if (success) success = cassandra.createLineItemTable();
         if (success) success = cassandra.createOrderTable();
         if (!success) System.out.println("An error occurred setting up the database");
@@ -93,5 +88,9 @@ public class CassandraDBStorer implements Storer {
         } catch (Exception e) {
             throw new DatabaseEventFailedException(e.getMessage());
         }
+    }
+
+    public void setLogger(CSVLogger logger) {
+        this.cassandra.setLogger(logger);
     }
 }
