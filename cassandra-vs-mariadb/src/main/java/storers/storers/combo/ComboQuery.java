@@ -72,6 +72,7 @@ public abstract class ComboQuery implements Runnable{
         // Cleanup
         try {
             getMariaBatch().close();
+            getMariaConnection().close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
