@@ -97,38 +97,39 @@ public class Cassandra {
 
     // CRUD
     public void addOrder(JSONObject order, Timer timer) {
-        String orderId = (String) order.get("id");
-        JSONArray lineItems = (JSONArray) order.get("lineItems");
-        ArrayList<String> lineItemsIds = new ArrayList<String>();
-        BatchStatement batch = new BatchStatement();
+            String orderId = (String) order.get("id");
+            JSONArray lineItems = (JSONArray) order.get("lineItems");
+            ArrayList<String> lineItemsIds = new ArrayList<String>();
+            BatchStatement batch = new BatchStatement();
 
-        for (int i = 0; i < lineItems.size(); i++) {
-            // Extract values
-            JSONObject lineItem = (JSONObject) lineItems.get(i);
-            String lineItemId = (String) lineItem.get("id");
-            String productId = (String) ((JSONObject) lineItem.get("product")).get("id");
-            int quantity = new Integer(((Long) lineItem.get("quantity")).intValue());
-            double linePrice = (Double) lineItem.get("linePrice");
+            for (int i = 0; i < lineItems.size(); i++) {
+                // Extract values
+                JSONObject lineItem = (JSONObject) lineItems.get(i);
+                String lineItemId = (String) lineItem.get("id");
+                String productId = (String) ((JSONObject) lineItem.get("product")).get("id");
+                int quantity = new Integer(((Long) lineItem.get("quantity")).intValue());
+                double linePrice = (Double) lineItem.get("linePrice");
+
+                // Add prepared statement to batch
+                PreparedStatement p = this.session.prepare(CQL_Querys.addLineItem(this.keyspaceName));
+
+                batch.add(p.bind(orderId, lineItemId, productId, quantity, linePrice));
+                lineItemsIds.add("'" + lineItemId + "'");
+            }
+
+            //Add Order
+            String clientId = (String) ((JSONObject) order.get("client")).get("id");
+            Long dateLong = (Long) order.get("date");
+            String created = new Date(dateLong).toString();
+            String status = (String) order.get("status");
+            Double subTotal = (Double) order.get("subTotal");
 
             // Add prepared statement to batch
-            PreparedStatement p = this.session.prepare(CQL_Querys.addLineItem(this.keyspaceName));
-            batch.add(p.bind(orderId, lineItemId, productId, quantity, linePrice));
-            lineItemsIds.add("'" + lineItemId + "'");
-        }
-
-        //Add Order
-        String clientId = (String) ((JSONObject) order.get("client")).get("id");
-        Long dateLong = (Long) order.get("date");
-        String created = new Date(dateLong).toString();
-        String status = (String) order.get("status");
-        Double subTotal = (Double) order.get("subTotal");
-
-        // Add prepared statement to batch
-        PreparedStatement p = this.session.prepare(CQL_Querys.addOrder(this.keyspaceName));
-        batch.add(p.bind(orderId, lineItemsIds, clientId, created, status, subTotal));
-        timer.startTimer();
-        ResultSetFuture futureOrders = session.executeAsync(batch);
-        queryHandler(futureOrders, "CREATE", timer);
+            PreparedStatement p = this.session.prepare(CQL_Querys.addOrder(this.keyspaceName));
+            batch.add(p.bind(orderId, lineItemsIds, clientId, created, status, subTotal));
+            timer.startTimer();
+            ResultSetFuture futureOrders = session.executeAsync(batch);
+            queryHandler(futureOrders, "CREATE", timer);
     }
 
     public void deleteOrder(JSONObject order, Timer timer) {
