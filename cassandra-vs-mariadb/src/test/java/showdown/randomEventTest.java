@@ -17,7 +17,7 @@ import java.io.File;
 /**
  * Created by dogle on 08/12/2016.
  */
-public class RandomEventTest {
+public class randomEventTest {
     @Test
     public void TenThousandTotalRandomEvents() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");

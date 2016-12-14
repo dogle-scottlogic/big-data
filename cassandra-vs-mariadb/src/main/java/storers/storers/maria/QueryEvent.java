@@ -78,7 +78,7 @@ public abstract class QueryEvent implements Runnable {
 
             wasSuccessful = true;
 
-            timeTaken =  Long.valueOf(timer.stopTimer()).toString();
+            timeTaken = Long.valueOf(timer.stopTimer()).toString();
 
             if (useASync) {
                 connection.close();
@@ -89,8 +89,8 @@ public abstract class QueryEvent implements Runnable {
             wasSuccessful = false;
             errorMessage = e.getMessage();
         }
-        String[] logLine = new String[] {
-            "MariaDB", ACTION_TYPE.toString(), timeTaken, Boolean.toString(wasSuccessful), errorMessage, String.valueOf(System.nanoTime())
+        String[] logLine = new String[]{
+                "MariaDB", ACTION_TYPE.toString(), timeTaken, Boolean.toString(wasSuccessful), errorMessage, String.valueOf(System.nanoTime())
         };
         csvLogger.logEvent(logLine, false);
     }
