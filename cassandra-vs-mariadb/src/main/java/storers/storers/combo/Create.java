@@ -19,8 +19,9 @@ import java.util.Date;
  */
 public class Create extends ComboQuery {
 
-    public Create(Session cassandraConnection, Connection mariaConnection, CSVLogger logger) throws SQLException {
+    public Create(Session cassandraConnection, Connection mariaConnection, CSVLogger logger, JSONObject message) throws SQLException {
         super(cassandraConnection, mariaConnection, logger, DBEventType.CREATE);
+        addToBatch(message);
     }
 
     public void addToBatch(JSONObject data) throws SQLException {
@@ -53,7 +54,7 @@ public class Create extends ComboQuery {
 
             // Add Maria Batch Statement
             String mariaLineItemQuery = mariaInsertQueryPrefix.concat( createLineItemPartialMariaQuery(orderId, lineItem)).concat(", ");
-            mariaLineItemQuery = mariaLineItemQuery.substring(0, mariaInsertQueryPrefix.length() - 2);
+            mariaLineItemQuery = mariaLineItemQuery.substring(0, mariaLineItemQuery.length() - 2);
             getMariaBatch().addBatch(mariaLineItemQuery);
         }
 

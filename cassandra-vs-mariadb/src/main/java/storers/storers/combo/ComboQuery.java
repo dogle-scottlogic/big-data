@@ -55,7 +55,6 @@ public abstract class ComboQuery implements Runnable{
         mariaTimer.startTimer();
         try {
             getMariaBatch().executeBatch();
-            getMariaBatch().close();
             getMariaConnection().commit();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -69,6 +68,13 @@ public abstract class ComboQuery implements Runnable{
         cassandraTimer.startTimer();
         ResultSetFuture futureOrders =  getCassandraConnection().executeAsync(getCassandraBatch());
         queryHandler(futureOrders, type.toString(), cassandraTimer);
+
+        // Cleanup
+        try {
+            getMariaBatch().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void queryHandler(ResultSetFuture future, final String type, final Timer timer) {

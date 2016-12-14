@@ -41,12 +41,14 @@ public class Combo implements Storer {
     public void messageHandler(JSONObject message) {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
 
+
+
         switch (eventType) {
             case CREATE:
                 try {
-//                    new Thread(
-                            new Create(session, mariaConnection, logger).run();
-//                    ).start();
+                    new Thread(
+                            new Create(session, mariaConnection, logger, (JSONObject) message.get("data"))
+                    ).start();
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
