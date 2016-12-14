@@ -14,7 +14,6 @@ import java.util.Arrays;
  */
 public abstract class QueryEvent implements Runnable {
     private Statement statement;
-    private Timer timer;
     private boolean useASync;
     private CSVLogger csvLogger;
     private boolean wasSuccessful;
@@ -33,7 +32,6 @@ public abstract class QueryEvent implements Runnable {
         this.orderId = orderId;
         this.ACTION_TYPE = eventType;
         this.csvLogger = csvLogger;
-        this.timer = new Timer();
         this.wasSuccessful = false;
         this.errorMessage = "No Error";
 
@@ -56,6 +54,7 @@ public abstract class QueryEvent implements Runnable {
     }
 
     public void end() {
+        Timer timer = new Timer();
         timer.startTimer();
         String timeTaken = "";
         try {
