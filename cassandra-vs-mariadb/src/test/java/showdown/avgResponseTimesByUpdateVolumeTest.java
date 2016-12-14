@@ -31,7 +31,7 @@ public class avgResponseTimesByUpdateVolumeTest {
         EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
         Conveyor.processEvents(nCreates, cdbs, eventGenerator);
 
-        cassandraLogger = new CSVLogger(absPath, "cassandraUpdateVolumeTest_" + Integer.toString(nUpdates));
+        cassandraLogger = new CSVLogger(absPath, "cassandraUpdateVolumeTest_" + Integer.toString(nUpdates)  + updateType.name());
         cdbs.setLogger(cassandraLogger);
         eventGenerator.setEvents(new Enums.EventType[]{updateType});
         timer.startTimer();
@@ -45,7 +45,7 @@ public class avgResponseTimesByUpdateVolumeTest {
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
         Conveyor.processEvents(nCreates, mdbs, eventGenerator);
 
-        mariaLogger = new CSVLogger(absPath, "mariaUpdateVolumeTest_" + Integer.toString(nUpdates));
+        mariaLogger = new CSVLogger(absPath, "mariaUpdateVolumeTest_" + Integer.toString(nUpdates)  + updateType.name());
         mdbs.setLogger(mariaLogger);
         eventGenerator.setEvents(new Enums.EventType[]{updateType});
         timer.startTimer();
@@ -57,9 +57,26 @@ public class avgResponseTimesByUpdateVolumeTest {
         Timer t = new Timer();
         t.startTimer();
         avgResponseTimesByUpdateVolumeTestHelper(1000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(2000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(3000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(4000, updateType);
         avgResponseTimesByUpdateVolumeTestHelper(5000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(6000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(7000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(8000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(9000, updateType);
         avgResponseTimesByUpdateVolumeTestHelper(10000, updateType);
-        avgResponseTimesByUpdateVolumeTestHelper(100000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(11000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(12000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(13000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(14000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(15000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(16000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(17000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(18000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(19000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(20000, updateType);
+        avgResponseTimesByUpdateVolumeTestHelper(21000, updateType);
         System.out.println("Update Test total time: " + Long.toString(t.stopTimer()));
     }
 
