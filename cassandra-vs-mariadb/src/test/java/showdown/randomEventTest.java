@@ -23,19 +23,27 @@ public class randomEventTest {
     @Test
     public void TenThousandTotalRandomEvents() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        Settings.setStringSetting("EVENT_GEN_MODE", "random");
-        int numOfEvents = 40000;
+        int numOfEvents = 10000;
 
         EventGenerator eventGenerator;
 
-        // COMBO!!
-        CSVLogger log = new CSVLogger(absPath, "TenThousandRandomEvents");
-        Combo storer = new Combo(log, DBType.MARIA_DB);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ });
-        Conveyor.processEvents(numOfEvents, storer, eventGenerator);
+        CSVLogger log = new CSVLogger(true);
+        Combo cs = new Combo(log, DBType.CASSANDRA);
+        Combo ms = new Combo(log, DBType.MARIA_DB);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
+        Conveyor.processEvents(500, cs, eventGenerator);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
+        Conveyor.processEvents(500, ms, eventGenerator);
 
-        storer = new Combo(log, DBType.CASSANDRA);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ });
-        Conveyor.processEvents(numOfEvents, storer, eventGenerator);
+
+        // COMBO!!
+        log = new CSVLogger(absPath, "TenThousandRandomEvents");
+        Settings.setStringSetting("EVENT_GEN_MODE", "random");
+        cs = new Combo(log, DBType.CASSANDRA);
+        ms = new Combo(log, DBType.MARIA_DB);
+        eventGenerator.setEvents(new Enums.EventType[]{ });
+
+        Conveyor.processEvents(numOfEvents, cs, eventGenerator);
+        Conveyor.processEvents(numOfEvents, ms, eventGenerator);
     }
 }

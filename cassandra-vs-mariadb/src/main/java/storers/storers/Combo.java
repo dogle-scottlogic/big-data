@@ -32,6 +32,7 @@ public class Combo implements Storer {
     private DBType type;
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
 
+
     public Combo(CSVLogger logger, DBType type) {
         this.type = type;
         this.logger = logger;
