@@ -32,6 +32,7 @@ public class Combo implements Storer {
     private DBType type;
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
 
+
     public Combo(CSVLogger logger, DBType type) {
         this.type = type;
         this.logger = logger;
@@ -80,7 +81,7 @@ public class Combo implements Storer {
     }
 
     private void initMariaDBInstance() throws SQLException {
-        hikariDataSource.setMaximumPoolSize(20);
+        hikariDataSource.setMaximumPoolSize(5);
         hikariDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
         hikariDataSource.setJdbcUrl(SQLQuery.CONNECTION_STRING.getQuery());
         hikariDataSource.setAutoCommit(false);

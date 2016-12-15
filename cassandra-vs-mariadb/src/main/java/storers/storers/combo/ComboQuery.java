@@ -88,7 +88,9 @@ public abstract class ComboQuery implements Runnable {
 //                        while (!allFuturesComplete(futures)) { /* Waiting...*/ }
 //                    }
                     for (final String mariaQuery : mariaQueryQueue) {
-                        getMariaBatch().executeQuery(mariaQuery);
+                        java.sql.ResultSet r = getMariaBatch().executeQuery(mariaQuery);
+                        //noinspection StatementWithEmptyBody
+                        while (r.next()) { /* Iterate Over Results */ }
                     }
 
 
