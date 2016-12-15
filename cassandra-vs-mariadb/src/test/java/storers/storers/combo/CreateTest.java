@@ -22,7 +22,7 @@ public class CreateTest {
     @Test
     public void ten() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        int numOfEvents = 10000;
+        int numOfEvents = 100000;
 
         EventGenerator eventGenerator;
 
