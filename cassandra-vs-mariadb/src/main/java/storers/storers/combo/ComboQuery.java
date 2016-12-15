@@ -2,8 +2,10 @@ package storers.storers.combo;
 
 import com.datastax.driver.core.*;
 import com.datastax.driver.core.ResultSet;
+
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import io.netty.util.concurrent.Future;
 import storers.storers.Order;
 import storers.storers.maria.enums.DBEventType;
 import storers.CSVLogger;
@@ -13,6 +15,8 @@ import storers.storers.maria.enums.DBType;
 import java.sql.*;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by lcollingwood on 14/12/2016.
@@ -58,14 +62,31 @@ public abstract class ComboQuery implements Runnable {
     public void run() {
         // Maria
         String mariaErrorMessage = "No Error";
+
         if (dbtype == DBType.MARIA_DB) {
             Timer mariaTimer = new Timer();
             mariaTimer.startTimer();
+            ExecutorService executor = Executors.newCachedThreadPool();
             try {
                 if (type == DBEventType.READ) {
-                    for (String mariaQuery : mariaQueryQueue) {
-                        getMariaBatch().executeQuery(mariaQuery);
+                    ArrayList<java.util.concurrent.Future<?>> futures = new ArrayList<java.util.concurrent.Future<?>>();
+                    for (final String mariaQuery : mariaQueryQueue) {
+                        futures.add(executor.submit(new Runnable() {
+                            public void run() {
+                                java.sql.ResultSet r = null;
+                                try {
+                                    r = getMariaBatch().executeQuery(mariaQuery);
+                                    //noinspection StatementWithEmptyBody
+                                    while (r.next()) { /* Iterate Over Results */ }
+                                } catch (SQLException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }));
+                        //noinspection StatementWithEmptyBody
+                        while (!allFuturesComplete(futures)) { /* Waiting...*/ }
                     }
+
                 } else {
                     getMariaBatch().executeBatch();
                 }
@@ -101,9 +122,19 @@ public abstract class ComboQuery implements Runnable {
         }
     }
 
+    private boolean allFuturesComplete(ArrayList<java.util.concurrent.Future<?>> futures) {
+        for (java.util.concurrent.Future<?> future : futures) {
+            if (!future.isDone()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     private void cassandraReadHandler(ResultSetFuture future, final String type, final Timer timer) {
         Futures.addCallback(future, new FutureCallback<ResultSet>() {
             public void onSuccess(ResultSet result) {
+                result.all();
                 if (readEventHappened[0]) {
                     readEventHappened[0] = false;
                     String[] log = new String[]{"Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(true), "No Error", String.valueOf(System.nanoTime())};
