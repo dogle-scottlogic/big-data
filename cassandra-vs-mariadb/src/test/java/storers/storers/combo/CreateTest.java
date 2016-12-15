@@ -34,6 +34,20 @@ public class CreateTest {
     }
 
     @Test
+    public void tenAsync() throws Exception {
+        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
+        int numOfEvents = 1000;
+
+        EventGenerator eventGenerator;
+
+        // COMBO!!
+        CSVLogger log = new CSVLogger(absPath, "ten");
+        Combo storer = new Combo(log);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
+        Conveyor.processEventsAsnc(numOfEvents, storer, eventGenerator);
+    }
+
+    @Test
     public void updateTen() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");
         int numOfEvents = 10;

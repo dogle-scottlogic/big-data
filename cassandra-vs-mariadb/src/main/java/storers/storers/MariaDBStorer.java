@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.concurrent.Future;
 
 /**
  * maria Storer.
@@ -103,6 +104,10 @@ public class MariaDBStorer implements Storer{
             default:
                 break;
         }
+    }
+
+    public Future<?> messageHandlerAsync(JSONObject message) {
+        return null;
     }
 
     public void setLogger(CSVLogger logger) {
