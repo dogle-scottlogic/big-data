@@ -24,8 +24,6 @@ public class Update extends ComboQuery {
 
     public void addToBatch(Order order) throws SQLException {
         String keyspaceName = getCassandraConnection().getLoggedKeyspace();
-        BatchStatement batchStatement = new BatchStatement();
-
         getMariaBatch().addBatch("UPDATE orders.`order` " +
                 "SET " +
                 "client_id='" + order.getClientId() + "', " +
@@ -38,7 +36,7 @@ public class Update extends ComboQuery {
             int quantity = Integer.parseInt(lineItem.get("quantity"));
             double linePrice = Double.parseDouble(lineItem.get("linePrice"));
             PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.updateLineItem(keyspaceName));
-            batchStatement.add(p.bind(quantity, linePrice, lineItemId, order.getOrderId()));
+            getCassandraBatch().add(p.bind(quantity, linePrice, lineItemId, order.getOrderId()));
             // Maria
             getMariaBatch().addBatch("UPDATE orders.line_item " +
                     "SET " +
@@ -48,6 +46,6 @@ public class Update extends ComboQuery {
                     "WHERE order_id='" + order.getOrderId() + "';");
         }
         PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.updateOrder(keyspaceName));
-        batchStatement.add(p.bind(order.getDate(), order.getStatus(), order.getSubTotal(), order.getOrderId()));
+        getCassandraBatch().add(p.bind(order.getDate(), order.getStatus(), order.getSubTotal(), order.getOrderId()));
     }
 }

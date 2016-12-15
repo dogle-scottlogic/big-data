@@ -1,9 +1,7 @@
 package storers.storers;
 
-import com.datastax.driver.core.PreparedStatement;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import storers.storers.cassandra.CQL_Querys;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,7 +19,9 @@ public class Order {
     private Double subTotal;
     private String date;
 
-    public Order() {}
+    public Order(String data) {
+        this.orderId = data;
+    }
 
     public Order(JSONObject data) {
         this.orderId = (String) data.get("id");
@@ -42,9 +42,8 @@ public class Order {
                 lineItemMap.put("linePrice", String.valueOf(lineItem.get("linePrice")));
                 this.lineItems.add(lineItemMap);
             }
-        }
-        catch (Exception e) {
-            System.out.println("No extra order data found.");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

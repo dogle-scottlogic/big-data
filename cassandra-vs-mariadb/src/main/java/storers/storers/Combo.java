@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.cassandra.CQL_Querys;
 import storers.storers.combo.Create;
+import storers.storers.combo.Delete;
 import storers.storers.combo.Update;
 import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.SQLQuery;
@@ -43,8 +44,12 @@ public class Combo implements Storer {
 
     public void messageHandler(JSONObject message) {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
-
-        Order order = new Order((JSONObject) message.get("data"));
+        Order order = null;
+        try {
+            order = new Order((JSONObject) message.get("data"));
+        } catch (ClassCastException cce) {
+            order = new Order((String) message.get("data"));
+        }
 
         switch (eventType) {
             case CREATE:
@@ -65,7 +70,11 @@ public class Combo implements Storer {
 //                new OrderStatusUpdateEvent(useASync, queryConnection, (JSONObject) message.get("data"), csvLogger).start();
                 break;
             case DELETE:
-//                new OrderDeleteEvent(useASync, queryConnection, (String) message.get("data"), csvLogger).start();
+                try {
+                    this.cachedPool.submit(new Delete(session, hikariDataSource.getConnection(), logger, order));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 break;
             case READ:
 //                new OrderReadByIdEvent(useASync, queryConnection, (String) message.get("data"), csvLogger).start();

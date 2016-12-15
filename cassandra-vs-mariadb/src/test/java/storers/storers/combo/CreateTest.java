@@ -51,4 +51,23 @@ public class CreateTest {
         eventGenerator.setEvents(new Enums.EventType[]{Enums.EventType.UPDATE});
         Conveyor.processEvents(numOfEvents, storer, eventGenerator);
     }
+
+    @Test
+    public void deleteTen() throws Exception {
+        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
+        int numOfEvents = 10;
+
+        EventGenerator eventGenerator;
+
+        // COMBO!!
+        CSVLogger log = new CSVLogger(true);
+        Combo storer = new Combo(log);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
+        Conveyor.processEvents(numOfEvents, storer, eventGenerator);
+
+        log = new CSVLogger(absPath, "ten");
+        storer.setLogger(log);
+        eventGenerator.setEvents(new Enums.EventType[]{Enums.EventType.DELETE});
+        Conveyor.processEvents(numOfEvents, storer, eventGenerator);
+    }
 }
