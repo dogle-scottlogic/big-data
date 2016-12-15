@@ -56,7 +56,7 @@ public class Combo implements Storer {
                 break;
             case UPDATE:
                 try {
-                    this.cachedPool.submit(new Update(session, mariaConnection, logger, order));
+                    this.cachedPool.submit(new Update(session, hikariDataSource.getConnection(), logger, order));
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -131,6 +131,9 @@ public class Combo implements Storer {
     public void createOrderTable() {
         this.session.execute(CQL_Querys.dropTable("orders"));
         this.session.execute(CQL_Querys.createOrderTable(this.keyspaceName));
+    }
 
+    public void setLogger(CSVLogger logger) {
+        this.logger = logger;
     }
 }

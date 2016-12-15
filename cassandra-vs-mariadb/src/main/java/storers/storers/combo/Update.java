@@ -29,7 +29,7 @@ public class Update extends ComboQuery {
         getMariaBatch().addBatch("UPDATE orders.`order` " +
                 "SET " +
                 "client_id='" + order.getClientId() + "', " +
-                "created='" + Long.valueOf(order.getDate()).toString() + "' " +
+                "created='" + order.getDate() + "' " +
                 "WHERE id='" + order.getOrderId() + "';");
 
         for (int i = 0; i < order.getLineItems().size(); i++) {
