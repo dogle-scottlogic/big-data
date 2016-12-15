@@ -1,17 +1,16 @@
 package storers.storers.combo;
 
+import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.Order;
 import storers.storers.cassandra.CQL_Querys;
 import storers.storers.maria.enums.DBEventType;
+
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 
 /**
  * Created by dogle on 15/12/2016.
@@ -24,62 +23,31 @@ public class Update extends ComboQuery {
     }
 
     public void addToBatch(Order order) throws SQLException {
+        String keyspaceName = getCassandraConnection().getLoggedKeyspace();
+        BatchStatement batchStatement = new BatchStatement();
 
-//        BatchStatement batchStatement = new BatchStatement();
-//        String orderId = (String) order.get("id");
-//        JSONArray lineItems = (JSONArray) order.get("lineItems");
-//        for (int i = 0; i < lineItems.size(); i++) {
-//            JSONObject lineItem = (JSONObject) lineItems.get(i);
-//            String lineItemId = (String) lineItem.get("id");
-//            int quantity = new Integer(((Long) lineItem.get("quantity")).intValue());
-//            double linePrice = (Double) lineItem.get("linePrice");
-//            PreparedStatement p = session.prepare(CQL_Querys.updateLineItem(this.keyspaceName));
-//            batchStatement.add(p.bind(quantity, linePrice, lineItemId, orderId));
-//        }
-//        Long dateLong = (Long) order.get("date");
-//        String created = new Date(dateLong).toString();
-//        String status = (String) order.get("status");
-//        Double subTotal = (Double) order.get("subTotal");
-//        PreparedStatement p = session.prepare(CQL_Querys.updateOrder(this.keyspaceName));
-//        batchStatement.add(p.bind(created, status, subTotal, orderId));
-//
-//        //END
-//
-//        Long dateLong = (Long) data.get("date");
-//        Double subTotal = (Double) data.get("subTotal");
-//        String clientId = (String) ((JSONObject) data.get("client")).get("id");
-//        String created = new Date(dateLong).toString();
-//        String status = (String) data.get("status");
-//        String orderId = (String) data.get("id");
-//        String keyspaceName = getCassandraConnection().getLoggedKeyspace();
-//        JSONArray lineItems = (JSONArray) data.get("lineItems");
-//        ArrayList<String> lineItemsIds = new ArrayList<String>();
-//
-//        // Maria (Create Order Query)
-//        getMariaBatch().addBatch("INSERT INTO orders.`order` VALUES('" + orderId + "', '" + clientId + "', '" + created + "', '" + status + "');");
-//        String mariaInsertQueryPrefix = "INSERT INTO orders.line_item(order_id, product_id, quantity) VALUES";
-//
-//        for (int i = 0; i < lineItems.size(); i++) {
-//            // Extract values
-//            JSONObject lineItem = (JSONObject) lineItems.get(i);
-//            String lineItemId = (String) lineItem.get("id");
-//            String productId = (String) ((JSONObject) lineItem.get("product")).get("id");
-//            int quantity = new Integer(((Long) lineItem.get("quantity")).intValue());
-//            double linePrice = (Double) lineItem.get("linePrice");
-//
-//            // Add Cassandra Batch Statement
-//            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.addLineItem(keyspaceName));
-//            getCassandraBatch().add(p.bind(orderId, lineItemId, productId, quantity, linePrice));
-//            lineItemsIds.add("'" + lineItemId + "'");
-//
-//            // Add Maria Batch Statement
-//            String mariaLineItemQuery = mariaInsertQueryPrefix.concat( createLineItemPartialMariaQuery(orderId, lineItem)).concat(", ");
-//            mariaLineItemQuery = mariaLineItemQuery.substring(0, mariaLineItemQuery.length() - 2);
-//            getMariaBatch().addBatch(mariaLineItemQuery);
-//        }
-//
-//        // Add prepared statement to batch
-//        PreparedStatement p =  getCassandraConnection().prepare(CQL_Querys.addOrder(keyspaceName));
-//        getCassandraBatch().add(p.bind(orderId, lineItemsIds, clientId, created, status, subTotal));
+        getMariaBatch().addBatch("UPDATE orders.`order` " +
+                "SET " +
+                "client_id='" + order.getClientId() + "', " +
+                "created='" + Long.valueOf(order.getDate()).toString() + "' " +
+                "WHERE id='" + order.getOrderId() + "';");
+
+        for (int i = 0; i < order.getLineItems().size(); i++) {
+            HashMap<String, String> lineItem = order.getLineItems().get(i);
+            String lineItemId = lineItem.get("id");
+            int quantity = Integer.parseInt(lineItem.get("quantity"));
+            double linePrice = Double.parseDouble(lineItem.get("linePrice"));
+            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.updateLineItem(keyspaceName));
+            batchStatement.add(p.bind(quantity, linePrice, lineItemId, order.getOrderId()));
+            // Maria
+            getMariaBatch().addBatch("UPDATE orders.line_item " +
+                    "SET " +
+                    "order_id='" + order.getOrderId() + "', " +
+                    "product_id='" + lineItem.get("productId") + "', " +
+                    "quantity=" + lineItem.get("quantity") + " " +
+                    "WHERE order_id='" + order.getOrderId() + "';");
+        }
+        PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.updateOrder(keyspaceName));
+        batchStatement.add(p.bind(order.getDate(), order.getStatus(), order.getSubTotal(), order.getOrderId()));
     }
 }
