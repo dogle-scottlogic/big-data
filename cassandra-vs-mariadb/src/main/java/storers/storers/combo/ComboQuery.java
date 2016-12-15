@@ -67,26 +67,30 @@ public abstract class ComboQuery implements Runnable {
         if (dbtype == DBType.MARIA_DB) {
             Timer mariaTimer = new Timer();
             mariaTimer.startTimer();
-            ExecutorService executor = Executors.newCachedThreadPool();
+//            ExecutorService executor = Executors.newCachedThreadPool();
             try {
                 if (type == DBEventType.READ) {
-                    ArrayList<java.util.concurrent.Future<?>> futures = new ArrayList<java.util.concurrent.Future<?>>();
+//                    ArrayList<java.util.concurrent.Future<?>> futures = new ArrayList<java.util.concurrent.Future<?>>();
+//                    for (final String mariaQuery : mariaQueryQueue) {
+//                        futures.add(executor.submit(new Runnable() {
+//                            public void run() {
+//                                java.sql.ResultSet r = null;
+//                                try {
+//                                    r = getMariaBatch().executeQuery(mariaQuery);
+//                                    //noinspection StatementWithEmptyBody
+//                                    while (r.next()) { /* Iterate Over Results */ }
+//                                } catch (SQLException e) {
+//                                    e.printStackTrace();
+//                                }
+//                            }
+//                        }));
+//                        //noinspection StatementWithEmptyBody
+//                        while (!allFuturesComplete(futures)) { /* Waiting...*/ }
+//                    }
                     for (final String mariaQuery : mariaQueryQueue) {
-                        futures.add(executor.submit(new Runnable() {
-                            public void run() {
-                                java.sql.ResultSet r = null;
-                                try {
-                                    r = getMariaBatch().executeQuery(mariaQuery);
-                                    //noinspection StatementWithEmptyBody
-                                    while (r.next()) { /* Iterate Over Results */ }
-                                } catch (SQLException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }));
-                        //noinspection StatementWithEmptyBody
-                        while (!allFuturesComplete(futures)) { /* Waiting...*/ }
+                        getMariaBatch().executeQuery(mariaQuery);
                     }
+
 
                 } else {
                     getMariaBatch().executeBatch();

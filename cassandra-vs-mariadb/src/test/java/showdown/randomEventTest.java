@@ -24,7 +24,7 @@ public class randomEventTest {
     public void TenThousandTotalRandomEvents() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
-        int numOfEvents = 40000;
+        int numOfEvents = 50000;
 
         EventGenerator eventGenerator;
 
