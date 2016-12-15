@@ -6,6 +6,7 @@ import com.datastax.driver.core.ResultSetFuture;
 import com.datastax.driver.core.Session;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import storers.storers.Order;
 import storers.storers.maria.enums.DBEventType;
 import org.json.simple.JSONObject;
 import storers.CSVLogger;
@@ -47,7 +48,7 @@ public abstract class ComboQuery implements Runnable{
         this.type = type;
     }
 
-    public abstract void addToBatch(JSONObject data) throws SQLException;
+    public abstract void addToBatch(Order order) throws SQLException;
 
     public void run() {
         // Maria
