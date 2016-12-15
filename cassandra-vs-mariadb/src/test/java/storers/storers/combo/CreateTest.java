@@ -29,7 +29,7 @@ public class CreateTest {
         // COMBO!!
         CSVLogger log = new CSVLogger(absPath, "ten");
         Combo storer = new Combo(log);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE, Enums.EventType.UPDATE_STATUS });
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE, Enums.EventType.READ });
         Conveyor.processEvents(numOfEvents, storer, eventGenerator);
     }
 

@@ -182,11 +182,11 @@ public class Cassandra {
         String orderId = (String) order.get("data");
         PreparedStatement p = session.prepare(CQL_Querys.selectAllLineItems(this.keyspaceName));
         BoundStatement b = p.bind(orderId);
+        timer.startTimer();
         ResultSetFuture fo = session.executeAsync(b);
         readHandler(fo, "READ", timer);
         p = session.prepare(CQL_Querys.selectAllOrders(this.keyspaceName));
         b = p.bind(orderId);
-        timer.startTimer();
         fo = session.executeAsync(b);
         readHandler(fo, "READ", timer);
     }
