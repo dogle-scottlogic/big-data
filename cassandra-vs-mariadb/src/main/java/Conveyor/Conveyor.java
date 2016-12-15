@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import storers.storers.Storer;
+
 import java.io.IOException;
 import java.util.Random;
 
@@ -27,7 +28,9 @@ public class Conveyor {
         return eventGenerator;
     }
 
-    public static void processEvents(int numberOfEventsToProcess,Storer storer, EventGenerator eventGenerator) throws IOException, ParseException {
+
+
+    public static void processEvents(int numberOfEventsToProcess, Storer storer, EventGenerator eventGenerator) throws IOException, ParseException {
         for (int i = 0; i < numberOfEventsToProcess; i++) {
             Event event = eventGenerator.getNextEvent();
             String jsonStringOrder = Serializer.Serialize(event);

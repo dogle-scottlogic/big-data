@@ -8,6 +8,7 @@ import storers.CSVLogger;
 import storers.storers.Order;
 import storers.storers.cassandra.CQL_Querys;
 import storers.storers.maria.enums.DBEventType;
+import storers.storers.maria.enums.DBType;
 
 
 import java.sql.Connection;
@@ -21,41 +22,57 @@ import java.util.HashMap;
  */
 public class Create extends ComboQuery {
 
-    public Create(Session cassandraConnection, Connection mariaConnection, CSVLogger logger, Order order) throws SQLException {
-        super(cassandraConnection, mariaConnection, logger, DBEventType.CREATE);
+    private ArrayList<String> lineItemsIds = new ArrayList<String>();
+    private String mariaLineItemQuery = "INSERT INTO orders.line_item(order_id, product_id, quantity) VALUES";
+
+    public Create(Session cassandraConnection, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
+        super(cassandraConnection, mariaConnection, logger, DBEventType.CREATE, type);
         addToBatch(order);
     }
 
     public void addToBatch(Order order) throws SQLException {
         String keyspaceName = getCassandraConnection().getLoggedKeyspace();
-        ArrayList<String> lineItemsIds = new ArrayList<String>();
 
-        // Maria (Create Order Query)
-        getMariaBatch().addBatch("INSERT INTO orders.`order` VALUES('" + order.getOrderId() + "', '" + order.getClientId() + "', '" + order.getDate() + "', '" + order.getStatus() + "');");
-        String mariaInsertQueryPrefix = "INSERT INTO orders.line_item(order_id, product_id, quantity) VALUES";
+        if (getDbtype() == DBType.MARIA_DB) {
+            // Maria (Create Order Query)
+            getMariaBatch().addBatch("INSERT INTO orders.`order` VALUES('" + order.getOrderId() + "', '" + order.getClientId() + "', '" + order.getDate() + "', '" + order.getStatus() + "');");
+        }
 
         for (int i = 0; i < order.getLineItems().size(); i++) {
-            // Extract values
             HashMap<String, String> lineItem = order.getLineItems().get(i);
-            String lineItemId = lineItem.get("id");
-            String productId = lineItem.get("productId");
-            int quantity = Integer.parseInt(lineItem.get("quantity"));
-            double linePrice = Double.parseDouble(lineItem.get("linePrice"));
+            addLineItemToBatch(lineItem, order, keyspaceName);
+        }
 
-            // Add Cassandra Batch Statement
-            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.addLineItem(keyspaceName));
-            getCassandraBatch().add(p.bind(order.getOrderId(), lineItemId, productId, quantity, linePrice));
-            lineItemsIds.add("'" + lineItemId + "'");
-
-            // Add Maria Batch Statement
-            String mariaLineItemQuery = mariaInsertQueryPrefix.concat( createLineItemPartialMariaQuery(order.getOrderId(), productId, lineItem.get("quantity"))).concat(", ");
-            mariaLineItemQuery = mariaLineItemQuery.substring(0, mariaLineItemQuery.length() - 2);
-            getMariaBatch().addBatch(mariaLineItemQuery);
+        if(getDbtype() == DBType.MARIA_DB) {
+            this.mariaLineItemQuery = this.mariaLineItemQuery.substring(0, this.mariaLineItemQuery.length() - 2);
+            getMariaBatch().addBatch(this.mariaLineItemQuery);
         }
 
         // Add prepared statement to batch
-        PreparedStatement p =  getCassandraConnection().prepare(CQL_Querys.addOrder(keyspaceName));
-        getCassandraBatch().add(p.bind(order.getOrderId(), lineItemsIds, order.getClientId(), order.getDate(), order.getStatus(), order.getSubTotal()));
+        if (getDbtype() == DBType.CASSANDRA) {
+            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.addOrder(keyspaceName));
+            getCassandraBatch().add(p.bind(order.getOrderId(), this.lineItemsIds, order.getClientId(), order.getDate(), order.getStatus(), order.getSubTotal()));
+        }
+    }
+
+    private void addLineItemToBatch(HashMap<String, String> lineItem, Order order, String keyspaceName) throws SQLException {
+        // Extract values
+        String lineItemId = lineItem.get("id");
+        String productId = lineItem.get("productId");
+        int quantity = Integer.parseInt(lineItem.get("quantity"));
+        double linePrice = Double.parseDouble(lineItem.get("linePrice"));
+
+        if (getDbtype() == DBType.CASSANDRA) {
+            // Add Cassandra Batch Statement
+            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.addLineItem(keyspaceName));
+            getCassandraBatch().add(p.bind(order.getOrderId(), lineItemId, productId, quantity, linePrice));
+            this.lineItemsIds.add("'" + lineItemId + "'");
+        }
+
+        if (getDbtype() == DBType.MARIA_DB) {
+            // Add Maria Batch Statement
+            this.mariaLineItemQuery = this.mariaLineItemQuery.concat(createLineItemPartialMariaQuery(order.getOrderId(), productId, lineItem.get("quantity"))).concat(", ");
+        }
     }
 
     private String createLineItemPartialMariaQuery(String orderId, String productId, String quantity) {

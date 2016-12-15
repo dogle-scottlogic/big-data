@@ -8,6 +8,7 @@ import storers.storers.Order;
 import storers.storers.maria.enums.DBEventType;
 import storers.CSVLogger;
 import storers.storers.Timer;
+import storers.storers.maria.enums.DBType;
 
 import java.sql.*;
 import java.sql.Statement;
@@ -16,8 +17,9 @@ import java.util.ArrayList;
 /**
  * Created by lcollingwood on 14/12/2016.
  */
-public abstract class ComboQuery implements Runnable{
+public abstract class ComboQuery implements Runnable {
     private DBEventType type;
+    private DBType dbtype;
     private CSVLogger logger;
 
     // Cassandra
@@ -31,29 +33,32 @@ public abstract class ComboQuery implements Runnable{
     private ArrayList<String> mariaQueryQueue;
 
     // Read Count Handler
-    final boolean[] readEventHappened = new boolean[]{ false };
+    final boolean[] readEventHappened = new boolean[]{false};
 
     public ComboQuery(
             Session cassandraConnection,
             Connection mariaConnection,
             CSVLogger logger,
-            DBEventType type
+            DBEventType type,
+            DBType dbtype
     ) throws SQLException {
         this.cassandraConnection = cassandraConnection;
         this.cassandraBatch = new BatchStatement();
-        this.cassandraQueryQueue = new  ArrayList<BoundStatement>();
+        this.cassandraQueryQueue = new ArrayList<BoundStatement>();
         this.mariaConnection = mariaConnection;
         this.mariaBatch = mariaConnection.createStatement();
-        this.mariaQueryQueue = new  ArrayList<String>();
+        this.mariaQueryQueue = new ArrayList<String>();
         this.logger = logger;
         this.type = type;
+        this.dbtype = dbtype;
     }
 
     public abstract void addToBatch(Order order) throws SQLException;
 
     public void run() {
-            // Maria
-            String mariaErrorMessage = "No Error";
+        // Maria
+        String mariaErrorMessage = "No Error";
+        if (dbtype == DBType.MARIA_DB) {
             Timer mariaTimer = new Timer();
             mariaTimer.startTimer();
             try {
@@ -70,14 +75,15 @@ public abstract class ComboQuery implements Runnable{
                 mariaErrorMessage = e.getMessage();
             } finally {
                 String timeTaken = String.valueOf(mariaTimer.stopTimer());
-                String[] log = new String[]{ "Maria", type.toString(), timeTaken, String.valueOf(true), mariaErrorMessage, String.valueOf(System.nanoTime()) };
+                String[] log = new String[]{"Maria", type.toString(), timeTaken, String.valueOf(true), mariaErrorMessage, String.valueOf(System.nanoTime())};
                 logger.logEvent(log, false);
             }
-
+        }
+        if (dbtype == DBType.CASSANDRA) {
             // Cassandra
             Timer cassandraTimer = new Timer();
             cassandraTimer.startTimer();
-            ResultSetFuture futureOrders =  getCassandraConnection().executeAsync(getCassandraBatch());
+            ResultSetFuture futureOrders = getCassandraConnection().executeAsync(getCassandraBatch());
             if (type == DBEventType.READ) {
                 for (BoundStatement cassandraQuery : cassandraQueryQueue) {
                     cassandraReadHandler(getCassandraConnection().executeAsync(cassandraQuery), "READ", cassandraTimer);
@@ -85,14 +91,14 @@ public abstract class ComboQuery implements Runnable{
             } else {
                 queryHandler(futureOrders, type.toString(), cassandraTimer);
             }
-
-            // Cleanup
-            try {
-                getMariaBatch().close();
-                getMariaConnection().close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        }
+        // Cleanup
+        try {
+            getMariaBatch().close();
+            getMariaConnection().close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     private void cassandraReadHandler(ResultSetFuture future, final String type, final Timer timer) {
@@ -119,14 +125,14 @@ public abstract class ComboQuery implements Runnable{
         Futures.addCallback(future, new FutureCallback<ResultSet>() {
             public void onSuccess(ResultSet result) {
                 String[] log = new String[]{
-                    "Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(true), "No Error", String.valueOf(System.nanoTime())
+                        "Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(true), "No Error", String.valueOf(System.nanoTime())
                 };
                 logger.logEvent(log, false);
             }
 
             public void onFailure(Throwable t) {
                 String[] log = new String[]{
-                    "Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(false), t.getMessage(), String.valueOf(System.nanoTime())
+                        "Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(false), t.getMessage(), String.valueOf(System.nanoTime())
                 };
                 logger.logEvent(log, false);
             }
@@ -155,5 +161,9 @@ public abstract class ComboQuery implements Runnable{
 
     public Connection getMariaConnection() {
         return mariaConnection;
+    }
+
+    public DBType getDbtype() {
+        return dbtype;
     }
 }

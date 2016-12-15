@@ -9,6 +9,7 @@ import storers.CSVLogger;
 import storers.storers.cassandra.CQL_Querys;
 import storers.storers.combo.*;
 import storers.storers.maria.enums.DBEventType;
+import storers.storers.maria.enums.DBType;
 import storers.storers.maria.enums.SQLQuery;
 
 import java.sql.Connection;
@@ -28,10 +29,11 @@ public class Combo implements Storer {
     private Session session;
     private String keyspaceName = "";
     private String host = "127.0.0.7";
+    private DBType type;
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
-    // private final boolean readEventHappened[] = {false};
 
-    public Combo(CSVLogger logger) {
+    public Combo(CSVLogger logger, DBType type) {
+        this.type = type;
         this.logger = logger;
         try {
             initMariaDBInstance();
@@ -44,7 +46,7 @@ public class Combo implements Storer {
     public void messageHandler(JSONObject message) {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
 
-        Order order = null;
+        Order order;
 
         try {
             order = new Order((JSONObject) message.get("data"));
@@ -55,19 +57,19 @@ public class Combo implements Storer {
         try {
             switch (eventType) {
                 case CREATE:
-                    this.cachedPool.submit(new Create(session, hikariDataSource.getConnection(), logger, order));
+                    this.cachedPool.submit(new Create(session, hikariDataSource.getConnection(), logger, order, this.type));
                     break;
                 case UPDATE:
-                    this.cachedPool.submit(new Update(session, hikariDataSource.getConnection(), logger, order));
+                    this.cachedPool.submit(new Update(session, hikariDataSource.getConnection(), logger, order, this.type));
                     break;
                 case UPDATE_STATUS:
-                    this.cachedPool.submit(new UpdateStatus(session, hikariDataSource.getConnection(), logger, order));
+                    this.cachedPool.submit(new UpdateStatus(session, hikariDataSource.getConnection(), logger, order, this.type));
                     break;
                 case DELETE:
-                    this.cachedPool.submit(new Delete(session, hikariDataSource.getConnection(), logger, order));
+                    this.cachedPool.submit(new Delete(session, hikariDataSource.getConnection(), logger, order, this.type));
                     break;
                 case READ:
-                    this.cachedPool.submit(new Read(session, hikariDataSource.getConnection(), logger, order));
+                    this.cachedPool.submit(new Read(session, hikariDataSource.getConnection(), logger, order, this.type));
                     break;
                 default:
                     break;
