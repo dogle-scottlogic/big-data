@@ -22,14 +22,14 @@ public class CreateTest {
     @Test
     public void ten() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        int numOfEvents = 100;
+        int numOfEvents = 10;
 
         EventGenerator eventGenerator;
 
         // COMBO!!
         CSVLogger log = new CSVLogger(absPath, "ten");
         Combo storer = new Combo(log);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE, Enums.EventType.READ });
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE });
         Conveyor.processEvents(numOfEvents, storer, eventGenerator);
     }
 

@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import storers.CSVLogger;
 import storers.storers.CassandraDBStorer;
+import storers.storers.Combo;
 import storers.storers.MariaDBStorer;
 import storers.storers.Storer;
 
@@ -22,21 +23,14 @@ public class randomEventTest {
     public void TenThousandTotalRandomEvents() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
-        int numOfEvents = 10000;
+        int numOfEvents = 40000;
 
         EventGenerator eventGenerator;
 
-        //Maria
-        boolean useASync = false;
-        CSVLogger mariaLogger = new CSVLogger(absPath, "TenThousandRandomEventsMaria");
-        MariaDBStorer mdbs = new MariaDBStorer(useASync, mariaLogger);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
-        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator);
-
-        // Cassandra
-        CSVLogger cassandraLogger = new CSVLogger(absPath, "TenThousandRandomEventsCassandra");
-        CassandraDBStorer cdbs = new CassandraDBStorer(cassandraLogger);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
-        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator);
+        // COMBO!!
+        CSVLogger log = new CSVLogger(absPath, "TenThousandRandomEvents");
+        Combo storer = new Combo(log);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ });
+        Conveyor.processEvents(numOfEvents, storer, eventGenerator);
     }
 }
