@@ -8,6 +8,7 @@ import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.cassandra.CQL_Querys;
 import storers.storers.combo.Create;
+import storers.storers.combo.Update;
 import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.SQLQuery;
 
@@ -43,16 +44,22 @@ public class Combo implements Storer {
     public void messageHandler(JSONObject message) {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
 
+        Order order = new Order((JSONObject) message.get("data"));
+
         switch (eventType) {
             case CREATE:
                 try {
-                    this.cachedPool.submit(new Create(session, hikariDataSource.getConnection(), logger, (JSONObject) message.get("data")));
+                    this.cachedPool.submit(new Create(session, hikariDataSource.getConnection(), logger, order));
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
                 break;
             case UPDATE:
-//                new OrderUpdateEvent(useASync, queryConnection, (JSONObject) message.get("data"), csvLogger).start();
+                try {
+                    this.cachedPool.submit(new Update(session, mariaConnection, logger, order));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 break;
             case UPDATE_STATUS:
 //                new OrderStatusUpdateEvent(useASync, queryConnection, (JSONObject) message.get("data"), csvLogger).start();
