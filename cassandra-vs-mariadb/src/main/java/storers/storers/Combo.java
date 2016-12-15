@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by lcollingwood on 14/12/2016.
@@ -44,10 +44,6 @@ public class Combo implements Storer {
     }
 
     public void messageHandler(JSONObject message) {
-    }
-
-    public Future<?> messageHandlerAsync(JSONObject message) {
-        Future<?> result = null;
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
         Order order;
         try {
@@ -59,14 +55,14 @@ public class Combo implements Storer {
         switch (eventType) {
             case CREATE:
                 try {
-                    result = this.cachedPool.submit(new Create(session, hikariDataSource.getConnection(), logger, order));
+                    this.cachedPool.submit(new Create(session, hikariDataSource.getConnection(), logger, order));
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
                 break;
             case UPDATE:
                 try {
-                    result = this.cachedPool.submit(new Update(session, hikariDataSource.getConnection(), logger, order));
+                    this.cachedPool.submit(new Update(session, hikariDataSource.getConnection(), logger, order));
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -76,7 +72,7 @@ public class Combo implements Storer {
                 break;
             case DELETE:
                 try {
-                    result = this.cachedPool.submit(new Delete(session, hikariDataSource.getConnection(), logger, order));
+                    this.cachedPool.submit(new Delete(session, hikariDataSource.getConnection(), logger, order));
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -87,7 +83,6 @@ public class Combo implements Storer {
             default:
                 break;
         }
-        return result;
     }
 
     private void initMariaDBInstance() throws SQLException {
@@ -150,5 +145,17 @@ public class Combo implements Storer {
 
     public void setLogger(CSVLogger logger) {
         this.logger = logger;
+    }
+
+    public void shutdown() {
+        cachedPool.shutdown();
+        try {
+            cachedPool.awaitTermination(60, TimeUnit.SECONDS);
+        }catch (InterruptedException ie) {
+            // (Re-)Cancel if current thread also interrupted
+            cachedPool.shutdownNow();
+            // Preserve interrupt status
+            Thread.currentThread().interrupt();
+        }
     }
 }

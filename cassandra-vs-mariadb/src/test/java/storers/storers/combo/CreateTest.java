@@ -44,7 +44,7 @@ public class CreateTest {
         CSVLogger log = new CSVLogger(absPath, "ten");
         Combo storer = new Combo(log);
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        Conveyor.processEventsAsnc(numOfEvents, storer, eventGenerator);
+        Conveyor.processEvents(numOfEvents, storer, eventGenerator);
     }
 
     @Test

@@ -6,8 +6,6 @@ import storers.CSVLogger;
 import storers.storers.maria.*;
 import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.SQLQuery;
-
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -106,8 +104,7 @@ public class MariaDBStorer implements Storer{
         }
     }
 
-    public Future<?> messageHandlerAsync(JSONObject message) {
-        return null;
+    public void shutdown() {
     }
 
     public void setLogger(CSVLogger logger) {

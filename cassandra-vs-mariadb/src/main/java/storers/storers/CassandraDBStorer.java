@@ -5,8 +5,6 @@ import storers.CSVLogger;
 import storers.DatabaseEventFailedException;
 import storers.storers.cassandra.Cassandra;
 
-import java.util.concurrent.Future;
-
 /**
  * Created by dogle on 05/12/2016.
  */
@@ -47,8 +45,7 @@ public class CassandraDBStorer implements Storer {
         }
     }
 
-    public Future<?> messageHandlerAsync(JSONObject message) {
-        return null;
+    public void shutdown() {
     }
 
     public void create(final JSONObject message) throws DatabaseEventFailedException {
