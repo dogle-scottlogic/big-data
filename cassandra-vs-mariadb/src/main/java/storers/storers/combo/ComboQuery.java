@@ -61,6 +61,7 @@ public abstract class ComboQuery implements Runnable {
 
     public void run() {
         // Maria
+        boolean success = true;
         String mariaErrorMessage = "No Error";
 
         if (dbtype == DBType.MARIA_DB) {
@@ -94,9 +95,12 @@ public abstract class ComboQuery implements Runnable {
             } catch (SQLException e) {
                 e.printStackTrace();
                 mariaErrorMessage = e.getMessage();
+                mariaErrorMessage = mariaErrorMessage.replace("\n", " ");
+                mariaErrorMessage = mariaErrorMessage.replace(',', ' ');
+                success = false;
             } finally {
                 String timeTaken = String.valueOf(mariaTimer.stopTimer());
-                String[] log = new String[]{"Maria", type.toString(), timeTaken, String.valueOf(true), mariaErrorMessage, String.valueOf(System.nanoTime())};
+                String[] log = new String[]{"Maria", type.toString(), timeTaken, String.valueOf(success), mariaErrorMessage, String.valueOf(System.nanoTime())};
                 logger.logEvent(log, false);
             }
         }

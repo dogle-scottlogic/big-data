@@ -12,6 +12,7 @@ import storers.storers.CassandraDBStorer;
 import storers.storers.Combo;
 import storers.storers.MariaDBStorer;
 import storers.storers.Storer;
+import storers.storers.maria.enums.DBType;
 
 import java.io.File;
 
@@ -29,7 +30,11 @@ public class randomEventTest {
 
         // COMBO!!
         CSVLogger log = new CSVLogger(absPath, "TenThousandRandomEvents");
-        Combo storer = new Combo(log);
+        Combo storer = new Combo(log, DBType.MARIA_DB);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ });
+        Conveyor.processEvents(numOfEvents, storer, eventGenerator);
+
+        storer = new Combo(log, DBType.CASSANDRA);
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ });
         Conveyor.processEvents(numOfEvents, storer, eventGenerator);
     }
