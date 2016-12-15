@@ -7,9 +7,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.cassandra.CQL_Querys;
-import storers.storers.combo.Create;
-import storers.storers.combo.Delete;
-import storers.storers.combo.Update;
+import storers.storers.combo.*;
 import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.SQLQuery;
 
@@ -45,43 +43,37 @@ public class Combo implements Storer {
 
     public void messageHandler(JSONObject message) {
         DBEventType eventType = DBEventType.valueOf((String) message.get("type"));
-        Order order;
+
+        Order order = null;
+
         try {
             order = new Order((JSONObject) message.get("data"));
         } catch (ClassCastException cce) {
             order = new Order((String) message.get("data"));
         }
 
-        switch (eventType) {
-            case CREATE:
-                try {
+        try {
+            switch (eventType) {
+                case CREATE:
                     this.cachedPool.submit(new Create(session, hikariDataSource.getConnection(), logger, order));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case UPDATE:
-                try {
+                    break;
+                case UPDATE:
                     this.cachedPool.submit(new Update(session, hikariDataSource.getConnection(), logger, order));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case UPDATE_STATUS:
-//                new OrderStatusUpdateEvent(useASync, queryConnection, (JSONObject) message.get("data"), csvLogger).start();
-                break;
-            case DELETE:
-                try {
+                    break;
+                case UPDATE_STATUS:
+                    this.cachedPool.submit(new UpdateStatus(session, hikariDataSource.getConnection(), logger, order));
+                    break;
+                case DELETE:
                     this.cachedPool.submit(new Delete(session, hikariDataSource.getConnection(), logger, order));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                break;
-            case READ:
-//                new OrderReadByIdEvent(useASync, queryConnection, (String) message.get("data"), csvLogger).start();
-                break;
-            default:
-                break;
+                    break;
+                case READ:
+                    this.cachedPool.submit(new Read(session, hikariDataSource.getConnection(), logger, order));
+                    break;
+                default:
+                    break;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

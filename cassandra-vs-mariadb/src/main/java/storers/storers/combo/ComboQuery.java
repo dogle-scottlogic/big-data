@@ -31,6 +31,8 @@ public abstract class ComboQuery implements Runnable{
     private Connection mariaConnection;
     private Statement mariaBatch;
 
+    private String mariaSoloQuery;
+
     public ComboQuery(
             Session cassandraConnection,
             Connection mariaConnection,
@@ -51,43 +53,68 @@ public abstract class ComboQuery implements Runnable{
     public abstract void addToBatch(Order order) throws SQLException;
 
     public void run() {
-        // Maria
-        Timer mariaTimer = new Timer();
-        mariaTimer.startTimer();
-        try {
-            getMariaBatch().executeBatch();
-            getMariaConnection().commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            String[] log = new String[]{"Maria", type.toString(), String.valueOf(mariaTimer.stopTimer()), String.valueOf(true), "No Error", String.valueOf(System.nanoTime())};
-            logger.logEvent(log, false);
-        }
+            // Maria
+            String mariaErrorMessage = "No Error";
+            Timer mariaTimer = new Timer();
+            mariaTimer.startTimer();
+            try {
+                if (type == DBEventType.READ) {
+                    getMariaBatch().execute(getMariaSoloQuery());
+                } else {
+                    getMariaBatch().executeBatch();
+                }
+                getMariaConnection().commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+                mariaErrorMessage = e.getMessage();
+            } finally {
+                String timeTaken = String.valueOf(mariaTimer.stopTimer());
+                String[] log = new String[]{
+                    "Maria", type.toString(), timeTaken,
+                        String.valueOf(true), mariaErrorMessage, String.valueOf(System.nanoTime())
+                };
+                logger.logEvent(log, false);
+            }
 
-        // Cassandra
-        Timer cassandraTimer = new Timer();
-        cassandraTimer.startTimer();
-        ResultSetFuture futureOrders =  getCassandraConnection().executeAsync(getCassandraBatch());
-        queryHandler(futureOrders, type.toString(), cassandraTimer);
+            // Cassandra
+            Timer cassandraTimer = new Timer();
+            cassandraTimer.startTimer();
+            ResultSetFuture futureOrders =  getCassandraConnection().executeAsync(getCassandraBatch());
+            queryHandler(futureOrders, type.toString(), cassandraTimer);
 
-        // Cleanup
-        try {
-            getMariaBatch().close();
-            getMariaConnection().close();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            // Cleanup
+            try {
+                getMariaBatch().close();
+                getMariaConnection().close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
     }
+
 
     private void queryHandler(ResultSetFuture future, final String type, final Timer timer) {
         Futures.addCallback(future, new FutureCallback<ResultSet>() {
             public void onSuccess(ResultSet result) {
-                String[] log = new String[]{"Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(true), "No Error", String.valueOf(System.nanoTime())};
+                String[] log = new String[]{
+                        "Cassandra",
+                        type,
+                        String.valueOf(timer.stopTimer()),
+                        String.valueOf(true),
+                        "No Error",
+                        String.valueOf(System.nanoTime())
+                };
                 logger.logEvent(log, false);
             }
 
             public void onFailure(Throwable t) {
-                String[] log = new String[]{"Cassandra", type, String.valueOf(timer.stopTimer()), String.valueOf(false), t.getMessage(), String.valueOf(System.nanoTime())};
+                String[] log = new String[]{
+                        "Cassandra",
+                        type,
+                        String.valueOf(timer.stopTimer()),
+                        String.valueOf(false),
+                        t.getMessage(),
+                        String.valueOf(System.nanoTime())
+                };
                 logger.logEvent(log, false);
             }
         });
@@ -107,5 +134,13 @@ public abstract class ComboQuery implements Runnable{
 
     public Connection getMariaConnection() {
         return mariaConnection;
+    }
+
+    public String getMariaSoloQuery() {
+        return mariaSoloQuery;
+    }
+
+    public void setMariaSoloQuery(String mariaSoloQuery) {
+        this.mariaSoloQuery = mariaSoloQuery;
     }
 }
