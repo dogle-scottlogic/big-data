@@ -81,7 +81,7 @@ public class Combo implements Storer {
     }
 
     private void initMariaDBInstance() throws SQLException {
-        hikariDataSource.setMaximumPoolSize(5);
+        hikariDataSource.setMaximumPoolSize(1);
         hikariDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
         hikariDataSource.setJdbcUrl(SQLQuery.CONNECTION_STRING.getQuery());
         hikariDataSource.setAutoCommit(false);
@@ -140,6 +140,10 @@ public class Combo implements Storer {
 
     public void setLogger(CSVLogger logger) {
         this.logger = logger;
+    }
+
+    public void reinitThreadPool(){
+        this.cachedPool = Executors.newCachedThreadPool();
     }
 
     public void shutdown() {

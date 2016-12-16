@@ -16,11 +16,21 @@ public class CSVLogger {
     private BufferedWriter bufferedWriter = null;
     private FileWriter fileWriter = null;
     private String fileName;
+    private String testID;
 
     public CSVLogger(String folderName, String fileName) throws IOException {
         this.headers = new String[]{"TestID", "DatabaseType", "EventType", "TimeTaken", "Success", "ErrorMessage", "TimeStamp"};
         this.folderName = folderName;
         this.fileName = fileName;
+        this.testID = fileName;
+        setUpLogFile();
+    }
+
+    public CSVLogger(String folderName, String fileName, String testID) throws IOException {
+        this.headers = new String[]{"TestID", "DatabaseType", "EventType", "TimeTaken", "Success", "ErrorMessage", "TimeStamp"};
+        this.folderName = folderName;
+        this.fileName = fileName;
+        this.testID = testID;
         setUpLogFile();
     }
 
@@ -50,7 +60,7 @@ public class CSVLogger {
 
     private String eventDataToLogLine(String[] eventData, boolean header) {
         String logLine = "";
-        if (!header) logLine = this.fileName + ", ";
+        if (!header) logLine = this.testID + ", ";
         for (String eventDatum : eventData) {
             logLine = logLine + eventDatum + ", ";
         }
@@ -70,6 +80,9 @@ public class CSVLogger {
 
     public void setUpLogFile() {
         logEvent(this.headers, true);
+    }
 
+    public void setTestID(String testID) {
+        this.testID = testID;
     }
 }

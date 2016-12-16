@@ -5,7 +5,6 @@ import com.datastax.driver.core.ResultSet;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import io.netty.util.concurrent.Future;
 import storers.storers.Order;
 import storers.storers.maria.enums.DBEventType;
 import storers.CSVLogger;
@@ -15,8 +14,6 @@ import storers.storers.maria.enums.DBType;
 import java.sql.*;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  * Created by lcollingwood on 14/12/2016.
