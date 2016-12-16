@@ -8,7 +8,9 @@ import org.junit.Before;
 import org.junit.Test;
 import storers.CSVLogger;
 import storers.storers.CassandraDBStorer;
+import storers.storers.Combo;
 import storers.storers.MariaDBStorer;
+import storers.storers.maria.enums.DBType;
 
 import java.io.File;
 
@@ -26,7 +28,7 @@ public class StartToEnd {
     }
     @Test
     public void end2end10000() throws Exception {
-        int numOfEvents = 100;
+        int numOfEvents = 50000;
 
         storers.storers.Timer timer = new storers.storers.Timer();
         timer.startTimer();
@@ -43,21 +45,21 @@ public class StartToEnd {
         CSVLogger dummyLogger = new CSVLogger(true);
 
         //Maria
-        MariaDBStorer mdbs;
+        Combo combo;
+        System.out.println("DB, Connection Pool Max Size, Total Time in Nanoseconds, Number of Operations,");
 
-        // Sync
-        timer.startTimer();
-        mdbs = new MariaDBStorer(false, dummyLogger);
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator);
-        System.out.println("MariaDB Sync: " + timer.stopTimer());
 
-        // A-Sync
-        timer.startTimer();
-        mdbs = new MariaDBStorer(true, dummyLogger);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator);
-        System.out.println("MariaDB A-Sync: " + timer.stopTimer());
+        for (int i = 1; i < 50; i++) {
+            for (int j = 0; j < 5; j++) {
+                combo = new Combo(dummyLogger, DBType.MARIA_DB, i);
+                timer.startTimer();
+                Conveyor.processEvents(numOfEvents, combo, eventGenerator);
+                System.out.println("MariaDB, " + i + ", " + timer.stopTimer() + ", " + numOfEvents + ",");
+            }
+        }
+
+
     }
 
 //    @Test
