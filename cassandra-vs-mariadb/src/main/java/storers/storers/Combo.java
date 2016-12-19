@@ -81,7 +81,7 @@ public class Combo implements Storer {
     }
 
     private void initMariaDBInstance() throws SQLException {
-        hikariDataSource.setMaximumPoolSize(1); // CPU Cores!
+        hikariDataSource.setMaximumPoolSize(4); // CPU Cores!
         hikariDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
         hikariDataSource.setJdbcUrl(SQLQuery.CONNECTION_STRING.getQuery());
         hikariDataSource.setAutoCommit(false);

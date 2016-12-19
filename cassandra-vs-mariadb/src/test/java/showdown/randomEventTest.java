@@ -8,10 +8,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import storers.CSVLogger;
-import storers.storers.CassandraDBStorer;
-import storers.storers.Combo;
-import storers.storers.MariaDBStorer;
-import storers.storers.Storer;
+import storers.storers.*;
 import storers.storers.maria.enums.DBType;
 
 import java.io.File;
@@ -21,30 +18,36 @@ import java.io.File;
  */
 public class randomEventTest {
     @Test
-    public void TenThousandTotalRandomEvents() throws Exception {
+    public void FiftyThousandTotalRandomEvents() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        int numOfEvents = 50000;
-
+        int numOfEvents = 100000;
+        Timer t = new Timer();
 
         EventGenerator eventGenerator;
-
+        Settings.setIntSetting("ORDER_CACHE_SIZE", 5000);
         CSVLogger log = new CSVLogger(true);
         Combo cs = new Combo(log, DBType.CASSANDRA);
         Combo ms = new Combo(log, DBType.MARIA_DB);
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        Conveyor.processEvents(500, cs, eventGenerator);
+        Conveyor.processEvents(5000, cs, eventGenerator);
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        Conveyor.processEvents(500, ms, eventGenerator);
+        Conveyor.processEvents(5000, ms, eventGenerator);
 
 
         // COMBO!!
-        log = new CSVLogger(absPath, "TenThousandRandomEvents");
+        // log = new CSVLogger(absPath, "TwoHundredThousandRandomEvents_lastTest");
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
-        cs = new Combo(log, DBType.CASSANDRA);
-        ms = new Combo(log, DBType.MARIA_DB);
+        cs.setLogger(log);
+        cs.reinitThreadPool();
+        ms.setLogger(log);
+        ms.reinitThreadPool();
         eventGenerator.setEvents(new Enums.EventType[]{ });
 
+        t.startTimer();
         Conveyor.processEvents(numOfEvents, cs, eventGenerator);
+        System.out.println(t.stopTimer());
+        t.startTimer();
         Conveyor.processEvents(numOfEvents, ms, eventGenerator);
+        System.out.println(t.stopTimer());
     }
 }
