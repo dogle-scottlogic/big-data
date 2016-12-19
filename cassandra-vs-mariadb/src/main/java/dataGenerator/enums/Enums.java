@@ -1,8 +1,8 @@
 package dataGenerator.enums;
 
-/*
- * Created by dogle on 30/11/2016.
- */
+/**
+ * @author dogle on 30/11/2016.
+ **/
 public class Enums {
 
     public enum EventType {
@@ -17,11 +17,11 @@ public class Enums {
         ORDERED, PROCESSING, DISPATCHED, DELIVERED
     }
 
-    public static String[] getEventTypes(){
+    public static String[] getEventTypes() {
         EventType[] eventTypes = EventType.values();
         String[] eventNames = new String[eventTypes.length];
 
-        for(int i = 0; i< eventTypes.length; i++) {
+        for (int i = 0; i < eventTypes.length; i++) {
             eventNames[i] = eventTypes[i].name();
         }
 

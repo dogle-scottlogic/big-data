@@ -18,7 +18,7 @@ public class OrderStatusUpdateEvent extends QueryEvent {
     }
 
     public void runQuery() {
-        doQuery("UPDATE orders.`order` SET status='" + (String) data.get("status") + "' WHERE id='" + orderId + "';");
+        doQuery("UPDATE orders.`order` SET status='" + data.get("status") + "' WHERE id='" + orderId + "';");
         end();
     }
 }

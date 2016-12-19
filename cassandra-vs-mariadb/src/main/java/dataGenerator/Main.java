@@ -1,14 +1,11 @@
 package dataGenerator;
 
 import dataGenerator.data_handlers.Settings;
-import dataGenerator.entities.Client;
-import dataGenerator.enums.Enums;
 import dataGenerator.transmission.Emitter;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.Random;
 
 import static java.lang.System.*;

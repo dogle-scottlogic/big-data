@@ -13,7 +13,7 @@ import org.json.simple.parser.ParseException;
  */
 public class JsonLoader {
 
-    private String filePath = Settings.getStringSetting("DATA_FILE_PATH"); //"\\src\\main\\resources\\data.json";
+    private String filePath = Settings.getStringSetting("DATA_FILE_PATH");
 
     public JsonLoader(String filePath) {
         this.filePath = filePath;

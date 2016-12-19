@@ -1,6 +1,5 @@
 package storers.storers.combo;
 
-import com.datastax.driver.core.BatchStatement;
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
 import storers.CSVLogger;

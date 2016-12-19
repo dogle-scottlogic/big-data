@@ -23,8 +23,6 @@ public class InboundMessageHandlerRabbitMQ {
     private static Connection connection;
     private static Channel channel;
     private static Consumer consumer;
-    private static CSVLogger logger;
-    private static CSVLogger mariaLogger;
 
     public static void initialise() {
         try {
@@ -47,7 +45,7 @@ public class InboundMessageHandlerRabbitMQ {
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body
                 ) throws UnsupportedEncodingException {
                     String message = new String(body, "UTF-8");
-                    Object obj = null;
+                    Object obj;
                     try {
                         obj = parser.parse(message);
                         JSONObject jsonObject = (JSONObject) obj;

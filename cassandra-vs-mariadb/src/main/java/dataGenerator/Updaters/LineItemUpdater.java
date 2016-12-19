@@ -2,7 +2,6 @@ package dataGenerator.Updaters;
 
 import dataGenerator.data_handlers.Settings;
 import dataGenerator.entities.LineItem;
-import dataGenerator.generators.DataGenerator;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

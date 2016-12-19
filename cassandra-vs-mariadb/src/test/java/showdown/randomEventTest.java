@@ -4,8 +4,6 @@ import Conveyor.Conveyor;
 import dataGenerator.data_handlers.Settings;
 import dataGenerator.enums.Enums;
 import dataGenerator.generators.EventGenerator;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 import storers.CSVLogger;
 import storers.storers.*;
@@ -20,7 +18,7 @@ public class randomEventTest {
     @Test
     public void FiftyThousandTotalRandomEvents() throws Exception {
         String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        int numOfEvents = 100000;
+        int numOfEvents = 50000;
         Timer t = new Timer();
 
         EventGenerator eventGenerator;
@@ -35,7 +33,7 @@ public class randomEventTest {
 
 
         // COMBO!!
-        log = new CSVLogger(absPath, "TwoHundredThousandRandomEvents_lastTest");
+        log = new CSVLogger(absPath, "FiftyThousandTotalRandomEvents");
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
         cs.setLogger(log);
         cs.reinitThreadPool();

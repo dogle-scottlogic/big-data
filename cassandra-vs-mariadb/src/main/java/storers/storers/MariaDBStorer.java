@@ -6,17 +6,17 @@ import storers.CSVLogger;
 import storers.storers.maria.*;
 import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.SQLQuery;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.concurrent.Future;
 
 /**
  * maria Storer.
  * Takes as input events from The Hat Shop as JSON data and as appropriate Creates, Updates and Deletes Order data.
  */
-public class MariaDBStorer implements Storer{
+public class MariaDBStorer implements Storer {
     private static Connection synchronisedConnection;
     private static final HikariDataSource hikariDataSource = new HikariDataSource();
     private CSVLogger csvLogger;

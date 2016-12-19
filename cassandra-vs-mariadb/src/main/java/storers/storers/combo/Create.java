@@ -43,7 +43,7 @@ public class Create extends ComboQuery {
             addLineItemToBatch(lineItem, order, keyspaceName);
         }
 
-        if(getDbtype() == DBType.MARIA_DB) {
+        if (getDbtype() == DBType.MARIA_DB) {
             this.mariaLineItemQuery = this.mariaLineItemQuery.substring(0, this.mariaLineItemQuery.length() - 2);
             getMariaBatch().addBatch(this.mariaLineItemQuery);
         }

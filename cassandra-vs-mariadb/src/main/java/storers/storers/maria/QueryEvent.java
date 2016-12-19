@@ -7,7 +7,6 @@ import storers.storers.maria.enums.DBEventType;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 
 /**
  * Created by lcollingwood on 06/12/2016.

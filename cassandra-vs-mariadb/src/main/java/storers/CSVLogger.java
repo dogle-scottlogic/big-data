@@ -3,7 +3,6 @@ package storers;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * Created by lcollingwood on 07/12/2016.

@@ -1,4 +1,5 @@
 package dataGenerator.data_handlers;
+
 import com.typesafe.config.*;
 
 /**
@@ -19,7 +20,7 @@ public class Settings {
         try {
             conf = conf.withValue(path.concat(setting), ConfigValueFactory.fromAnyRef(value));
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
@@ -28,7 +29,7 @@ public class Settings {
         try {
             conf = conf.withValue(path.concat(setting), ConfigValueFactory.fromAnyRef(value));
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }

@@ -28,8 +28,6 @@ public class Conveyor {
         return eventGenerator;
     }
 
-
-
     public static void processEvents(int numberOfEventsToProcess, Storer storer, EventGenerator eventGenerator) throws IOException, ParseException {
         for (int i = 0; i < numberOfEventsToProcess; i++) {
             Event event = eventGenerator.getNextEvent();

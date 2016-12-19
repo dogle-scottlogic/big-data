@@ -28,20 +28,11 @@ public class StartToEnd {
     }
     @Test
     public void end2end10000() throws Exception {
-        int numOfEvents = 50000;
+        int numOfEvents = 10000;
 
         storers.storers.Timer timer = new storers.storers.Timer();
         timer.startTimer();
         EventGenerator eventGenerator;
-
-//        // Cassandra
-//        CassandraDBStorer cdbs = new CassandraDBStorer();
-//        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-//        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator);
-//
-//        System.out.println("Cassandra: " + timer.stopTimer());
-
-
         CSVLogger dummyLogger = new CSVLogger(true);
 
         //Maria
@@ -61,52 +52,4 @@ public class StartToEnd {
 
 
     }
-
-//    @Test
-//    public void loggingDoesNotDetrimentTesting() throws Exception {
-//        int numOfEvents = 10000;
-//
-//        storers.storers.Timer timer = new storers.storers.Timer();
-//
-//        CassandraDBStorer cdbs;
-//        MariaDBStorer mdbs;
-//        // Do not log
-//        // Cassandra
-//        timer.startTimer();
-//        cdbs = new CassandraDBStorer();
-//        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-//        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator);
-//
-//        long cassandraUnlogged = timer.stopTimer();
-//        System.out.println("Cassandra Unlogged Time: " + cassandraUnlogged);
-//
-//        //Maria
-//        timer.startTimer();
-//        mdbs = new MariaDBStorer(true, "\\testLogs", "testtestest");
-//        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-//        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator);
-//        long mariaUnlogged = timer.stopTimer();
-//        System.out.println("MariaDB Unlogged Time: " + mariaUnlogged);
-//
-//        // Log
-//        // Cassandra
-//        timer.startTimer();
-//        cdbs = new CassandraDBStorer();
-//        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-//        Conveyor.processEvents(numOfEvents, cdbs, eventGenerator, "timingTestCassandra");
-//        long cassandraLogged = timer.stopTimer();
-//        System.out.println("Cassandra Logged Time: " + cassandraLogged);
-//
-//        //Maria
-//        timer.startTimer();
-//        mdbs = new MariaDBStorer(true, "\\testLogs", "testtestest");
-//        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
-//        Conveyor.processEvents(numOfEvents, mdbs, eventGenerator, "timingTestMaria");
-//        long mariaLogged = timer.stopTimer();
-//        System.out.println("MariaDB Logged Time:" + mariaLogged);
-//
-//        // Summary
-//        System.out.println("Cassandra Log Effect: " + (cassandraLogged - cassandraUnlogged));
-//        System.out.println("Maria Log Effect: " + (mariaLogged - mariaUnlogged));
-//    }
 }
