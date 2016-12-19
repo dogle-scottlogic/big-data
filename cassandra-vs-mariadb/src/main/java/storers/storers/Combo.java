@@ -31,7 +31,19 @@ public class Combo implements Storer {
     private String host = "127.0.0.7";
     private DBType type;
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
+    private int mariaConnectionPoolMax = 1;
 
+    public Combo(CSVLogger logger, DBType type, int mariaConnectionPoolMax) {
+        this.type = type;
+        this.logger = logger;
+        this.mariaConnectionPoolMax = mariaConnectionPoolMax;
+        try {
+            initMariaDBInstance();
+            initCassandraInstance();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public Combo(CSVLogger logger, DBType type) {
         this.type = type;
@@ -81,7 +93,7 @@ public class Combo implements Storer {
     }
 
     private void initMariaDBInstance() throws SQLException {
-        hikariDataSource.setMaximumPoolSize(4); // CPU Cores!
+        hikariDataSource.setMaximumPoolSize(mariaConnectionPoolMax); // CPU Cores!
         hikariDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
         hikariDataSource.setJdbcUrl(SQLQuery.CONNECTION_STRING.getQuery());
         hikariDataSource.setAutoCommit(false);
