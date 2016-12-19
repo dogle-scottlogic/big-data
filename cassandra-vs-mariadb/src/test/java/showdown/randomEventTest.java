@@ -35,7 +35,7 @@ public class randomEventTest {
 
 
         // COMBO!!
-        // log = new CSVLogger(absPath, "TwoHundredThousandRandomEvents_lastTest");
+        log = new CSVLogger(absPath, "TwoHundredThousandRandomEvents_lastTest");
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
         cs.setLogger(log);
         cs.reinitThreadPool();

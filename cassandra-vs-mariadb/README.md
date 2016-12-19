@@ -3,8 +3,8 @@
 ### Data Generator
 
 The data generator package is responsible for creating Events. The package is dependant on two external files:
- - data.json
- - application.conf
+- data.json
+- application.conf
  
 These are expected in the folder:
 ```sh
@@ -39,6 +39,9 @@ The application.conf file is the configuration file for the system and has the f
 - MIN_WEIGHT = The minimim weight of a hat
 **\* Only applicable if using RabbitMQ**
 
+Settings in application.conf can be set programatically via the *Settings* class.
+
+#### Running
 To run the data generator from the command line interface run: 
 ```sh
 /src/main/java/dataGenerator/Main.java
@@ -132,8 +135,80 @@ The Storers package is responsible for handling events and passing them to the d
 **consumers** holds classes for pulling data from RabbitMQ, this can be extended to inculde other data sources.
 **storers** holds storers for handling events with database types and also a timer class for timing events.
 The Class *Storer* is an interface only and requires that all implentations contain the method *messageHandler()*. This method takes an event as a JSONObject and executes that event against a specific database.
+There are currently three storers in use: Cassandra, Maria and Combo. Cassandra and Maria are each responsible for an individual database. Combo will run against either Cassandra or MariaDB dependant on the **DBType** enum passed in on creation of the class. 
+This Class has been created in an attempt to keep the code the same as much as possible for both databases. Combo implaments threaded execution of queries with a connection pool for MariaDB which can be given a max connections value.
 
+### Conveyor
 
+The last package is the Conveyor. This contains the Conveyor class which is responsible for getting events from the data generator and passing them to a storer. The conveyor has one function **processEvents** which takes a storer, a event generator and a number of events to process.
+
+### CSVLogger
+
+An instance of the CSVLogger is given to a storer on construction. The parameter is manditory however if you do not wish to log results then creating the CSVLogger with **doNotLog** parameter set to true will ensure nothing is logged. 
+To log results create the CSVLogger with a folder name and file name. The folder must exist however the file does not need to. The CSVLogger can be created with an optional Test name to be used in the log, if this is not set the file name will be used instead.
+The test name (testID) can be set after construction for logging a second set of tests to the same file. 
+
+## Test Example
+
+Run a thousand random events with a database containing 1000 orders:
+
+First task is to set the order cache size (see **Things to watch out for**) and create a new logger with the doNotLog flag set.
+```java 
+Settings.setIntSetting("ORDER_CACHE_SIZE", 1000);
+CSVLogger log = new CSVLogger(true);
+```
+Next we create our two storers, one for Cassandra and one for MariaDB. In this example we will user the combo storer for both.
+```java
+Combo cs = new Combo(log, DBType.CASSANDRA);
+Combo ms = new Combo(log, DBType.MARIA_DB);
+```
+now run up a new event generator for each database and with just CREATE events and process 1000 events. 
+```java
+eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
+Conveyor.processEvents(1000, cs, eventGenerator);
+eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
+Conveyor.processEvents(1000, ms, eventGenerator);
+```
+That's both databases seeded with the same 1000 events. Now some more setup. 
+- We create a new logger, this time with a file path for where we want the log saved
+- We set the generator mode to random
+- We reinitalize the thread pool for each storer
+- We set the list of Events in the event generator to include all events this time.
+
+```java
+log = new CSVLogger(absPath, "OneThousandRandomEvents");
+Settings.setStringSetting("EVENT_GEN_MODE", "random");
+cs.setLogger(log);
+cs.reinitThreadPool();
+ms.setLogger(log);
+ms.reinitThreadPool();
+eventGenerator.setEvents(new Enums.EventType[]{ });
+```
+lastly we run the conveyor again for each database type.
+```java
+Conveyor.processEvents(1000, cs, eventGenerator);
+Conveyor.processEvents(1000, ms, eventGenerator);
+```
+
+## Things to watch out for
+
+##### Event Generator Modes
+The event generator expects a list of at least two events if running in "Random" mode. If you wish to pass in only a single event (as in the above example) ensue that the **EVENT_GEN_MODE** flag in the application.conf file is set to "fixed" or do so programitaclly before running the Conveyor:
+```java 
+Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
+``` 
+##### Order Cache Size
+The Event Generator maintains a cache of orders that is used to generate other events. When pre-populating a database with orders be aware that the Event Generator will only reference the orders stored in the cache. This means that if the cache is set to say twenty, the Event Generator will only generate *update* events for, at most, the twenty events stored in the cache. To change this setting alter the **ORDER_CACHE_SIZE** value in the application.conf or do so programitaclly before running the Conveyor:
+```java 
+Settings.setIntSetting("ORDER_CACHE_SIZE", 5000);
+``` 
+
+##### Thread Pool Re-initilization
+When processing events using the combo storer the thread pool is shutdown at the end of each run in order to ensure that all threads have execeuted before exiting the program. If running the same combo storer twice (as in the above example) then ensure that 
+```java
+comboStorer.reinitThreadPool();
+```
+is called before re-running the Conveyor.  
 
 
 
