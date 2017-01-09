@@ -124,7 +124,7 @@ order_id(Partition Key) | line_item_id(Clustering Key) | product_id | quantity |
 The table now has a composite Primary Key made up of **order\_id** and **line\_item\_id**. As discussed the first element (**order\_id**) serves as a Partition Key. This means that now all line items of a given order are stored under the same node in the database, now when a query is made on multiple line items belonging to an order, Cassandra only has to access one node to retrieve all relevant data. **Fig 1** shows the times for different queries with the old table style (**line_items**) and the new (**line\_items\_by\_order**). As can be seen access times are noticeably improved in most instances.
 
 **Fig 1**
-![](https://i.imgur.com/PYXSA3X.png)
+![](https://i.imgur.com/PYXSA3X.png "Cassandra times before and after table restructure")
 
 \* *Or virtual nodes (vNodes) in our case as we are only using a single node instance*
 
@@ -133,7 +133,7 @@ The table now has a composite Primary Key made up of **order\_id** and **line\_i
 **Fig 2** shows the influence of the *maximum connections* setting on performance in terms of the overall execution time. To produce this chart we took the average of the total execution times of 5 runs of 50,000 'create' operations against MariaDB at each max-connection parameter we tried from 1 to 30.
 
 **Fig 2**
-![](https://i.imgur.com/ifVrUCC.png)
+![](https://i.imgur.com/ifVrUCC.png "MariaDB average times over max pool size")
 
 At a maximum connection pool size of _1_, operations are effectively running synchronously, taking nearly 2 minutes to complete the operations. At a maximum of _2_, the total execution time is reduced to just over 80 seconds. At _4_ we stop seeing the benefit of increasing the size of the connection pool further, achieving an execution time of just over 1 minute.
 
@@ -218,7 +218,7 @@ Running 200,000 random events against a relatively small number of orders (500) 
 We ran multiple 'update' events against both databases in sizes of 500, 5000, 10,000 and 100,000. The results of this showed that whilst the average time taken for an update to succeed remained a relative constant for each database, in MariaDB the standard deviation (**s**) grew with the number of updates performed, whilst **s** remained fairly small in Cassandra. This indicates that the time taken to execute an update becomes less consistent in MariaDB as the number of updates performed grows, even though the average time is not affected. 
 
 **Fig 3**
-![enter image description here](https://lh3.googleusercontent.com/-rio0eFux3bI/WHNkernM3cI/AAAAAAAAAAU/NDos8UW9UNUHmyYrDpdW0OYnWDkE04jxACLcB/s0/updates.png "updates SD")
+![](https://lh3.googleusercontent.com/-rio0eFux3bI/WHNkernM3cI/AAAAAAAAAAU/NDos8UW9UNUHmyYrDpdW0OYnWDkE04jxACLcB/s0/updates.png "Standard Deviation of 'update' event times")
 
 ### Average Response Times & Overall Execution Times
 
@@ -227,7 +227,7 @@ We ran multiple 'update' events against both databases in sizes of 500, 5000, 10
 These figures should not be considered as rigorous benchmarks, we attempted to bring the MariaDB driver into line with Cassandra driver by making it work asynchronously with the connection pool but neither database has been optimised beyond default settings. Our single-node setup lets us play with the performance features that are under the control of the developer but neither database would be deployed to production in the way we have it set up. That said, it is still interesting to note that as well as having comparable response times to our single-node instance of Cassandra, the overall execution time of MariaDB was just below 55.7 Seconds compared to Cassandra's 4 minutes and 30. 
 
 **Fig 4**
-![](https://i.imgur.com/HqSSmOG.png)
+![](https://i.imgur.com/HqSSmOG.png "Average Response times, Cassandra and MariaDB. All Events")
 
 
 ## Conclusion - Hats all folks
