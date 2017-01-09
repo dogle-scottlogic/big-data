@@ -1,4 +1,13 @@
-﻿# Cassandra vs. MariaDB.
+﻿---
+author: dogle
+contributors: 
+ - lcollingwood
+title: Cassandra vs. MariaDB
+summary: Comparison of Cassandra against MariaDB
+layout: post
+---
+
+# Cassandra vs. MariaDB.
 
 ## Keeping the 'Hat Shop' in Business
 
