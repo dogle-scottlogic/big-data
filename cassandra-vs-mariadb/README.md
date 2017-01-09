@@ -26,20 +26,20 @@ The application.conf file is the configuration file for the system and has the f
 - DATA_FILE_PATH = Where the system expects to find the data.json file
 - EVENT_GEN_MODE = The mode to run the event generator in. 'fixed' runs a set number of events one after the other, 'random' creates random events until the 'stop' command is run
 - NUM_FIXED_EVENTS = the number of each event type to generate when running in 'fixed' mode
-- DELETE_CHANCE =  Deletes can be weighted to occure less frequently. This var sets the chance that the system will generate a DELETE event. e.g. 5 = 1 in 5 chance.
+- DELETE_CHANCE =  Deletes can be weighted to occur less frequently. This var sets the chance that the system will generate a DELETE event. e.g. 5 = 1 in 5 chance.
 - QUEUE_NAME = Name of the Rabbit MQ queue to connect to*
 - HOST_NAME = The host the queue should use*
-- DURABLE = Dont forget the queue if rabbitMQ crashes*
+- DURABLE = Don't forget the queue if rabbitMQ crashes*
 - EXCLUSIVE = Queue can only be accessed by current connection*
 - AUTO_DELETE = exchange is deleted when all queues have finished using it*
 - EXCHANGE = exchange where the message is sent: default (Empty string) and amq.direct
 - MAX_PRICE = The maximum price of a hat
 - MIN_PRICE = The minimum price of a hat
-- MAX_WEIGHT = The maximim weight of a hat
-- MIN_WEIGHT = The minimim weight of a hat
+- MAX_WEIGHT = The maximum weight of a hat
+- MIN_WEIGHT = The minimum weight of a hat
 **\* Only applicable if using RabbitMQ**
 
-Settings in application.conf can be set programatically via the *Settings* class.
+Settings in application.conf can be set programmatically via the *Settings* class.
 
 #### Running
 To run the data generator from the command line interface run: 
@@ -53,7 +53,7 @@ The command options available are:
 - Exit = Close the program
 \*Note - Running the program via command line expects to use an instance of RabbitMQ to send events to.
 
-To run the package programatically create an instance of:
+To run the package programmatically create an instance of:
 ```sh
 /src/main/java/dataGenerator/generators/EventGenerator.java
 ```
@@ -121,7 +121,7 @@ and call the *getNextEvent()* method. This will return an event in the form:
 }
 ```
 
-Event types can be ammended and added to via:
+Event types can be amended and added to via:
 ```sh
 /src/main/java/dataGenerator/enums/Enums.java
 ```
@@ -132,11 +132,11 @@ The Storers package is responsible for handling events and passing them to the d
 - consumers
 - storers
 
-**consumers** holds classes for pulling data from RabbitMQ, this can be extended to inculde other data sources.
+**consumers** holds classes for pulling data from RabbitMQ, this can be extended to include other data sources.
 **storers** holds storers for handling events with database types and also a timer class for timing events.
-The Class *Storer* is an interface only and requires that all implentations contain the method *messageHandler()*. This method takes an event as a JSONObject and executes that event against a specific database.
+The Class *Storer* is an interface only and requires that all implementations contain the method *messageHandler()*. This method takes an event as a JSONObject and executes that event against a specific database.
 There are currently three storers in use: Cassandra, Maria and Combo. Cassandra and Maria are each responsible for an individual database. Combo will run against either Cassandra or MariaDB dependant on the **DBType** enum passed in on creation of the class. 
-This Class has been created in an attempt to keep the code the same as much as possible for both databases. Combo implaments threaded execution of queries with a connection pool for MariaDB which can be given a max connections value.
+This Class has been created in an attempt to keep the code the same as much as possible for both databases. Combo implements threaded execution of queries with a connection pool for MariaDB which can be given a max connections value.
 
 ### Conveyor
 
@@ -172,7 +172,7 @@ Conveyor.processEvents(1000, ms, eventGenerator);
 That's both databases seeded with the same 1000 events. Now some more setup. 
 - We create a new logger, this time with a file path for where we want the log saved
 - We set the generator mode to random
-- We reinitalize the thread pool for each storer
+- We reinitialize the thread pool for each storer
 - We set the list of Events in the event generator to include all events this time.
 
 ```java
@@ -203,8 +203,8 @@ The Event Generator maintains a cache of orders that is used to generate other e
 Settings.setIntSetting("ORDER_CACHE_SIZE", 5000);
 ``` 
 
-##### Thread Pool Re-initilization
-When processing events using the combo storer the thread pool is shutdown at the end of each run in order to ensure that all threads have execeuted before exiting the program. If running the same combo storer twice (as in the above example) then ensure that 
+##### Thread Pool Re-initialization
+When processing events using the combo storer the thread pool is shutdown at the end of each run in order to ensure that all threads have executed before exiting the program. If running the same combo storer twice (as in the above example) then ensure that
 ```java
 comboStorer.reinitThreadPool();
 ```

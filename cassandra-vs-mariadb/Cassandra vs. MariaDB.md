@@ -17,7 +17,7 @@ Welcome to the world's most popular hat shop. Our database is old and creaky and
 
 It's a foregone conclusion that if horizontal scalability is necessary in a system Cassandra should outperform a traditional relational database. So instead we’ll be looking at how [Cassandra](http://cassandra.apache.org/) performs against [MariaDB](https://mariadb.org/) in a single node setup and how easy it is to use from a development perspective, in particular what the performance of Cassandra is like before we start to scale out.
 
-## The Hats
+### The Hats
 
 To test our databases, we need some data. We built a system that can generate _events_ as serialised JSON which can be actioned against our databases. We chose standard CRUD operations for our event types, i.e. creating new orders, reading orders, updating the order status and attributes (colour, size, quantity) and deleting orders.
 
