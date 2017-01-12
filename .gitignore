@@ -1,3 +1,85 @@
-/cassandra-vs-mariadb/BigDataBenchProject2/build/
-/cassandra-vs-mariadb/BigDataBenchProject2/dist/
-/cassandra-vs-mariadb/BigDataBenchProject2/nbproject/private/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/private/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/build/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/nbbuild/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/dist/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/nbdist/
+cassandra-vs-mariadb/BigDataProject2WithMavennbproject/.nb-gradle/
+# Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio and Webstorm
+# Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
+
+# User-specific stuff:
+.idea/workspace.xml
+.idea/tasks.xml
+
+# Sensitive or high-churn files:
+.idea/dataSources/
+.idea/dataSources.ids
+.idea/dataSources.xml
+.idea/dataSources.local.xml
+.idea/sqlDataSources.xml
+.idea/dynamic.xml
+.idea/uiDesigner.xml
+
+# Gradle:
+.idea/gradle.xml
+.idea/libraries
+
+# Mongo Explorer plugin:
+.idea/mongoSettings.xml
+
+## File-based project format:
+*.iws
+
+## Plugin-specific files:
+
+# IntelliJ
+/out/
+
+# mpeltonen/sbt-idea plugin
+.idea_modules/
+
+# JIRA plugin
+atlassian-ide-plugin.xml
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+cassandra-vs-mariadb/build/classes/main/transmission/Serializer.class
+cassandra-vs-mariadb/build/
+cassandra-vs-mariadb/.idea/
+cassandra-vs-mariadb/data-generator/build/*
+cassandra-vs-mariadb/data-generator/.idea/*
+cassandra-vs-mariadb/mariadb-storer/build/
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__com_datastax_cassandra_cassandra_driver_core_3_1_2.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__com_github_jnr_jffi_1_2_10.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__com_github_jnr_jffi_native_1_2_10.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__com_github_jnr_jnr_constants_0_9_0.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__com_github_jnr_jnr_ffi_2_0_7.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__com_github_jnr_jnr_posix_3_0_27.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__com_github_jnr_jnr_x86asm_1_0_2.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__com_google_guava_guava_16_0_1.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__io_dropwizard_metrics_metrics_core_3_1_2.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__io_netty_netty_buffer_4_0_37_Final.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__io_netty_netty_codec_4_0_37_Final.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__io_netty_netty_common_4_0_37_Final.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__io_netty_netty_handler_4_0_37_Final.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__io_netty_netty_transport_4_0_37_Final.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__org_ow2_asm_asm_5_0_3.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__org_ow2_asm_asm_analysis_5_0_3.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__org_ow2_asm_asm_commons_5_0_3.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__org_ow2_asm_asm_tree_5_0_3.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__org_ow2_asm_asm_util_5_0_3.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/workspace.xml
+
+
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__log4j_log4j_1_2_17.xml
+cassandra-vs-mariadb/mariadb-storer/.idea/libraries/Gradle__org_slf4j_slf4j_log4j12_1_7_21.xml
+cassandra-vs-mariadb/.gradle/3.1/taskArtifacts/cache.properties
+cassandra-vs-mariadb/.gradle/3.1/taskArtifacts/cache.properties.lock
+cassandra-vs-mariadb/.gradle/3.1/taskArtifacts/fileHashes.bin
+cassandra-vs-mariadb/.gradle/3.1/taskArtifacts/fileSnapshots.bin
+cassandra-vs-mariadb/.gradle/3.1/taskArtifacts/taskArtifacts.bin
+cassandra-vs-mariadb/gradle/wrapper/gradle-wrapper.jar
+cassandra-vs-mariadb/gradle/wrapper/gradle-wrapper.properties
