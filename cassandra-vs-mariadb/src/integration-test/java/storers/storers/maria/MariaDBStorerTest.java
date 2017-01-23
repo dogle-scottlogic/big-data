@@ -8,7 +8,6 @@ import org.junit.Test;
 import storers.CSVLogger;
 import storers.storers.MariaDBStorer;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -19,8 +18,7 @@ public class MariaDBStorerTest {
     @Test
     public void testMariaStorer() throws IOException, ParseException, SQLException {
         int numOfEvents = 10;
-        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        CSVLogger logger = new CSVLogger(absPath, "test");
+        CSVLogger logger = new CSVLogger("test");
         MariaDBStorer storer = new MariaDBStorer(false, logger);
         EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
         Conveyor.processEvents(numOfEvents, storer, eventGenerator);

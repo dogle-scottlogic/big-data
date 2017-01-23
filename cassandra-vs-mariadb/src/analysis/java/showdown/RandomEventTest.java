@@ -14,10 +14,9 @@ import java.io.File;
 /**
  * Created by dogle on 08/12/2016.
  */
-public class randomEventTest {
+public class RandomEventTest {
     @Test
     public void FiftyThousandTotalRandomEvents() throws Exception {
-        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
         int numOfEvents = 50000;
         Timer t = new Timer();
 
@@ -33,7 +32,7 @@ public class randomEventTest {
 
 
         // COMBO!!
-        log = new CSVLogger(absPath, "FiftyThousandTotalRandomEvents");
+        log = new CSVLogger("FiftyThousandTotalRandomEvents");
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
         cs.setLogger(log);
         cs.reinitThreadPool();

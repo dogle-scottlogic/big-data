@@ -1,6 +1,7 @@
 package storers.storers;
 
 import com.zaxxer.hikari.HikariDataSource;
+import dataGenerator.data_handlers.Settings;
 import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.maria.*;
@@ -11,17 +12,21 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * maria Storer.
  * Takes as input events from The Hat Shop as JSON data and as appropriate Creates, Updates and Deletes Order data.
  */
 public class MariaDBStorer implements Storer {
-    private static Connection synchronisedConnection;
-    private static final HikariDataSource hikariDataSource = new HikariDataSource();
+    private static final List<Connection> synchronisedConnections = new ArrayList<>();
+    private static final List<HikariDataSource> hikariDataSources = new ArrayList<>();
+    private static final String[] mariaIps = Settings.getStringVmSetting("MARIA_IPS").split(",");
     private CSVLogger csvLogger;
 
     private boolean useASync;
+    private static int mariaConnectionIndex = 0;
 
     public MariaDBStorer(boolean useASync, CSVLogger csvLogger) throws SQLException {
         this.csvLogger = csvLogger;
@@ -35,24 +40,53 @@ public class MariaDBStorer implements Storer {
 
     public void end() throws SQLException {
         if (!useASync) {
-            this.synchronisedConnection.close();
+            for (Connection synchronisedConnection: synchronisedConnections) {
+                synchronisedConnection.close();
+            }
         }
     }
 
     private static void initialise() throws SQLException {
-        synchronisedConnection = DriverManager.getConnection(SQLQuery.CONNECTION_STRING.getQuery());
-        synchronisedConnection.setAutoCommit(false);
-        initTables(synchronisedConnection);
-        synchronisedConnection = DriverManager.getConnection(SQLQuery.CONNECTION_STRING.getQuery());
-        synchronisedConnection.setAutoCommit(false);
+
+        for(String ip: mariaIps) {
+            Connection synchronisedConnection = DriverManager.getConnection(SQLQuery.CONNECTION_STRING.getQuery(ip));
+            synchronisedConnection.setAutoCommit(false);
+            synchronisedConnections.add(synchronisedConnection);
+        }
+        initTables(getSynchronisedConnection());
     }
 
     private static void initialiseASync() throws SQLException {
-        hikariDataSource.setMaximumPoolSize(100);
-        hikariDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
-        hikariDataSource.setJdbcUrl(SQLQuery.CONNECTION_STRING.getQuery());
-        hikariDataSource.setAutoCommit(false);
-        initTables(hikariDataSource.getConnection());
+        for(String ip: mariaIps) {
+            HikariDataSource hikariDataSource = new HikariDataSource();
+            hikariDataSource.setMaximumPoolSize(100);
+            hikariDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
+            hikariDataSource.setJdbcUrl(SQLQuery.CONNECTION_STRING.getQuery(ip));
+            hikariDataSource.setAutoCommit(false);
+            hikariDataSources.add(hikariDataSource);
+        }
+        initTables(getConnection());
+    }
+
+    /**
+     * Returns the next maria connection from the list to provide round robin load balancing.
+     */
+    private static Connection getSynchronisedConnection() throws SQLException {
+        if (mariaConnectionIndex + 1 == synchronisedConnections.size()) {
+            mariaConnectionIndex = 0;
+        } else {
+            mariaConnectionIndex++;
+        }
+        return synchronisedConnections.get(mariaConnectionIndex);
+    }
+
+    private static Connection getConnection() throws SQLException {
+        if (mariaConnectionIndex + 1 == hikariDataSources.size()) {
+            mariaConnectionIndex = 0;
+        } else {
+            mariaConnectionIndex++;
+        }
+        return hikariDataSources.get(mariaConnectionIndex).getConnection();
     }
 
     private static void initTables(Connection queryConnection) throws SQLException {
@@ -75,9 +109,9 @@ public class MariaDBStorer implements Storer {
         Connection queryConnection = null;
         try {
             if (useASync) {
-                queryConnection = hikariDataSource.getConnection();
+                queryConnection = getConnection();
             } else {
-                queryConnection = synchronisedConnection;
+                queryConnection = getSynchronisedConnection();
             }
         } catch (SQLException e) {
             e.printStackTrace();

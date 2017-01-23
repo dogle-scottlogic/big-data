@@ -19,8 +19,7 @@ public class CassandraTest {
         @Test
         public void testCassandraStorer() throws IOException, ParseException {
             int numOfEvents = 10;
-                String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-                CSVLogger logger = new CSVLogger(absPath, "test");
+            CSVLogger logger = new CSVLogger("test");
                 CassandraDBStorer storer = new CassandraDBStorer(logger);
                 EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{});
                 Conveyor.processEvents(numOfEvents, storer, eventGenerator);

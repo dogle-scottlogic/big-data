@@ -103,7 +103,7 @@ public abstract class ComboQuery implements Runnable {
                 success = false;
             } finally {
                 String timeTaken = String.valueOf(mariaTimer.stopTimer());
-                String[] log = new String[]{"Maria", type.toString(), timeTaken, String.valueOf(success), mariaErrorMessage, String.valueOf(System.nanoTime())};
+                String[] log = new String[]{"Maria", type.toString(), timeTaken, String.valueOf(success), mariaErrorMessage, String.valueOf(System.currentTimeMillis())};
                 logger.logEvent(log, false);
             }
         }

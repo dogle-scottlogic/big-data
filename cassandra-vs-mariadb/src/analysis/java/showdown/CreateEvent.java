@@ -12,7 +12,6 @@ import storers.CSVLogger;
 import storers.storers.CassandraDBStorer;
 import storers.storers.MariaDBStorer;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 
@@ -33,8 +32,7 @@ public class CreateEvent {
     public void Create500() throws SQLException, IOException, ParseException {
         Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
         int numOfEvents = 500;
-        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        CSVLogger logger = new CSVLogger(absPath, "Create500");
+        CSVLogger logger = new CSVLogger("Create500");
         logger.setTestID("Cassandra_500");
 
 
@@ -54,8 +52,7 @@ public class CreateEvent {
     public void Create1000() throws SQLException, IOException, ParseException {
         Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
         int numOfEvents = 1000;
-        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        CSVLogger logger = new CSVLogger(absPath, "Create1000");
+        CSVLogger logger = new CSVLogger("Create1000");
         logger.setTestID("Cassandra_1000");
 
 
@@ -75,8 +72,7 @@ public class CreateEvent {
     public void Create10000() throws SQLException, IOException, ParseException {
         Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
         int numOfEvents = 10000;
-        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        CSVLogger logger = new CSVLogger(absPath, "Create10000");
+        CSVLogger logger = new CSVLogger("Create10000");
         logger.setTestID("Cassandra_10000");
 
 

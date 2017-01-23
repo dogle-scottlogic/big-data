@@ -38,9 +38,8 @@ public class responseTimesByTableSize {
         Conveyor.processEvents(nUpdates, ms, eventGenerator);
     }
 
-    public void testAllVolumes(Enums.EventType updateType) throws Exception {
-        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        CSVLogger log = new CSVLogger(absPath, "updateResponseByTableSize");
+    private void testAllVolumes(Enums.EventType updateType) throws Exception {
+        CSVLogger log = new CSVLogger("updateResponseByTableSize");
 
         for(int i = 1; i < 21; i++) {
             log.setTestID(Integer.toString(i * 2000));

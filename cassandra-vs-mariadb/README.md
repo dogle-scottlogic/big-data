@@ -5,10 +5,10 @@
 #### Setup AWS access
 
 1. Copy `awscredentials.rb.template` to `awscredentials.rb`.
-2. [Create a new user](https://console.aws.amazon.com/iam/home?#users). You will be displayed the 'Access Key ID' and the 'Secret Access Key'. Update `AWS_KEY` and `AWS_SECRET` with these values. 
-3. [Create a new SSH key](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#KeyPairs:sort=keyName). It will be automatically downloaded for you. Move the downloaded key to `keys/dev.pem`.
-4. [Navigate to policies](https://console.aws.amazon.com/iam/home?region=eu-west-2#policies). Click on `AmazonEC2FullAccess`. In the `Attached Entities` tab, attach the policy to your new user.
-5. [Create a new security group for the Cassandra instances](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#SecurityGroups:sort=groupId). Add the security group *ID* to `awscredentials.rb`. Add the following inbound rules.
+1. Create an AWS account and sign in.
+1. [Create a new user](https://console.aws.amazon.com/iam/home?#users) with programmatic access. Create a new user group with AmazonEC2FullAccess policy. You will be displayed the 'Access Key ID' and the 'Secret Access Key'. Update `AWS_KEY` and `AWS_SECRET` with these values. 
+1. [Create a new SSH key](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#KeyPairs:sort=keyName). Name this key dev. It will be automatically downloaded for you. Move the downloaded key to `keys/dev.pem`.
+1. [Create a new security group for the Cassandra instances](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#SecurityGroups:sort=groupId). Add the security group *ID* to `awscredentials.rb`. Add the following inbound rules.
     * SSH, 22, anwhere
     * Custom TCP, 3306, anywhere
     * Custom TCP, 7000-7001, anywhere
@@ -16,14 +16,13 @@
     * Custom TCP, 9042, anywhere
     * Custom TCP, 9160, anywhere
     * ALL Traffic, ALL, 172.31.0.0/20
-6. [Create a subnet](https://eu-west-2.console.aws.amazon.com/vpc/home?region=eu-west-2#subnets) and copy and paste its ID into `awscredentials.rb`. Use `172.31.0.0/20` as the CIDR.
-7. [Create two elastic IPs](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#Addresses:sort=PublicIp). Add them to `awscredentials.rb`.
-8. [Install the Amazon CLI](https://aws.amazon.com/cli/) and add it to your PATH. Configure it with `aws configure` using the same credentials you added to`awscredentials.rb`. Set the default region name to `eu-west-2`.
+1. [Create a subnet](https://eu-west-2.console.aws.amazon.com/vpc/home?region=eu-west-2#subnets) and copy and paste its ID into `awscredentials.rb`. Use `172.31.0.0/20` as the CIDR.
+1. [Install the Amazon CLI](https://aws.amazon.com/cli/) and add it to your PATH. Configure it with `aws configure` using the same credentials you added to`awscredentials.rb`. Set the default region name to `eu-west-2`.
 
 #### Install Vagrant and VirtualBox
 
 1. Install the latest versions of [Vagrant](https://www.vagrantup.com/downloads.html) and [VirtualBox](https://www.virtualbox.org/). At the time of writing these are Vagrant 1.9.1 and VirtualBox 5.1.12.
-2. Install the Vagrant AWS plugin: `vagrant plugin install vagrant-aws`
+1. Install the Vagrant AWS plugin: `vagrant plugin install vagrant-aws`
 
 #### Start Cluster
 
@@ -42,6 +41,21 @@ Note you cannot `vagrant up` the VirtualBox provider if the AWS provider has ins
 * `vagrant halt` powers off the VMs.
 * `vagrant destroy` terminates and cleans up the VMs.
 
+#### Running Analysis tests
+
+After running the `./start-cluster` script as described above then the analysis test can be run.
+
+If you don't already have vagrant scp, install it with `vagrant plugin install vagrant-scp`
+
+Run `./run-analysis` to run all the analysis tests from a sparate vm in AWS.
+* To run the tests in a virtual box vm pass `-v` (you need to have started the cluster in virtual box as well for this to work)
+* To run specific tests pass `-t` followed by a comma separated list of the tests you want to run e.g.
+    * `-t showdown.RandomEventTest`
+    * `-t showdown.CreateEvent.Create500`
+* To run the tests with gradle in debug mode pass `-d`
+
+If the databases have been started in Virtualbox the tests can also just be run locally though an IDE or gradle.
+
 ### Data Generator
 
 The data generator package is responsible for creating Events. The package is dependant on two external files:
@@ -50,7 +64,7 @@ The data generator package is responsible for creating Events. The package is de
  
 These are expected in the folder:
 ```sh
-sr/main/resources
+src/main/resources
 ```
 
 #### data.json

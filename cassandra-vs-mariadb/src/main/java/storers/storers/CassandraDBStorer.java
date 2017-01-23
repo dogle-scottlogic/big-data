@@ -18,8 +18,8 @@ public class CassandraDBStorer implements Storer {
     public CassandraDBStorer(CSVLogger logger) {
         boolean success;
         this.cassandra = new Cassandra(cassandra_ip, logger);
-        cassandra.connect();
-        success = cassandra.createKeySpace("orders");
+        success = cassandra.connect();
+        if (success) success = cassandra.createKeySpace("orders");
         if (success) success = cassandra.createLineItemTable();
         if (success) success = cassandra.createOrderTable();
         if (!success) System.out.println("An error occurred setting up the database");
@@ -56,7 +56,7 @@ public class CassandraDBStorer implements Storer {
         try {
             cassandra.addOrder(message, timer);
         } catch (Exception e) {
-            throw new DatabaseEventFailedException(e.getMessage());
+            throw new DatabaseEventFailedException(e);
         }
     }
 
@@ -65,7 +65,7 @@ public class CassandraDBStorer implements Storer {
         try {
             cassandra.readOrder(message, timer);
         } catch (Exception e) {
-            throw new DatabaseEventFailedException(e.getMessage());
+            throw new DatabaseEventFailedException(e);
         }
     }
 
@@ -74,7 +74,7 @@ public class CassandraDBStorer implements Storer {
         try {
             cassandra.updateOrder(message, timer);
         } catch (Exception e) {
-            throw new DatabaseEventFailedException(e.getMessage());
+            throw new DatabaseEventFailedException(e);
         }
     }
 
@@ -83,7 +83,7 @@ public class CassandraDBStorer implements Storer {
         try {
             cassandra.updateOrderStatus(message, timer);
         } catch (Exception e) {
-            throw new DatabaseEventFailedException(e.getMessage());
+            throw new DatabaseEventFailedException(e);
         }
     }
 
@@ -92,7 +92,7 @@ public class CassandraDBStorer implements Storer {
         try {
             cassandra.deleteOrder(message, timer);
         } catch (Exception e) {
-            throw new DatabaseEventFailedException(e.getMessage());
+            throw new DatabaseEventFailedException(e);
         }
     }
 

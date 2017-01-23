@@ -9,6 +9,7 @@ import java.io.IOException;
  */
 public class CSVLogger {
 
+    private static final String DEFAULT_FOLDER = "./testLogs";
     private boolean doNotLog;
     private String folderName;
     private String[] headers;
@@ -17,12 +18,8 @@ public class CSVLogger {
     private String fileName;
     private String testID;
 
-    public CSVLogger(String folderName, String fileName) throws IOException {
-        this.headers = new String[]{"TestID", "DatabaseType", "EventType", "TimeTaken", "Success", "ErrorMessage", "TimeStamp"};
-        this.folderName = folderName;
-        this.fileName = fileName;
-        this.testID = fileName;
-        setUpLogFile();
+    public CSVLogger(String fileName) throws IOException {
+        this(DEFAULT_FOLDER, fileName, fileName);
     }
 
     public CSVLogger(String folderName, String fileName, String testID) throws IOException {

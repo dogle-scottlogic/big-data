@@ -32,7 +32,7 @@ public class Cassandra {
     public boolean connect() {
         try {
             this.session = this.cluster.connect();
-            return true;
+            return session != null;
         } catch (Exception e) {
             System.out.println(e.fillInStackTrace());
             return false;

@@ -6,19 +6,14 @@ import dataGenerator.enums.Enums;
 import dataGenerator.generators.EventGenerator;
 import org.junit.Test;
 import storers.CSVLogger;
-import storers.storers.CassandraDBStorer;
 import storers.storers.Combo;
-import storers.storers.MariaDBStorer;
-import storers.storers.Timer;
 import storers.storers.maria.enums.DBType;
-
-import java.io.File;
 
 /**
  * Created by lcollingwood on 12/12/2016.
  */
 public class avgResponseTimesByUpdateVolumeTest {
-    public void avgResponseTimesByUpdateVolumeTestHelper(int nUpdates, Enums.EventType updateType, CSVLogger logger) throws Exception {
+    private void avgResponseTimesByUpdateVolumeTestHelper(int nUpdates, Enums.EventType updateType, CSVLogger logger) throws Exception {
         EventGenerator eventGenerator;
 
         // Init
@@ -41,9 +36,8 @@ public class avgResponseTimesByUpdateVolumeTest {
         Conveyor.processEvents(nUpdates, ms, eventGenerator);
     }
 
-    public void testAllVolumes(Enums.EventType updateType) throws Exception {
-        String absPath = new File("").getAbsolutePath().concat("\\testLogs");
-        CSVLogger log = new CSVLogger(absPath, "UpdateTests_f");
+    private void testAllVolumes(Enums.EventType updateType) throws Exception {
+        CSVLogger log = new CSVLogger("UpdateTests_f");
 
         log.setTestID(Integer.toString(100000));
         avgResponseTimesByUpdateVolumeTestHelper(100000, updateType, log);

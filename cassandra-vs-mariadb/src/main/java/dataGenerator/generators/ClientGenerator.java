@@ -25,7 +25,7 @@ public class ClientGenerator {
     }
 
     public ArrayList<Client> getClients(int number) {
-        ArrayList<Client> clients = new ArrayList();
+        ArrayList<Client> clients = new ArrayList<>();
         for(int i = 0; i < number; i++) {
             clients.add(generateClient());
         }
