@@ -1,0 +1,134 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Check for missing plugins
+required_plugins = %w( vagrant-aws )
+missing_plugins  = Array.new
+required_plugins.each do |plugin|
+  if not Vagrant.has_plugin? plugin
+    missing_plugins.push(plugin)
+  end
+end
+
+if not missing_plugins.empty?
+  abort "Missing the following plugins. Please run 'vagrant plugin install PLUGIN' for each one.\n#{missing_plugins.join(" ")}"
+end
+
+# require plugins
+required_plugins.each do |plugin|
+  require plugin
+end
+
+# Load AWS secrets
+require './awscredentials'
+
+# Function to assign private IPs. Assumes a CIDR 172.31.0.0/20
+def getIpFromNum(ii)
+  "172.31.0.#{100+ii}"
+end
+
+# Calculate MariaDB private IPs
+MARIA_IPS_CSV = ((NUM_NODES + 1)..(NUM_NODES * 2)).map { |ii| getIpFromNum(ii) }.join(",")
+
+# Primary Cassandra IP
+CASSANDRA_PRIMARY_IP = getIpFromNum(1)
+
+# Read in scripts
+setup_cassandra_cluster_script = File.read("cassandra/setup-cassandra-cluster.sh")
+
+# A function for copying scripts
+def copy_script(vagrantcfg, source, target)
+  vagrantcfg.vm.provision "file", source: source, destination: target
+  vagrantcfg.vm.provision "shell", inline: "dos2unix #{target}"
+  vagrantcfg.vm.provision "shell", inline: "chmod a+x #{target}"
+end
+
+# Vagrant config
+Vagrant.configure("2") do |config|
+  # Provider default ordering.
+  config.vm.provider "aws"
+  config.vm.provider "virtualbox"
+
+  cassandra_nodes = (1..NUM_NODES).map { |ii| "cass#{ii}" }
+  maria_nodes     = (1..NUM_NODES).map { |ii| "maria#{ii}" }
+
+  (cassandra_nodes + maria_nodes).each_with_index do |name, index|
+    config.vm.define name do |node|
+      is_primary           = name.include? "1"
+      is_cassandra         = name.include? "cass"
+      is_maria             = name.include? "maria"
+      num                  = index + 1
+      private_ip           = getIpFromNum(num)
+
+      node.vm.provider "aws" do |aws, awsconfig|
+        # Use a dummy box that supports AWS. We can then use this box to spin up an AMI on AWS.
+        awsconfig.vm.box     = "dummy"
+        awsconfig.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+        # Disable default synced folder
+        awsconfig.vm.synced_folder ".", "/vagrant", disabled: true
+
+        # Login details
+        aws.access_key_id     = AWS_KEY
+        aws.secret_access_key = AWS_SECRET
+        aws.keypair_name      = AWS_KEYNAME
+
+        # VM details
+        aws.ami                = "ami-57eae033" # Ubuntu Server 16.04
+        aws.region             = "eu-west-2"
+        aws.instance_type      = "t2.micro"
+        aws.subnet_id          = AWS_SUBNET_ID
+        aws.security_groups    = [AWS_SECURITY_GROUP_ID]
+        aws.private_ip_address = private_ip
+        aws.tags               = {"Name" => name}
+
+        # SSH details
+        awsconfig.ssh.username         = "ubuntu"
+        awsconfig.ssh.private_key_path = AWS_KEYPATH
+      end
+
+      node.vm.provider "virtualbox" do |vb, vbconfig|
+        vbconfig.vm.box = "ubuntu/xenial64" # Ubuntu 16.04
+        vb.memory       = 1024
+        vb.name         = name
+        vb.linked_clone = true
+
+        # Setup network
+        vbconfig.vm.network "private_network", ip: private_ip
+      end
+
+      # Provision
+      # Common scripts
+      Dir.foreach('common') do |file|
+        next if file == '.' or file == '..'
+        node.vm.provision "shell", path: "common/#{file}"
+      end
+
+      if is_cassandra
+        node.vm.provision "shell", path: "cassandra/bootstrap.sh"
+        node.vm.provision "shell", inline: setup_cassandra_cluster_script.gsub("PRIMARY_IP", CASSANDRA_PRIMARY_IP)
+        copy_script(node, "cassandra/start-local-cassandra.sh", "/tmp/start.sh")
+      elsif is_maria
+        node.vm.provision "shell", path: "maria/bootstrap.sh"
+
+        # Substitute and copy template file
+        text = File.read("maria/galera.cnf.template")
+        new_contents = text.gsub(/IPS_CSV/, MARIA_IPS_CSV).gsub(/PRIVATE_IP/, private_ip).gsub(/NODE_NAME/, name)
+        File.open("out/galera.cnf.#{name}", "w") { |file| file.puts new_contents }
+
+        # Copy it. Temp location first because we don't have permissions to copy it directly into place
+        node.vm.provision "file", source: "out/galera.cnf.#{name}", destination: "/tmp/galera.cnf"
+        node.vm.provision "shell", inline: "cp /tmp/galera.cnf /etc/mysql/conf.d/galera.cnf"
+
+        # Copy necessary scripts
+        copy_script(node, "maria/start-local-mariadb.sh", "/tmp/start.sh")
+        copy_script(node, "maria/allow-access.sh", "/tmp/allow-access.sh")
+
+        # Bootstrap script for primary node
+        if is_primary
+          copy_script(node, "maria/install-primary.sh", "/tmp/install-primary.sh")
+        end
+      end
+    end
+  end
+end

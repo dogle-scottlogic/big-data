@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.Updaters.HatLineItemUpdaterTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:03" hostname="WS00278" time="0.0">
+  <properties/>
+  <testcase name="getUpdatableFields" classname="dataGenerator.Updaters.HatLineItemUpdaterTest" time="0.0"/>
+  <testcase name="updateRandomLineItemField" classname="dataGenerator.Updaters.HatLineItemUpdaterTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

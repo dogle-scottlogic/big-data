@@ -4,6 +4,7 @@ import com.datastax.driver.core.Cluster;
 import com.datastax.driver.core.Session;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.zaxxer.hikari.HikariDataSource;
+import dataGenerator.data_handlers.Settings;
 import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.cassandra.CQL_Querys;
@@ -15,6 +16,8 @@ import storers.storers.maria.enums.SQLQuery;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -23,15 +26,17 @@ import java.util.concurrent.TimeUnit;
  * Created by lcollingwood on 14/12/2016.
  */
 public class Combo implements Storer {
-    private static final HikariDataSource hikariDataSource = new HikariDataSource();
+    private static final List<HikariDataSource> hikariDataSources = new ArrayList<>();
     private CSVLogger logger;
     private Cluster cluster;
     private Session session;
     private String keyspaceName = "";
-    private String host = "127.0.0.7";
+    private static final String cassandra_ip = Settings.getStringVmSetting("CASSANDRA_IP");
+    private static final String[] mariaIps = Settings.getStringVmSetting("MARIA_IPS").split(",");
+    private int mariaConnectionIndex = 0;
     private DBType type;
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
-    private int mariaConnectionPoolMax = 1;
+    private int mariaConnectionPoolMax;
 
     public Combo(CSVLogger logger, DBType type, int mariaConnectionPoolMax) {
         this.type = type;
@@ -46,14 +51,7 @@ public class Combo implements Storer {
     }
 
     public Combo(CSVLogger logger, DBType type) {
-        this.type = type;
-        this.logger = logger;
-        try {
-            initMariaDBInstance();
-            initCassandraInstance();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        this(logger, type, 1);
     }
 
     public void messageHandler(JSONObject message) {
@@ -70,19 +68,19 @@ public class Combo implements Storer {
         try {
             switch (eventType) {
                 case CREATE:
-                    this.cachedPool.submit(new Create(session, hikariDataSource.getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new Create(session, getConnection(), logger, order, this.type));
                     break;
                 case UPDATE:
-                    this.cachedPool.submit(new Update(session, hikariDataSource.getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new Update(session, getConnection(), logger, order, this.type));
                     break;
                 case UPDATE_STATUS:
-                    this.cachedPool.submit(new UpdateStatus(session, hikariDataSource.getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new UpdateStatus(session, getConnection(), logger, order, this.type));
                     break;
                 case DELETE:
-                    this.cachedPool.submit(new Delete(session, hikariDataSource.getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new Delete(session, getConnection(), logger, order, this.type));
                     break;
                 case READ:
-                    this.cachedPool.submit(new Read(session, hikariDataSource.getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new Read(session, getConnection(), logger, order, this.type));
                     break;
                 default:
                     break;
@@ -93,17 +91,33 @@ public class Combo implements Storer {
     }
 
     private void initMariaDBInstance() throws SQLException {
-        hikariDataSource.setMaximumPoolSize(mariaConnectionPoolMax); // CPU Cores!
-        hikariDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
-        hikariDataSource.setJdbcUrl(SQLQuery.CONNECTION_STRING.getQuery());
-        hikariDataSource.setAutoCommit(false);
-        Connection connection = hikariDataSource.getConnection();
+        for(String ip: mariaIps) {
+            HikariDataSource hikariDataSource = new HikariDataSource();
+            hikariDataSource.setMaximumPoolSize(mariaConnectionPoolMax); // CPU Cores!
+            hikariDataSource.setDriverClassName("org.mariadb.jdbc.Driver");
+            hikariDataSource.setJdbcUrl(SQLQuery.CONNECTION_STRING.getQuery(ip));
+            hikariDataSource.setAutoCommit(false);
+            hikariDataSources.add(hikariDataSource);
+        }
+        Connection connection = getConnection();
         doSingleMariaQuery(connection, SQLQuery.DROP_ORDERS_DB);
         doSingleMariaQuery(connection, SQLQuery.CREATE_ORDERS_DB);
         doSingleMariaQuery(connection, SQLQuery.CREATE_ORDER_TABLE);
         doSingleMariaQuery(connection, SQLQuery.CREATE_LINE_ITEM_TABLE);
         connection.commit();
         connection.close();
+    }
+
+    /**
+     * Returns the next maria connection from the list to provide round robin load balancing.
+     */
+    private Connection getConnection() throws SQLException {
+        if (mariaConnectionIndex + 1 == hikariDataSources.size()) {
+            mariaConnectionIndex = 0;
+        } else {
+            mariaConnectionIndex++;
+        }
+        return hikariDataSources.get(mariaConnectionIndex).getConnection();
     }
 
     private void doSingleMariaQuery(Connection connection, SQLQuery query) throws SQLException {
@@ -114,25 +128,25 @@ public class Combo implements Storer {
 
     // Cassandra Setup
     private void initCassandraInstance() {
-        this.cluster = Cluster.builder().addContactPoint(this.host).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
+        this.cluster = Cluster.builder().addContactPoint(cassandra_ip).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
         cassandraConnect();
         createKeySpace("orders");
         createLineItemTable();
         createOrderTable();
     }
 
-    public void cassandraConnect() {
+    private void cassandraConnect() {
         this.session = this.cluster.connect();
     }
 
-    public void createKeySpace(String name) {
+    private void createKeySpace(String name) {
         dropKeySpace(name);
         this.session.execute(CQL_Querys.createKeySpace(name, 1));
         this.session.execute("USE " + name);
         this.keyspaceName = name;
     }
 
-    public void dropKeySpace(String name) {
+    private void dropKeySpace(String name) {
         try {
             this.session.execute(CQL_Querys.dropKeySpace(name));
         } catch (Exception e) {
@@ -140,12 +154,12 @@ public class Combo implements Storer {
         }
     }
 
-    public void createLineItemTable() {
+    private void createLineItemTable() {
         this.session.execute(CQL_Querys.dropTable("lineItems_by_orderId"));
         this.session.execute(CQL_Querys.createLineItemTable(this.keyspaceName));
     }
 
-    public void createOrderTable() {
+    private void createOrderTable() {
         this.session.execute(CQL_Querys.dropTable("orders"));
         this.session.execute(CQL_Querys.createOrderTable(this.keyspaceName));
     }

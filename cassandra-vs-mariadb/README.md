@@ -1,5 +1,47 @@
 # Cassandra vs MariaDB
 
+### Getting Started
+
+#### Setup AWS access
+
+1. Copy `awscredentials.rb.template` to `awscredentials.rb`.
+2. [Create a new user](https://console.aws.amazon.com/iam/home?#users). You will be displayed the 'Access Key ID' and the 'Secret Access Key'. Update `AWS_KEY` and `AWS_SECRET` with these values. 
+3. [Create a new SSH key](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#KeyPairs:sort=keyName). It will be automatically downloaded for you. Move the downloaded key to `keys/dev.pem`.
+4. [Navigate to policies](https://console.aws.amazon.com/iam/home?region=eu-west-2#policies). Click on `AmazonEC2FullAccess`. In the `Attached Entities` tab, attach the policy to your new user.
+5. [Create a new security group for the Cassandra instances](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#SecurityGroups:sort=groupId). Add the security group *ID* to `awscredentials.rb`. Add the following inbound rules.
+    * SSH, 22, anwhere
+    * Custom TCP, 3306, anywhere
+    * Custom TCP, 7000-7001, anywhere
+    * Custom TCP, 7199, anywhere
+    * Custom TCP, 9042, anywhere
+    * Custom TCP, 9160, anywhere
+    * ALL Traffic, ALL, 172.31.0.0/20
+6. [Create a subnet](https://eu-west-2.console.aws.amazon.com/vpc/home?region=eu-west-2#subnets) and copy and paste its ID into `awscredentials.rb`. Use `172.31.0.0/20` as the CIDR.
+7. [Create two elastic IPs](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#Addresses:sort=PublicIp). Add them to `awscredentials.rb`.
+8. [Install the Amazon CLI](https://aws.amazon.com/cli/) and add it to your PATH. Configure it with `aws configure` using the same credentials you added to`awscredentials.rb`. Set the default region name to `eu-west-2`.
+
+#### Install Vagrant and VirtualBox
+
+1. Install the latest versions of [Vagrant](https://www.vagrantup.com/downloads.html) and [VirtualBox](https://www.virtualbox.org/). At the time of writing these are Vagrant 1.9.1 and VirtualBox 5.1.12.
+2. Install the Vagrant AWS plugin: `vagrant plugin install vagrant-aws`
+
+#### Start Cluster
+
+Run `./start-cluster`. This will spin up and start Cassandra and MariaDB instances.
+
+* To start the instances in Virtualbox instead, pass `-v`
+* To start just Cassandra, pass `-c`
+* To start just MariaDB, pass `-m`
+
+#### Start Cassandra service
+
+Note you cannot `vagrant up` the VirtualBox provider if the AWS provider has instances created. Destroy these instances before trying the start the VirtualBox provider.
+
+#### Cleaning up
+
+* `vagrant halt` powers off the VMs.
+* `vagrant destroy` terminates and cleans up the VMs.
+
 ### Data Generator
 
 The data generator package is responsible for creating Events. The package is dependant on two external files:

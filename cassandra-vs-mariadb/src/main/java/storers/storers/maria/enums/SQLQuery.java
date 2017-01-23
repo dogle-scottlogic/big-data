@@ -4,7 +4,7 @@ package storers.storers.maria.enums;
  * Created by lcollingwood on 06/12/2016.
  */
 public enum SQLQuery {
-    CONNECTION_STRING("jdbc:mariadb://localhost:3306/?user=root&password=root"),
+    CONNECTION_STRING("jdbc:mariadb://${0}:3306/?user=root&password=myfirstpassword"),
 
     DROP_ORDERS_DB("DROP DATABASE IF EXISTS `orders`"),
 
@@ -30,8 +30,15 @@ public enum SQLQuery {
 
     private String query;
 
-    public String getQuery() {
-        return query;
+    /**
+     * Replaces ${int} in the SQL query with the value at the same index in the provided parameters.
+     */
+    public String getQuery(String... parameters) {
+        String subsitutedQuery = query;
+        for (int i = 0; i < parameters.length; i++) {
+            subsitutedQuery = subsitutedQuery.replace("${"+ i +"}", parameters[i]);
+        }
+        return subsitutedQuery;
     }
 
     SQLQuery(String query) {

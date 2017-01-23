@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.data_handlers.JsonLoaderTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:02" hostname="WS00278" time="0.093">
+  <properties/>
+  <testcase name="testLoadJson_Success" classname="dataGenerator.data_handlers.JsonLoaderTest" time="0.093"/>
+  <testcase name="testGetJsonField_Fail" classname="dataGenerator.data_handlers.JsonLoaderTest" time="0.0"/>
+  <testcase name="testGetJsonField_Success" classname="dataGenerator.data_handlers.JsonLoaderTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

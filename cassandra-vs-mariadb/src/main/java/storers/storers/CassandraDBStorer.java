@@ -1,5 +1,6 @@
 package storers.storers;
 
+import dataGenerator.data_handlers.Settings;
 import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.DatabaseEventFailedException;
@@ -12,9 +13,11 @@ public class CassandraDBStorer implements Storer {
 
     private Cassandra cassandra;
 
+    private static final String cassandra_ip = Settings.getStringVmSetting("CASSANDRA_IP");
+
     public CassandraDBStorer(CSVLogger logger) {
         boolean success;
-        this.cassandra = new Cassandra("127.0.0.7", logger);
+        this.cassandra = new Cassandra(cassandra_ip, logger);
         cassandra.connect();
         success = cassandra.createKeySpace("orders");
         if (success) success = cassandra.createLineItemTable();

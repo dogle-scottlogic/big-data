@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.generators.ClientGeneratorTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:02" hostname="WS00278" time="0.0">
+  <properties/>
+  <testcase name="testGetClientsZeroNumber" classname="dataGenerator.generators.ClientGeneratorTest" time="0.0"/>
+  <testcase name="testGetClients" classname="dataGenerator.generators.ClientGeneratorTest" time="0.0"/>
+  <testcase name="testGenerateClientRandomSeed" classname="dataGenerator.generators.ClientGeneratorTest" time="0.0"/>
+  <system-out><![CDATA[getClients - With Random Seed - Empty List
+getClients - With Random Seed
+generateClient - With Random Seed
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

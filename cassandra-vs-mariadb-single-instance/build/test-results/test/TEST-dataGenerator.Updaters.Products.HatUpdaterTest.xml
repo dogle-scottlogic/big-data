@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.Updaters.Products.HatUpdaterTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:03" hostname="WS00278" time="0.0">
+  <properties/>
+  <testcase name="getUpdatableFields" classname="dataGenerator.Updaters.Products.HatUpdaterTest" time="0.0"/>
+  <testcase name="updateProductPrice" classname="dataGenerator.Updaters.Products.HatUpdaterTest" time="0.0"/>
+  <testcase name="updateProductWeight" classname="dataGenerator.Updaters.Products.HatUpdaterTest" time="0.0"/>
+  <testcase name="updateProductName" classname="dataGenerator.Updaters.Products.HatUpdaterTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

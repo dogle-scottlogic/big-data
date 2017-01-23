@@ -10,6 +10,7 @@ public class Settings {
     private static final String path = "data-generator.";
     private static final String hatPath = "hat.";
     private static final String queuePath = "queue-settings.";
+    private static final String vmPath = "db-vm-settings.";
     private static Config conf = ConfigFactory.load();
 
     public static String getStringSetting(String setting) {
@@ -50,4 +51,5 @@ public class Settings {
         return conf.getBoolean(queuePath.concat(setting));
     }
 
+    public static String getStringVmSetting(String setting) { return  conf.getString(vmPath.concat(setting)); }
 }

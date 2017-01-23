@@ -25,7 +25,7 @@ public class Cassandra {
     private CSVLogger logger;
 
     public Cassandra(String host, CSVLogger logger) {
-        this.cluster = Cluster.builder().addContactPoint(host).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
+        this.cluster = Cluster.builder().addContactPoint(host).withLoadBalancingPolicy(new RoundRobinPolicy()).withQueryOptions(new QueryOptions().setConsistencyLevel(ConsistencyLevel.ONE)).build();
         this.logger = logger;
     }
 
@@ -53,7 +53,7 @@ public class Cassandra {
     public boolean createKeySpace(String name) {
         try {
             dropKeySpace(name);
-            this.session.execute(CQL_Querys.createKeySpace(name, 1));
+            this.session.execute(CQL_Querys.createKeySpace(name, 3));
             this.session.execute("USE " + name);
             this.keyspaceName = name;
         } catch (Exception e) {

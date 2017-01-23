@@ -1,0 +1,20 @@
+#!/bin/bash -e
+
+# Run this from within the cassandra-vs-mariadb directory
+
+TEST_CONFIG=src/main/resources/application.conf
+MARIA_IPS=$( grep MARIA_IPS $TEST_CONFIG | cut -d= -f2 | sed -r 's#\"##g' | sed -r 's#,# #g' )
+
+have_access() {
+  IP=$1
+  mysql -h $IP -u root --password=myfirstpassword -e "SHOW STATUS LIKE 'wsrep_cluster_size'" >/dev/null 2>&1
+}
+
+for IP in $MARIA_IPS ; do
+  echo -n Testing access to $IP...
+  if have_access $IP ; then
+    echo " OK"
+  else
+    echo " FAILED"
+  fi
+done

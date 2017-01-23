@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.generators.EventGeneratorTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:02" hostname="WS00278" time="0.859">
+  <properties/>
+  <testcase name="addOrderToList" classname="dataGenerator.generators.EventGeneratorTest" time="0.828"/>
+  <testcase name="generateCreateEvent" classname="dataGenerator.generators.EventGeneratorTest" time="0.015"/>
+  <testcase name="generateUpdateEvent_CreatedOrders" classname="dataGenerator.generators.EventGeneratorTest" time="0.016"/>
+  <testcase name="generateUpdateEvent_NoCreatedOrders" classname="dataGenerator.generators.EventGeneratorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

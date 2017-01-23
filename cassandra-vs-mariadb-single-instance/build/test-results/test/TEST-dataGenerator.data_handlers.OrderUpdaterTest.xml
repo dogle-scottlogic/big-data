@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.data_handlers.OrderUpdaterTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:02" hostname="WS00278" time="0.016">
+  <properties/>
+  <testcase name="updateOrderStatus" classname="dataGenerator.data_handlers.OrderUpdaterTest" time="0.016"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

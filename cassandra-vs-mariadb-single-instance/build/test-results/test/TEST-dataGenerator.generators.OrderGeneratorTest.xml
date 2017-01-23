@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.generators.OrderGeneratorTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:03" hostname="WS00278" time="0.015">
+  <properties/>
+  <testcase name="testGenerateOrdersNoItems" classname="dataGenerator.generators.OrderGeneratorTest" time="0.0"/>
+  <testcase name="testGenerateOrder" classname="dataGenerator.generators.OrderGeneratorTest" time="0.0"/>
+  <testcase name="testGenerateOrders" classname="dataGenerator.generators.OrderGeneratorTest" time="0.015"/>
+  <system-out><![CDATA[generateOrders - With Random Seed - Empty List
+generateOrder - With random seed
+generateOrders - With random seed
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

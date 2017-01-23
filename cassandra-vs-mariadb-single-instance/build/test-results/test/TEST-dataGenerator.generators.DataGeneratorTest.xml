@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.generators.DataGeneratorTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:02" hostname="WS00278" time="0.0">
+  <properties/>
+  <testcase name="getAddressesZero" classname="dataGenerator.generators.DataGeneratorTest" time="0.0"/>
+  <testcase name="getAddresses" classname="dataGenerator.generators.DataGeneratorTest" time="0.0"/>
+  <testcase name="getNamesZero" classname="dataGenerator.generators.DataGeneratorTest" time="0.0"/>
+  <testcase name="generatePrice" classname="dataGenerator.generators.DataGeneratorTest" time="0.0"/>
+  <testcase name="getHatData" classname="dataGenerator.generators.DataGeneratorTest" time="0.0"/>
+  <testcase name="getEmail" classname="dataGenerator.generators.DataGeneratorTest" time="0.0"/>
+  <testcase name="getNames" classname="dataGenerator.generators.DataGeneratorTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

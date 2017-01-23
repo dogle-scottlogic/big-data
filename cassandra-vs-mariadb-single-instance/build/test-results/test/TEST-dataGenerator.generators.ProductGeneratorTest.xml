@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.generators.ProductGeneratorTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:03" hostname="WS00278" time="0.016">
+  <properties/>
+  <testcase name="testGenerateProductsNoItems" classname="dataGenerator.generators.ProductGeneratorTest" time="0.0"/>
+  <testcase name="testGenerateProducts" classname="dataGenerator.generators.ProductGeneratorTest" time="0.016"/>
+  <testcase name="testGenerateProductHat" classname="dataGenerator.generators.ProductGeneratorTest" time="0.0"/>
+  <system-out><![CDATA[generateProducts - With Random Seed - Empty List
+generateProducts - With random seed
+generateProduct - With random seed - HAT
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

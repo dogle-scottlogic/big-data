@@ -11,6 +11,21 @@ cassandra-vs-mariadb/BigDataProject2WithMavennbproject/.nb-gradle/
 .idea/workspace.xml
 .idea/tasks.xml
 
+# Vagrant stuff
+*/.vagrant/*
+
+# Gradle stuff
+.gradle/
+
+# Ignore SSH keys
+cassandra-vs-mariadb/keys/*
+
+# Ignore credentials
+cassandra-vs-mariadb/awscredentials.rb
+
+# out files
+cassandra-vs-mariadb/out/galera.cnf.*
+
 # Sensitive or high-churn files:
 .idea/dataSources/
 .idea/dataSources.ids
@@ -23,6 +38,7 @@ cassandra-vs-mariadb/BigDataProject2WithMavennbproject/.nb-gradle/
 # Gradle:
 .idea/gradle.xml
 .idea/libraries
+.idea/*
 
 # Mongo Explorer plugin:
 .idea/mongoSettings.xml
@@ -49,6 +65,8 @@ fabric.properties
 cassandra-vs-mariadb/build/classes/main/transmission/Serializer.class
 cassandra-vs-mariadb/build/
 cassandra-vs-mariadb/.idea/
+cassandra-vs-mariadb/.gradle/
+cassandra-vs-mariadb/testLogs
 cassandra-vs-mariadb/data-generator/build/*
 cassandra-vs-mariadb/data-generator/.idea/*
 cassandra-vs-mariadb/mariadb-storer/build/

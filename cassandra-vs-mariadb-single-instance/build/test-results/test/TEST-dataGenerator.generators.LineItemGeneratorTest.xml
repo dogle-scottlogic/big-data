@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="dataGenerator.generators.LineItemGeneratorTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2017-01-19T14:41:03" hostname="WS00278" time="0.0">
+  <properties/>
+  <testcase name="testGenerateLineItems" classname="dataGenerator.generators.LineItemGeneratorTest" time="0.0"/>
+  <testcase name="testGenerateLineItemHat" classname="dataGenerator.generators.LineItemGeneratorTest" time="0.0"/>
+  <testcase name="testGenerateLineItemsNoItem" classname="dataGenerator.generators.LineItemGeneratorTest" time="0.0"/>
+  <system-out><![CDATA[generateLineItems - With Random Seed
+generateLineItem -With Random Seed-Hat
+generateLineItems - With Random Seed - Empty List
+]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
