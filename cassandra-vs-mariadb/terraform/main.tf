@@ -56,6 +56,7 @@ module "cluster_3" {
   num_nodes           = 3
   cassandra_ami       = "${module.ami-nodes.cassandra_ami_id}"
   mariadb_ami         = "${module.ami-nodes.mariadb_ami_id}"
+  test-client_ami     = "${module.ami-nodes.test-client_ami_id}"
   mariadb_password    = "${module.ami-nodes.mariadb_password}"
   cluster_name        = "threeNode-"
   key_name            = "${aws_key_pair.auth.key_name}"
@@ -68,4 +69,7 @@ output "cluster_3_cassandra_ips" {
 }
 output "cluster_3_mariadb_ips" {
   value = "${module.cluster_3.mariadb_public_ips}"
+}
+output "cluster_3_test-client_ip" {
+  value = "${module.cluster_3.test-client_public_ip}"
 }

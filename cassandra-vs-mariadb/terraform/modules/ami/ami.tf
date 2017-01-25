@@ -63,6 +63,37 @@ resource "aws_instance" "mariadb" {
   }
 }
 
+resource "aws_instance" "test-client" {
+  ami             = "${var.ami}"
+  instance_type   = "${var.instance_type}"
+  security_groups = ["${var.security_group_name}"]
+  key_name        = "${var.key_name}"
+
+  tags {
+    Name = "test-client-ami"
+  }
+
+  connection {
+    user        = "${var.user}"
+    private_key = "${var.private_key}"
+  }
+
+  provisioner "file" {
+    source = "scripts"
+    destination = "/tmp/scripts"
+  }
+
+  provisioner "remote-exec" {
+    inline = [
+      "sudo apt-get install -y dos2unix",
+      "dos2unix /tmp/scripts/*/*",
+      "chmod a+x /tmp/scripts/*/*",
+      "echo chmod-ed all scripts",
+      "sudo /tmp/scripts/test-client/bootstrap.sh"
+    ]
+  }
+}
+
 resource "aws_ami_from_instance" "cass_ami" {
   name               = "cassandra-ami"
   source_instance_id = "${aws_instance.cassandra.id}"
@@ -71,4 +102,9 @@ resource "aws_ami_from_instance" "cass_ami" {
 resource "aws_ami_from_instance" "mariadb_ami" {
   name               = "mariadb-ami"
   source_instance_id = "${aws_instance.mariadb.id}"
+}
+
+resource "aws_ami_from_instance" "test-client_ami" {
+  name = "test-client-ami"
+  source_instance_id = "${aws_instance.test-client.id}"
 }

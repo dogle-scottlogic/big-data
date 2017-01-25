@@ -19,6 +19,9 @@ variable "cassandra_ami" {
 variable "mariadb_ami" {
   description = "Bootstrapped AMI created by the ami module"
 }
+variable "test-client_ami" {
+  description = "Bootstrapped AMI created by the ami module"
+}
 variable "mariadb_password" {
   description = "Root password for mariadb"
   default     = "myfirstpassword"
