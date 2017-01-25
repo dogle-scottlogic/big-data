@@ -1,6 +1,7 @@
 package storers.storers;
 
 import dataGenerator.data_handlers.Settings;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.DatabaseEventFailedException;
@@ -10,6 +11,7 @@ import storers.storers.cassandra.Cassandra;
  * Created by dogle on 05/12/2016.
  */
 public class CassandraDBStorer implements Storer {
+    private final static Logger LOG = Logger.getLogger(CassandraDBStorer.class);
 
     private Cassandra cassandra;
 
@@ -22,7 +24,7 @@ public class CassandraDBStorer implements Storer {
         if (success) success = cassandra.createKeySpace("orders");
         if (success) success = cassandra.createLineItemTable();
         if (success) success = cassandra.createOrderTable();
-        if (!success) System.out.println("An error occurred setting up the database");
+        if (!success) LOG.error("An error occurred setting up the database");
     }
 
     public void messageHandler(JSONObject message) {
@@ -43,8 +45,8 @@ public class CassandraDBStorer implements Storer {
             if (type.equals("DELETE")) {
                 delete(message);
             }
-        } catch (DatabaseEventFailedException exception) {
-            exception.printStackTrace();
+        } catch (DatabaseEventFailedException e) {
+            LOG.warn("Failed to handle message", e);
         }
     }
 

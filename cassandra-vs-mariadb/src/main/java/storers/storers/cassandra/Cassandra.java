@@ -4,20 +4,21 @@ import com.datastax.driver.core.*;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import storers.CSVLogger;
+import storers.storers.Timer;
 
 import java.util.ArrayList;
 import java.util.Date;
-
-import storers.CSVLogger;
-import storers.storers.Timer;
 
 /**
  * Created by dogle on 05/12/2016.
  */
 public class Cassandra {
 
+    private final static Logger LOG = Logger.getLogger(Cassandra.class);
     private Cluster cluster;
     private Session session;
     private String keyspaceName = "";
@@ -33,8 +34,8 @@ public class Cassandra {
         try {
             this.session = this.cluster.connect();
             return session != null;
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to connect", e);
             return false;
         }
     }
@@ -43,8 +44,8 @@ public class Cassandra {
         try {
             this.session.close();
             this.cluster.close();
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to close", e);
             return false;
         }
         return true;
@@ -56,18 +57,18 @@ public class Cassandra {
             this.session.execute(CQL_Querys.createKeySpace(name, 3));
             this.session.execute("USE " + name);
             this.keyspaceName = name;
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to create key space", e);
             return false;
         }
         return true;
     }
 
-    public boolean dropKeySpace(String name) {
+    private boolean dropKeySpace(String name) {
         try {
             this.session.execute(CQL_Querys.dropKeySpace(name));
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to drop key space", e);
             return false;
         }
         return true;
@@ -77,8 +78,8 @@ public class Cassandra {
         try {
             this.session.execute(CQL_Querys.dropTable("lineItems_by_orderId"));
             this.session.execute(CQL_Querys.createLineItemTable(this.keyspaceName));
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to create lineitem table", e);
             return false;
         }
         return true;
@@ -88,8 +89,8 @@ public class Cassandra {
         try {
             this.session.execute(CQL_Querys.dropTable("orders"));
             this.session.execute(CQL_Querys.createOrderTable(this.keyspaceName));
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to create order table", e);
             return false;
         }
         return true;
@@ -102,34 +103,34 @@ public class Cassandra {
             ArrayList<String> lineItemsIds = new ArrayList<String>();
             BatchStatement batch = new BatchStatement();
 
-            for (int i = 0; i < lineItems.size(); i++) {
-                // Extract values
-                JSONObject lineItem = (JSONObject) lineItems.get(i);
-                String lineItemId = (String) lineItem.get("id");
-                String productId = (String) ((JSONObject) lineItem.get("product")).get("id");
-                int quantity = new Integer(((Long) lineItem.get("quantity")).intValue());
-                double linePrice = (Double) lineItem.get("linePrice");
-
-                // Add prepared statement to batch
-                PreparedStatement p = this.session.prepare(CQL_Querys.addLineItem(this.keyspaceName));
-
-                batch.add(p.bind(orderId, lineItemId, productId, quantity, linePrice));
-                lineItemsIds.add("'" + lineItemId + "'");
-            }
-
-            //Add Order
-            String clientId = (String) ((JSONObject) order.get("client")).get("id");
-            Long dateLong = (Long) order.get("date");
-            String created = new Date(dateLong).toString();
-            String status = (String) order.get("status");
-            Double subTotal = (Double) order.get("subTotal");
+        for (Object lineItem1 : lineItems) {
+            // Extract values
+            JSONObject lineItem = (JSONObject) lineItem1;
+            String lineItemId = (String) lineItem.get("id");
+            String productId = (String) ((JSONObject) lineItem.get("product")).get("id");
+            int quantity = ((Long) lineItem.get("quantity")).intValue();
+            double linePrice = (Double) lineItem.get("linePrice");
 
             // Add prepared statement to batch
-            PreparedStatement p = this.session.prepare(CQL_Querys.addOrder(this.keyspaceName));
-            batch.add(p.bind(orderId, lineItemsIds, clientId, created, status, subTotal));
-            timer.startTimer();
-            ResultSetFuture futureOrders = session.executeAsync(batch);
-            queryHandler(futureOrders, "CREATE", timer);
+            PreparedStatement p = this.session.prepare(CQL_Querys.addLineItem(this.keyspaceName));
+
+            batch.add(p.bind(orderId, lineItemId, productId, quantity, linePrice));
+            lineItemsIds.add("'" + lineItemId + "'");
+        }
+
+        //Add Order
+        String clientId = (String) ((JSONObject) order.get("client")).get("id");
+        Long dateLong = (Long) order.get("date");
+        String created = new Date(dateLong).toString();
+        String status = (String) order.get("status");
+        Double subTotal = (Double) order.get("subTotal");
+
+        // Add prepared statement to batch
+        PreparedStatement p = this.session.prepare(CQL_Querys.addOrder(this.keyspaceName));
+        batch.add(p.bind(orderId, lineItemsIds, clientId, created, status, subTotal));
+        timer.startTimer();
+        ResultSetFuture futureOrders = session.executeAsync(batch);
+        queryHandler(futureOrders, "CREATE", timer);
     }
 
     public void deleteOrder(JSONObject order, Timer timer) {
@@ -148,10 +149,10 @@ public class Cassandra {
         BatchStatement batchStatement = new BatchStatement();
         String orderId = (String) order.get("id");
         JSONArray lineItems = (JSONArray) order.get("lineItems");
-        for (int i = 0; i < lineItems.size(); i++) {
-            JSONObject lineItem = (JSONObject) lineItems.get(i);
+        for (Object lineItem1 : lineItems) {
+            JSONObject lineItem = (JSONObject) lineItem1;
             String lineItemId = (String) lineItem.get("id");
-            int quantity = new Integer(((Long) lineItem.get("quantity")).intValue());
+            int quantity = ((Long) lineItem.get("quantity")).intValue();
             double linePrice = (Double) lineItem.get("linePrice");
             PreparedStatement p = session.prepare(CQL_Querys.updateLineItem(this.keyspaceName));
             batchStatement.add(p.bind(quantity, linePrice, lineItemId, orderId));

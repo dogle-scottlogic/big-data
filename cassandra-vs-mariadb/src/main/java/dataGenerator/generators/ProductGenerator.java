@@ -6,28 +6,28 @@
 package dataGenerator.generators;
 
 import dataGenerator.data_handlers.Settings;
-import dataGenerator.entities.products.Hat;
 import dataGenerator.entities.Product;
-
-import java.util.*;
-
+import dataGenerator.entities.products.Hat;
 import dataGenerator.enums.Enums.ProductType;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * @author lcollingwood
  */
 public class ProductGenerator {
 
-    private Random random;
     private DataGenerator dg;
 
     public ProductGenerator(Random random) {
-        this.random = random;
-        this.dg = new DataGenerator(this.random);
+        this.dg = new DataGenerator(random);
     }
 
     public ArrayList<Product> generateProducts(int n, ProductType productType) {
-        ArrayList<Product> generatedProducts = new ArrayList();
+        ArrayList<Product> generatedProducts = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             generatedProducts.add(this.generateProduct(productType));
         }

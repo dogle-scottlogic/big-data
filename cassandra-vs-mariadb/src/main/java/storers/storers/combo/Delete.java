@@ -16,19 +16,16 @@ import java.sql.SQLException;
  */
 public class Delete extends ComboQuery {
 
-    public Delete(Session cassandraConnection, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
-        super(cassandraConnection, mariaConnection, logger, DBEventType.DELETE, type);
+    public Delete(Session cassandraConnection, PreparedStatement orderPreparedStatement, PreparedStatement lineItemPreparedStatement, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
+        super(cassandraConnection, orderPreparedStatement, lineItemPreparedStatement, mariaConnection, logger, DBEventType.DELETE, type);
         addToBatch(order);
     }
 
     public void addToBatch(Order order) throws SQLException {
 
         if (getDbtype() == DBType.CASSANDRA) {
-            String keyspaceName = getCassandraConnection().getLoggedKeyspace();
-            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.deleteLineItem(keyspaceName));
-            getCassandraBatch().add(p.bind(order.getOrderId()));
-            p = getCassandraConnection().prepare(CQL_Querys.deleteOrder(keyspaceName));
-            getCassandraBatch().add(p.bind(order.getOrderId()));
+            getCassandraBatch().add(getLineItemPreparedStatement().bind(order.getOrderId()));
+            getCassandraBatch().add(getOrderPreparedStatement().bind(order.getOrderId()));
         }
 
         if (getDbtype() == DBType.MARIA_DB) {

@@ -8,7 +8,6 @@ import org.junit.Test;
 import storers.CSVLogger;
 import storers.storers.CassandraDBStorer;
 
-import java.io.File;
 import java.io.IOException;
 
 /**

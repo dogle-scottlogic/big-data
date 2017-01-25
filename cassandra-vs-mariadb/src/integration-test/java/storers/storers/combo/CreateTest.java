@@ -3,19 +3,17 @@ package storers.storers.combo;
 import Conveyor.Conveyor;
 import dataGenerator.enums.Enums;
 import dataGenerator.generators.EventGenerator;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import storers.CSVLogger;
 import storers.storers.Combo;
 import storers.storers.maria.enums.DBType;
 
-import java.io.File;
-
-import static org.junit.Assert.*;
-
 /**
  * Created by lcollingwood on 14/12/2016.
  */
 public class CreateTest {
+    private final static Logger LOG = Logger.getLogger(CreateTest.class);
 
     @Test
     public void ten() throws Exception {
@@ -27,12 +25,12 @@ public class CreateTest {
         CSVLogger log = new CSVLogger("ten");
         Combo storer = new Combo(log, DBType.CASSANDRA);
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        System.out.println("Start Cassandra");
+        LOG.info("Start Cassandra");
         Conveyor.processEvents(numOfEvents, storer, eventGenerator);
 
         storer = new Combo(log, DBType.MARIA_DB);
         eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        System.out.println("Start MariaDB");
+        LOG.info("Start MariaDB");
         Conveyor.processEvents(numOfEvents, storer, eventGenerator);
     }
 

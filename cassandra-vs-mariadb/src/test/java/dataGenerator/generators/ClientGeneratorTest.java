@@ -1,36 +1,27 @@
 package dataGenerator.generators;
 
-import org.junit.After;
-import org.junit.Before;
+import dataGenerator.entities.Client;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import dataGenerator.entities.Client;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by dogle on 30/11/2016.
  */
 public class ClientGeneratorTest {
-    @Before
-    public void setUp() throws Exception {
-
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
-    }
+    private final static Logger LOG = Logger.getLogger(ClientGeneratorTest.class);
 
     /**
      * Test of getClients method, of class ClientGenerator.
      */
     @Test
     public void testGetClients() {
-        System.out.println("getClients - With Random Seed");
+        LOG.info("getClients - With Random Seed");
         Random random = new Random(1234);
         ClientGenerator cg = new ClientGenerator(random);
         ArrayList<Client> clientList = cg.getClients(5);
@@ -49,7 +40,7 @@ public class ClientGeneratorTest {
      */
     @Test
     public void testGetClientsZeroNumber() {
-        System.out.println("getClients - With Random Seed - Empty List");
+        LOG.info("getClients - With Random Seed - Empty List");
         Random random = new Random(1234);
         ClientGenerator cg = new ClientGenerator(random);
         ArrayList<Client> clientList = cg.getClients(0);
@@ -62,7 +53,7 @@ public class ClientGeneratorTest {
      */
     @Test
     public void testGenerateClientRandomSeed() {
-        System.out.println("generateClient - With Random Seed");
+        LOG.info("generateClient - With Random Seed");
         Random random = new Random(1234);
         ClientGenerator cg = new ClientGenerator(random);
         Client testClient = cg.generateClient();

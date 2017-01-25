@@ -35,8 +35,8 @@ while getopts "vt:d" opt; do
 done
 
 vagrant up test ${VAGRANT_ARGS}
-gradle clean
-vagrant ssh test -- "mkdir ./analysis"
-vagrant scp . test:./analysis
+vagrant ssh test -- "mkdir ./analysis; mkdir ./analysis/testLogs"
+vagrant scp src test:./analysis
+vagrant scp build.gradle test:./analysis
 vagrant ssh test -- "cd ./analysis; gradle clean analysis ${TESTS} ${GRADLE_ARGS}"
 vagrant scp test:./analysis/testLogs .

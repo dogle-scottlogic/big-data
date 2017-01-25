@@ -1,47 +1,30 @@
 package dataGenerator.generators;
 
+import dataGenerator.entities.LineItem;
 import dataGenerator.enums.Enums;
-import org.junit.*;
+import org.apache.log4j.Logger;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Random;
 
-import dataGenerator.entities.LineItem;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * Created by dogle on 30/11/2016.
  */
 public class LineItemGeneratorTest {
+    private final static Logger LOG = Logger.getLogger(LineItemGeneratorTest.class);
 
-    Enums.ProductType[] productList = {Enums.ProductType.HAT};
-
-    public LineItemGeneratorTest() {
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
-
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
+    private Enums.ProductType[] productList = {Enums.ProductType.HAT};
 
     /**
      * Test of generateLineItems method, of class LineItemGenerator.
      */
     @Test
     public void testGenerateLineItems() {
-        System.out.println("generateLineItems - With Random Seed");
+        LOG.info("generateLineItems - With Random Seed");
         Random random = new Random(1234);
         ProductGenerator pg = new ProductGenerator(random);
         LineItemGenerator lg = new LineItemGenerator(random, pg, this.productList);
@@ -62,7 +45,7 @@ public class LineItemGeneratorTest {
      */
     @Test
     public void testGenerateLineItemsNoItem() {
-        System.out.println("generateLineItems - With Random Seed - Empty List");
+        LOG.info("generateLineItems - With Random Seed - Empty List");
         Random random = new Random(1234);
         ProductGenerator pg = new ProductGenerator(random);
         LineItemGenerator lg = new LineItemGenerator(random, pg, this.productList);
@@ -75,7 +58,7 @@ public class LineItemGeneratorTest {
      */
     @Test
     public void testGenerateLineItemHat() {
-        System.out.println("generateLineItem -With Random Seed-Hat");
+        LOG.info("generateLineItem -With Random Seed-Hat");
         Random random = new Random(1234);
         ProductGenerator pg = new ProductGenerator(random);
         LineItemGenerator cg = new LineItemGenerator(random, pg, this.productList);

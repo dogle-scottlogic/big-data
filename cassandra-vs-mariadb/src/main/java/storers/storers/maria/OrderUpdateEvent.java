@@ -28,7 +28,7 @@ public class OrderUpdateEvent extends QueryEvent {
         doQuery("UPDATE orders.`order` " +
                 "SET " +
                 "client_id='" + clientId + "', " +
-                "created='" + Long.valueOf(date).toString() + "' " +
+                "created='" + date.toString() + "' " +
                 "WHERE id='" + orderId + "';");
         updateLineItems(orderId, lineItems);
         end();
@@ -47,7 +47,7 @@ public class OrderUpdateEvent extends QueryEvent {
                     "SET " +
                     "order_id='" + orderId + "', " +
                     "product_id='" + productId + "', " +
-                    "quantity=" + Long.valueOf(quantity).toString() + " " +
+                    "quantity=" + quantity.toString() + " " +
                     "WHERE order_id='" + orderId + "';");
         }
     }

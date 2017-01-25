@@ -2,7 +2,7 @@ package dataGenerator.data_handlers;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by dogle on 02/12/2016.

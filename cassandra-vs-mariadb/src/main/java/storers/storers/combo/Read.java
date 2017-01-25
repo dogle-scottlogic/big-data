@@ -1,5 +1,6 @@
 package storers.storers.combo;
 
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
 import storers.CSVLogger;
 import storers.storers.Order;
@@ -14,13 +15,12 @@ import java.sql.SQLException;
  * Created by lcollingwood on 15/12/2016.
  */
 public class Read extends ComboQuery {
-    public Read(Session cassandraConnection, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
-        super(cassandraConnection, mariaConnection, logger, DBEventType.READ, type);
+    public Read(Session cassandraConnection, PreparedStatement orderPreparedStatement, PreparedStatement lineItemPreparedStatement, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
+        super(cassandraConnection, orderPreparedStatement, lineItemPreparedStatement, mariaConnection, logger, DBEventType.READ, type);
         addToBatch(order);
     }
 
     public void addToBatch(Order order) throws SQLException {
-        String keyspaceName = getCassandraConnection().getLoggedKeyspace();
         String orderId = order.getOrderId();
 
         if (getDbtype() == DBType.MARIA_DB) {
@@ -28,15 +28,8 @@ public class Read extends ComboQuery {
             addToMariaQueryQueue("SELECT * FROM orders.`line_item` WHERE order_id='" + orderId + "';");
         }
         if (getDbtype() == DBType.CASSANDRA) {
-            addToCassandraQueryQueue(
-                    getCassandraConnection()
-                            .prepare(CQL_Querys.selectAllLineItems(keyspaceName))
-                            .bind(orderId));
-
-            addToCassandraQueryQueue(
-                    getCassandraConnection()
-                            .prepare(CQL_Querys.selectAllOrders(keyspaceName))
-                            .bind(orderId));
+            addToCassandraQueryQueue(getLineItemPreparedStatement().bind(orderId));
+            addToCassandraQueryQueue(getOrderPreparedStatement().bind(orderId));
         }
     }
 }

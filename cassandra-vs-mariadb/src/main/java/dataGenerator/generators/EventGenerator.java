@@ -5,10 +5,11 @@ import dataGenerator.data_handlers.Settings;
 import dataGenerator.entities.Client;
 import dataGenerator.entities.Event;
 import dataGenerator.entities.Order;
-import dataGenerator.enums.Enums.ProductType;
 import dataGenerator.enums.Enums.EventType;
-import org.apache.commons.lang3.ArrayUtils;
+import dataGenerator.enums.Enums.ProductType;
 import dataGenerator.transmission.Emitter;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +21,8 @@ import java.util.Random;
  */
 public class EventGenerator implements Runnable {
 
-    private HashMap<String, Order> orderList = new HashMap<String, Order>();
+    private final static Logger LOG = Logger.getLogger(EventGenerator.class);
+    private HashMap<String, Order> orderList = new HashMap<>();
     private ArrayList<Client> clientList;
     private Random random;
 
@@ -69,15 +71,15 @@ public class EventGenerator implements Runnable {
                 }
                 Event newEvent = generateEvents(type);
                 // Emit event
-                System.out.println(eventCounter + ":" + Emitter.emitEvent(newEvent));
+                LOG.info(eventCounter + ":" + Emitter.emitEvent(newEvent));
                 eventCounter++;
                 if (newEvent.getType() == EventType.CREATE) addOrderToList((Order) newEvent.getData());
                 if (newEvent.getType() == EventType.DELETE) removeOrderFromList((String) newEvent.getData());
                 Thread.sleep(Settings.getIntSetting("SLEEP"));
             } catch (InterruptedException e) {
                 interrupted = true;
-                System.out.println("Stopping: ");
-                System.out.println(e.getMessage());
+                LOG.info("Stopping: ");
+                LOG.info(e.getMessage());
             }
         }
     }
@@ -147,17 +149,16 @@ public class EventGenerator implements Runnable {
         OrderGenerator og = new OrderGenerator(random, lig, client);
         Order order = og.generateOrder();
         // Create Event
-        Event event = new Event(EventType.CREATE, order);
-        return event;
+        return new Event<>(EventType.CREATE, order);
     }
 
-    public Event generateReadEvent() {
+    private Event generateReadEvent() {
 
         Event event;
 
         if (this.orderList.size() >= 1) {
             String randomOrderId = this.orderList.keySet().toArray()[this.random.nextInt(this.orderList.keySet().toArray().length)].toString();
-            event = new Event(EventType.READ, randomOrderId);
+            event = new Event<>(EventType.READ, randomOrderId);
         } else { // If there have been no create events yet, raise a create event instead
             event = generateCreateEvent();
         }
@@ -182,20 +183,20 @@ public class EventGenerator implements Runnable {
             if (type == EventType.UPDATE_STATUS) {
                 updateOrder = orderUpdater.updateOrderStatus(updateOrder);
             }
-            event = new Event(type, updateOrder);
+            event = new Event<>(type, updateOrder);
         } else { // If there have been no create events yet, raise a create event instead
             event = generateCreateEvent();
         }
         return event;
     }
 
-    public Event generateDeleteEvent() {
+    private Event generateDeleteEvent() {
 
         Event event;
 
         if (this.orderList.size() >= 1) {
             String randomOrderId = this.orderList.keySet().toArray()[this.random.nextInt(this.orderList.keySet().toArray().length)].toString();
-            event = new Event(EventType.DELETE, randomOrderId);
+            event = new Event<>(EventType.DELETE, randomOrderId);
         } else { // If there have been no create events yet, raise a create event instead
             event = generateCreateEvent();
         }
@@ -245,8 +246,7 @@ public class EventGenerator implements Runnable {
     private EventType getFixedEventType(int fixedEventTypeCount) {
         EventType[] events =  EventType.values();
         if (this.events.length > 0) events = this.events;
-        EventType type = events[fixedEventTypeCount];
-        return type;
+        return events[fixedEventTypeCount];
     }
 
     private EventType getRandomEventType() {

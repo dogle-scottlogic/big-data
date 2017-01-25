@@ -1,5 +1,6 @@
 package storers.storers.maria;
 
+import org.apache.log4j.Logger;
 import storers.CSVLogger;
 import storers.storers.Timer;
 import storers.storers.maria.enums.DBEventType;
@@ -12,13 +13,14 @@ import java.sql.Statement;
  * Created by lcollingwood on 06/12/2016.
  */
 public abstract class QueryEvent implements Runnable {
+    private final static Logger LOG = Logger.getLogger(QueryEvent.class);
     private Statement statement;
     private boolean useASync;
     private CSVLogger csvLogger;
     private boolean wasSuccessful;
     private String errorMessage;
 
-    public DBEventType ACTION_TYPE;
+    private DBEventType ACTION_TYPE;
     public Connection connection;
     public String orderId;
     private boolean didBatch;
@@ -37,7 +39,7 @@ public abstract class QueryEvent implements Runnable {
         try {
             this.statement = connection.createStatement();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to create statement", e);
         }
     }
 
@@ -62,15 +64,8 @@ public abstract class QueryEvent implements Runnable {
             }
 
             if (doSingleQuery) {
-                try {
-                    statement = connection.createStatement();
-                    statement.execute(query);
-                    wasSuccessful = true;
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    wasSuccessful = false;
-                    errorMessage = e.getMessage();
-                }
+                statement = connection.createStatement();
+                statement.execute(query);
             }
 
             connection.commit();
@@ -84,7 +79,7 @@ public abstract class QueryEvent implements Runnable {
             }
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to execute query", e);
             wasSuccessful = false;
             errorMessage = e.getMessage();
         }
@@ -108,7 +103,7 @@ public abstract class QueryEvent implements Runnable {
         try {
             statement.addBatch(query);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to execute query", e);
         }
     }
 }

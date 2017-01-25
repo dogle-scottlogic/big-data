@@ -17,13 +17,12 @@ import java.util.HashMap;
  */
 public class Update extends ComboQuery {
 
-    public Update(Session cassandraConnection, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
-        super(cassandraConnection, mariaConnection, logger, DBEventType.UPDATE, type);
+    public Update(Session cassandraConnection, PreparedStatement orderPreparedStatement, PreparedStatement lineItemPreparedStatement, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
+        super(cassandraConnection, orderPreparedStatement, lineItemPreparedStatement, mariaConnection, logger, DBEventType.UPDATE, type);
         addToBatch(order);
     }
 
     public void addToBatch(Order order) throws SQLException {
-        String keyspaceName = getCassandraConnection().getLoggedKeyspace();
 
         if (getDbtype() == DBType.MARIA_DB) {
             getMariaBatch().addBatch("UPDATE orders.`order` " +
@@ -35,23 +34,21 @@ public class Update extends ComboQuery {
 
         for (int i = 0; i < order.getLineItems().size(); i++) {
             HashMap<String, String> lineItem = order.getLineItems().get(i);
-            addLineItemToBatch(lineItem, keyspaceName, order);
+            addLineItemToBatch(lineItem, order);
         }
 
         if (getDbtype() == DBType.CASSANDRA) {
-            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.updateOrder(keyspaceName));
-            getCassandraBatch().add(p.bind(order.getDate(), order.getStatus(), order.getSubTotal(), order.getOrderId()));
+            getCassandraBatch().add(getOrderPreparedStatement().bind(order.getDate(), order.getStatus(), order.getSubTotal(), order.getOrderId()));
         }
     }
 
-    public void addLineItemToBatch(HashMap<String, String> lineItem, String keyspaceName, Order order) throws SQLException {
+    public void addLineItemToBatch(HashMap<String, String> lineItem, Order order) throws SQLException {
         String lineItemId = lineItem.get("id");
         int quantity = Integer.parseInt(lineItem.get("quantity"));
         double linePrice = Double.parseDouble(lineItem.get("linePrice"));
 
         if (getDbtype() == DBType.CASSANDRA) {
-            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.updateLineItem(keyspaceName));
-            getCassandraBatch().add(p.bind(quantity, linePrice, lineItemId, order.getOrderId()));
+            getCassandraBatch().add(getLineItemPreparedStatement().bind(quantity, linePrice, lineItemId, order.getOrderId()));
         }
 
         // Maria

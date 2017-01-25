@@ -18,13 +18,11 @@ public class HatUpdaterTest {
 
     private Hat hat = new Hat(UUID.randomUUID(), Enums.ProductType.HAT, "TestHat", "Red", "L", 20.22, 43.44);
     private HatUpdater hatUpdater;
-    private Random random;
-    private int seed = 1234;
 
     @Before
     public void setUp() throws Exception {
-        random = new Random(this.seed);
-        this.hatUpdater = new HatUpdater(this.random);
+        Random random = new Random(1234);
+        this.hatUpdater = new HatUpdater(random);
     }
 
     @After

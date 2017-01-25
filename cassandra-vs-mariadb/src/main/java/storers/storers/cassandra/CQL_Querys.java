@@ -6,23 +6,20 @@ package storers.storers.cassandra;
 public class CQL_Querys {
 
     public static String createKeySpace(String keyspaceName, int replication) {
-        String query = "CREATE KEYSPACE IF NOT EXISTS " + keyspaceName + " WITH replication "
+        return "CREATE KEYSPACE IF NOT EXISTS " + keyspaceName + " WITH replication "
                 + "= {'class':'SimpleStrategy', 'replication_factor':" + replication + "}; ";
-        return query;
     }
 
     public static String dropKeySpace(String keyspaceName) {
-        String query = "Drop KEYSPACE " + keyspaceName;
-        return query;
+        return "Drop KEYSPACE " + keyspaceName;
     }
 
     public static String dropTable(String tableName) {
-        String query = "DROP TABLE IF EXISTS " + tableName + ";";
-        return query;
+        return "DROP TABLE IF EXISTS " + tableName + ";";
     }
 
     public static String createLineItemTable(String keyspaceName) {
-        String query = "CREATE TABLE IF NOT EXISTS " + keyspaceName + ".lineItems_by_orderId"
+        return "CREATE TABLE IF NOT EXISTS " + keyspaceName + ".lineItems_by_orderId"
                 + "( order_id text, "
                 + "lineItem_id text, "
                 + "product_id text, "
@@ -30,11 +27,10 @@ public class CQL_Querys {
                 + "line_price double, "
                 + "PRIMARY KEY (order_id, lineItem_id)"
                 + ");";
-        return query;
     }
 
     public static String createOrderTable(String keyspaceName) {
-        String query = "CREATE TABLE IF NOT EXISTS " + keyspaceName + ".orders"
+        return "CREATE TABLE IF NOT EXISTS " + keyspaceName + ".orders"
                 + "( order_id text, "
                 + "lineItem_ids list<text>, "
                 + "client_id text, "
@@ -43,21 +39,18 @@ public class CQL_Querys {
                 + "order_subTotal double, "
                 + "PRIMARY KEY (order_id)"
                 + ");";
-        return query;
     }
 
     public static String addLineItem(String keyspaceName) {
-        String query = "INSERT INTO " + keyspaceName + ".lineItems_by_orderId" +
+        return "INSERT INTO " + keyspaceName + ".lineItems_by_orderId" +
                 "( order_id, lineItem_id, product_id, quantity, line_price ) " +
                 "VALUES (?, ?, ?, ?, ?);";
-        return query;
     }
 
     public static String addOrder(String keyspaceName) {
-        String query = "INSERT INTO " + keyspaceName + ".orders"
+        return "INSERT INTO " + keyspaceName + ".orders"
                 + "( order_id, lineItem_ids, client_id, date_created, status, order_subTotal ) "
                 + "VALUES (?, ?, ?, ?, ?, ?);";
-        return query;
     }
 
     public static String updateLineItem(String keyspaceName) {

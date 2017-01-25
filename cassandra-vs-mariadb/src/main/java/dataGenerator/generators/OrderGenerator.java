@@ -41,7 +41,7 @@ public class OrderGenerator {
     }
     
     public ArrayList<Order> generateOrders(int n) {
-        ArrayList<Order> orders = new ArrayList();
+        ArrayList<Order> orders = new ArrayList<>();
         for (int i = 0; i < n; i++) {
             orders.add(this.generateOrder());
         }

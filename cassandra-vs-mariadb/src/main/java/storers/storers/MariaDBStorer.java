@@ -2,6 +2,7 @@ package storers.storers;
 
 import com.zaxxer.hikari.HikariDataSource;
 import dataGenerator.data_handlers.Settings;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.maria.*;
@@ -20,6 +21,7 @@ import java.util.List;
  * Takes as input events from The Hat Shop as JSON data and as appropriate Creates, Updates and Deletes Order data.
  */
 public class MariaDBStorer implements Storer {
+    private final static Logger LOG = Logger.getLogger(MariaDBStorer.class);
     private static final List<Connection> synchronisedConnections = new ArrayList<>();
     private static final List<HikariDataSource> hikariDataSources = new ArrayList<>();
     private static final String[] mariaIps = Settings.getStringVmSetting("MARIA_IPS").split(",");
@@ -114,7 +116,7 @@ public class MariaDBStorer implements Storer {
                 queryConnection = getSynchronisedConnection();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to handle message", e);
         }
 
         switch (eventType) {
