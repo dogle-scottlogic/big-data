@@ -33,18 +33,20 @@ Delete its block from `main.tf`. Run `terraform plan` / `terraform apply`.
 
 #### Running Analysis tests
 
-After running the `./start-cluster` script as described above then the analysis test can be run.
+After running `terraform apply` as described above then the analysis test script can be run.
 
-If you don't already have vagrant scp, install it with `vagrant plugin install vagrant-scp`
+To run tests on a particular cluster
+```
+./run-tests.sh <CLUSTER_NAME> <TESTS_TO_RUN>
+```
 
-Run `./run-analysis` to run all the analysis tests from a sparate vm in AWS.
-* To run the tests in a virtual box vm pass `-v` (you need to have started the cluster in virtual box as well for this to work)
-* To run specific tests pass `-t` followed by a comma separated list of the tests you want to run e.g.
-    * `-t showdown.RandomEventTest`
-    * `-t showdown.CreateEvent.Create500`
-* To run the tests with gradle in debug mode pass `-d`
+e.g.
 
-If the databases have been started in Virtualbox the tests can also just be run locally though an IDE or gradle.
+```
+./run-tests.sh cluster_3 showdown.RandomEventTest
+```
+
+This job will run the tests on the cluster and then copy the results into a timestamped directory in `out/`.
 
 ### Data Generator
 

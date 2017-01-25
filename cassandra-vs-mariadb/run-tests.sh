@@ -2,6 +2,11 @@
 
 cd terraform
 
+# INPUTS
+CLUSTER_NAME=$1 # Cluster name as defined in main.tf module, e.g. cluster_3
+shift
+TESTS_TO_RUN=$* # Rest of args are test arguments
+
 show_clusters() {
   echo Clusters available:
   echo
@@ -24,9 +29,7 @@ clean_test_client() {
   terraform apply
 }
 
-CLUSTER_NAME=$1 # Cluster name as defined in main.tf module, e.g. cluster_3
-shift
-TESTS_TO_RUN=$* # Rest of args are test arguments
+# Check inputs
 [[ -z $CLUSTER_NAME ]] && echo Must pass CLUSTER_NAME && echo && show_clusters && exit 1
 [[ -z $TESTS_TO_RUN ]] && echo Must pass TESTS_TO_RUN, e.g. "showdown.RandomEventTest" && exit 1
 echo Running tests on cluster $CLUSTER_NAME
