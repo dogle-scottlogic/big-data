@@ -26,6 +26,11 @@ cassandra-vs-mariadb/awscredentials.rb
 # out files
 cassandra-vs-mariadb/out/galera.cnf.*
 
+# terraform stuff
+cassandra-vs-mariadb/terraform/.terraform/*
+cassandra-vs-mariadb/terraform/terraform.tfstate*
+cassandra-vs-mariadb/terraform/terraform.tfvars
+
 # Sensitive or high-churn files:
 .idea/dataSources/
 .idea/dataSources.ids
