@@ -2,44 +2,34 @@
 
 ### Getting Started
 
+These instructions are only suppored in git bash.
+
+#### Install packages
+
+Ensure [Terraform](https://www.terraform.io/downloads.html) is installed. 
+
 #### Setup AWS access
 
-1. Copy `awscredentials.rb.template` to `awscredentials.rb`.
 1. Create an AWS account and sign in.
-1. [Create a new user](https://console.aws.amazon.com/iam/home?#users) with programmatic access. Create a new user group with AmazonEC2FullAccess policy. You will be displayed the 'Access Key ID' and the 'Secret Access Key'. Update `AWS_KEY` and `AWS_SECRET` with these values. 
-1. [Create a new SSH key](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#KeyPairs:sort=keyName). Name this key dev. It will be automatically downloaded for you. Move the downloaded key to `keys/dev.pem`.
-1. [Create a new security group for the Cassandra instances](https://eu-west-2.console.aws.amazon.com/ec2/v2/home?region=eu-west-2#SecurityGroups:sort=groupId). Add the security group *ID* to `awscredentials.rb`. Add the following inbound rules.
-    * SSH, 22, anwhere
-    * Custom TCP, 3306, anywhere
-    * Custom TCP, 7000-7001, anywhere
-    * Custom TCP, 7199, anywhere
-    * Custom TCP, 9042, anywhere
-    * Custom TCP, 9160, anywhere
-    * ALL Traffic, ALL, 172.31.0.0/20
-1. [Create a subnet](https://eu-west-2.console.aws.amazon.com/vpc/home?region=eu-west-2#subnets) and copy and paste its ID into `awscredentials.rb`. Use `172.31.0.0/20` as the CIDR.
-1. [Install the Amazon CLI](https://aws.amazon.com/cli/) and add it to your PATH. Configure it with `aws configure` using the same credentials you added to`awscredentials.rb`. Set the default region name to `eu-west-2`.
+1. [Create a new user](https://console.aws.amazon.com/iam/home?#users) with programmatic access. Create a new user group with AmazonEC2FullAccess policy. You will be displayed the 'Access Key ID' and the 'Secret Access Key'. Create `terraform/terraform.tfvars` with these values:
+```
+access_key=<ACCESS_KEY>
+secret_key=<SECRET_KEY>
+```
+1. In git bash, ensure that an `id_rsa` / `id_rsa.pub` pair exist at `~/.ssh`.
 
-#### Install Vagrant and VirtualBox
+#### Define your clusters
 
-1. Install the latest versions of [Vagrant](https://www.vagrantup.com/downloads.html) and [VirtualBox](https://www.virtualbox.org/). At the time of writing these are Vagrant 1.9.1 and VirtualBox 5.1.12.
-1. Install the Vagrant AWS plugin: `vagrant plugin install vagrant-aws`
+* In `terraform/main.tf` a 3 node cluster, `cluster_3`, is defined for you. This cluster will contain 3 Cassandra nodes, 3 MariaDB nodes, and a test client.
+* If you want additional clusters, copy and paste the `module` and 3 `output` blocks. Change the `num_nodes` parameter to suit.
 
-#### Start Cluster
+#### Spinning up your clusters
 
-Run `./start-cluster`. This will spin up and start Cassandra and MariaDB instances.
+From within the `terraform/` directory, run `terraform plan`. This will show you what AWS resources will be created and deleted if you choose to apply this config. If everything is ok, run `terraform apply`. Once this completes, you can see the public IPs you can use to access the cluster with `terraform output`. To log in, run `ssh ubuntu@<PUBLIC_IP>`. No password will be required.
 
-* To start the instances in Virtualbox instead, pass `-v`
-* To start just Cassandra, pass `-c`
-* To start just MariaDB, pass `-m`
+#### Deleting a cluster
 
-#### Start Cassandra service
-
-Note you cannot `vagrant up` the VirtualBox provider if the AWS provider has instances created. Destroy these instances before trying the start the VirtualBox provider.
-
-#### Cleaning up
-
-* `vagrant halt` powers off the VMs.
-* `vagrant destroy` terminates and cleans up the VMs.
+Delete its block from `main.tf`. Run `terraform plan` / `terraform apply`.
 
 #### Running Analysis tests
 
