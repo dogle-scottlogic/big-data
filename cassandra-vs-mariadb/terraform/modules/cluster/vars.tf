@@ -1,7 +1,3 @@
-variable "ami_creation_mode" {
-  description = "If set to true, only bootstrap nodes, ready for saving as AMIs"
-  default     = "false"
-}
 variable "num_nodes" {
   description = "The number of nodes each database should have"
 }
@@ -18,10 +14,10 @@ variable "private_key" {
   description = "Private key to use when connecting"
 }
 variable "cassandra_ami" {
-  default = "ami-57eae033" // Ubuntu 16.04
+  description = "Bootstrapped AMI created by the ami module"
 }
 variable "mariadb_ami" {
-  default = "ami-57eae033" // Ubuntu 16.04
+  description = "Bootstrapped AMI created by the ami module"
 }
 variable "mariadb_password" {
   description = "Root password for mariadb"

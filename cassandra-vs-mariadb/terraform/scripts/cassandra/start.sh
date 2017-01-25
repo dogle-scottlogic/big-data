@@ -13,7 +13,7 @@ areInCluster() {
 echo $HOSTNAME is attempting to join cluster...
 
 # Start the Cassandra service
-service cassandra start
+sudo service cassandra start
 
 # Wait for us to join the cluster
 ii=0

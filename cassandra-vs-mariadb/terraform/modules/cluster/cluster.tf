@@ -1,6 +1,5 @@
 module "cassandra" {
   source              = "cassandra"
-  ami_creation_mode   = "${var.ami_creation_mode}"
   ami                 = "${var.cassandra_ami}"
   num_nodes           = "${var.num_nodes}"
   cluster_name        = "${var.cluster_name}"
@@ -11,8 +10,8 @@ module "cassandra" {
 
 module "mariadb" {
   source              = "mariadb"
-  ami_creation_mode   = "${var.ami_creation_mode}"
   ami                 = "${var.mariadb_ami}"
+  mariadb_password    = "${var.mariadb_password}"
   num_nodes           = "${var.num_nodes}"
   cluster_name        = "${var.cluster_name}"
   key_name            = "${var.key_name}"

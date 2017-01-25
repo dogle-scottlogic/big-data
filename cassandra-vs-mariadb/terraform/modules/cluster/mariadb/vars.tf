@@ -1,7 +1,3 @@
-variable "ami_creation_mode" {
-  description = "If set to true, only bootstrap nodes, ready for saving as AMIs"
-  default     = "false"
-}
 variable "num_nodes" {
   description = "The number of nodes each database should have"
 }
@@ -21,7 +17,6 @@ variable "ami" {
 }
 variable "mariadb_password" {
   description = "Root password for mariadb"
-  default     = "myfirstpassword"
 }
 variable "user" {
   description = "User to connect as"

@@ -7,6 +7,10 @@ MARIA_IPS=$2
 PRIVATE_IP=$(ip addr show eth0 | grep -oP "inet [\d\.]+" | cut -d" " -f2)
 GALERA_CONFIG=/etc/mysql/conf.d/galera.cnf
 
+# Ensure MariaDB is stopped and in initial state
+service mysql stop
+rm -rf /var/lib/mysql/*
+
 # Copy config into place and munge it
 cp /tmp/scripts/mariadb/galera.cnf.template $GALERA_CONFIG
 sed -i -r "s#IPS_CSV#$MARIA_IPS#g" $GALERA_CONFIG

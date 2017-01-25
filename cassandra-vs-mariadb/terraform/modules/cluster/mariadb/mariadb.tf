@@ -1,4 +1,3 @@
-// Setup indivprivate_ipual instances
 resource "aws_instance" "mariadb" {
   ami             = "${var.ami}"
   instance_type   = "${var.instance_type}"
@@ -22,20 +21,16 @@ resource "aws_instance" "mariadb" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get install -y dos2unix",
       "dos2unix /tmp/scripts/*/*",
       "chmod a+x /tmp/scripts/*/*",
-      "echo chmod-ed all scripts",
-      "sudo /tmp/scripts/common/bootstrap.sh",
-      "sudo /tmp/scripts/mariadb/bootstrap.sh ${var.mariadb_password}"
+      "echo chmod-ed all scripts"
     ]
   }
 }
 
 resource "null_resource" "mariadb-cluster-config" {
-  count = "${var.ami_creation_mode ? 0 : var.num_nodes}" // Disable configuration if only creating AMIs
+  count = "${var.num_nodes}"
   triggers {
-    password  = "${var.mariadb_password}"
     maria_ips = "${join(",", aws_instance.mariadb.*.private_ip)}"
     // Change to any instance of the cluster requires reprovisioning
     cluster_instance_ids = "${join(",", aws_instance.mariadb.*.id)}"
@@ -45,10 +40,6 @@ resource "null_resource" "mariadb-cluster-config" {
     user        = "${var.user}"
     private_key = "${var.private_key}"
   }
-  provisioner "file" {
-    source = "scripts"
-    destination = "/tmp/scripts"
-  }
   provisioner "remote-exec" {
     inline = [
       "sudo /tmp/scripts/mariadb/config.sh maria${count.index} ${join(",", aws_instance.mariadb.*.private_ip)}"
@@ -57,8 +48,7 @@ resource "null_resource" "mariadb-cluster-config" {
 }
 
 resource "null_resource" "mariadb-cluster-primary" {
-  depends_on  = ["null_resource.mariadb-cluster-config"]
-  count = "${var.ami_creation_mode ? 0 : 1}" // Disable configuration if only creating AMIs
+  depends_on = ["null_resource.mariadb-cluster-config"]
   triggers {
     password  = "${var.mariadb_password}"
     maria_ips = "${join(",", aws_instance.mariadb.*.private_ip)}"
@@ -79,7 +69,6 @@ resource "null_resource" "mariadb-cluster-primary" {
 
 resource "null_resource" "mariadb-cluster-start" {
   depends_on = ["null_resource.mariadb-cluster-primary"]
-  count = "${var.ami_creation_mode ? 0 : 1}" // Disable configuration if only creating AMIs
   triggers {
     password  = "${var.mariadb_password}"
     maria_ips = "${join(",", aws_instance.mariadb.*.private_ip)}"

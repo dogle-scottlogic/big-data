@@ -6,6 +6,10 @@ echo SEED_IP=$SEED_IP
 CONFIG=/etc/cassandra/cassandra.yaml
 [[ -z $SEED_IP ]]      && echo Must pass seed IP && exit 1
 
+# Ensure Cassandra is in a stopped, clean state.
+service cassandra stop
+rm -rf /var/lib/cassandra/*
+
 # Crudely hack our settings into the config yaml file
 
 # Use first VM as seed

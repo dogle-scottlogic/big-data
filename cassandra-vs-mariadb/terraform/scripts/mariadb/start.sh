@@ -10,7 +10,7 @@ areInCluster() {
 }
 
 # Ensure the bind-address is commented out so that the DB doesn't bind to the loopback interface.
-sudo sed -i -r 's|^\s*(bind-address.*)|# \1|' /etc/mysql/my.cnf
+sed -i -r 's|^\s*(bind-address.*)|# \1|' /etc/mysql/my.cnf
 
 # Join the cluster
 echo $HOSTNAME is attempting to join cluster...

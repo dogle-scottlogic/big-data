@@ -1,4 +1,4 @@
-// Setup indivprivate_ipual instances
+// Setup individual instances
 resource "aws_instance" "cassandra" {
   ami             = "${var.ami}"
   instance_type   = "${var.instance_type}"
@@ -22,21 +22,17 @@ resource "aws_instance" "cassandra" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo apt-get install -y dos2unix",
       "dos2unix /tmp/scripts/*/*",
       "chmod a+x /tmp/scripts/*/*",
-      "echo chmod-ed all scripts",
-      "sudo /tmp/scripts/common/bootstrap.sh",
-      "sudo /tmp/scripts/cassandra/bootstrap.sh"
+      "echo chmod-ed all scripts"
     ]
   }
 }
 
 resource "null_resource" "cassandra-cluster-config" {
-  count = "${var.ami_creation_mode ? 0 : var.num_nodes}" // Disable configuration if only creating AMIs
+  count = "${var.num_nodes}"
   triggers {
     seed_ip = "${aws_instance.cassandra.0.private_ip}"
-    this_ip = "${element(aws_instance.cassandra.*.private_ip, count.index)}"
     // Change to this instance requires reprovisioning
     this_id = "${element(aws_instance.cassandra.*.id, count.index)}"
   }
@@ -44,10 +40,6 @@ resource "null_resource" "cassandra-cluster-config" {
     host        = "${element(aws_instance.cassandra.*.public_ip, count.index)}"
     user        = "${var.user}"
     private_key = "${var.private_key}"
-  }
-  provisioner "file" {
-    source = "scripts"
-    destination = "/tmp/scripts"
   }
   provisioner "remote-exec" {
     inline = [
@@ -57,7 +49,6 @@ resource "null_resource" "cassandra-cluster-config" {
 }
 
 resource "null_resource" "cassandra-cluster-start" {
-  count = "${var.ami_creation_mode ? 0 : 1}" // Disable configuration if only creating AMIs
   depends_on = ["null_resource.cassandra-cluster-config"]
   triggers {
     seed_ip = "${aws_instance.cassandra.0.private_ip}"
