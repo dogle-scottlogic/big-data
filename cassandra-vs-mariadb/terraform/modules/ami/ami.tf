@@ -26,7 +26,9 @@ resource "aws_instance" "cassandra" {
       "chmod a+x /tmp/scripts/*/*",
       "echo chmod-ed all scripts",
       "sudo /tmp/scripts/common/bootstrap.sh",
-      "sudo /tmp/scripts/cassandra/bootstrap.sh"
+      "sudo /tmp/scripts/cassandra/bootstrap.sh",
+      "mkdir -p /home/ubuntu/analysis/src",
+      "mkdir -p /home/ubuntu/analysis/testLogs"
     ]
   }
 }
@@ -63,7 +65,7 @@ resource "aws_instance" "mariadb" {
   }
 }
 
-resource "aws_instance" "test-client" {
+resource "aws_instance" "test" {
   ami             = "${var.ami}"
   instance_type   = "${var.instance_type}"
   security_groups = ["${var.security_group_name}"]
@@ -106,5 +108,5 @@ resource "aws_ami_from_instance" "mariadb_ami" {
 
 resource "aws_ami_from_instance" "test-client_ami" {
   name = "test-client-ami"
-  source_instance_id = "${aws_instance.test-client.id}"
+  source_instance_id = "${aws_instance.test.id}"
 }

@@ -31,6 +31,9 @@ cassandra-vs-mariadb/terraform/.terraform/*
 cassandra-vs-mariadb/terraform/terraform.tfstate*
 cassandra-vs-mariadb/terraform/terraform.tfvars
 
+# terraform output
+cassandra-vs-mariadb/terraform/out/testLogs-*
+
 # Sensitive or high-churn files:
 .idea/dataSources/
 .idea/dataSources.ids

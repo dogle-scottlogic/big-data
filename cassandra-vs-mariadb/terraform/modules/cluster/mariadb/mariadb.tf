@@ -80,3 +80,20 @@ resource "null_resource" "mariadb-cluster-start" {
   }
 }
 
+// Setup access to test client
+resource "null_resource" "setup_access" {
+  triggers = {
+    cluster_instance_ids = "${join(",", aws_instance.mariadb.*.id)}"
+    test_client_ip       = "${var.test_client_ip}"
+  }
+  connection = {
+    host        = "${aws_instance.mariadb.0.public_ip}"
+    user        = "${var.user}"
+    private_key = "${var.private_key}"
+  }
+  provisioner "remote-exec" {
+    inline = [
+      "/tmp/scripts/mariadb/allow-access.sh ${var.test_client_ip} ${var.mariadb_password}"
+    ]
+  }
+}

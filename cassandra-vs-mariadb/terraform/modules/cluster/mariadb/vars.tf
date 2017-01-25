@@ -18,6 +18,9 @@ variable "ami" {
 variable "mariadb_password" {
   description = "Root password for mariadb"
 }
+variable "test_client_ip" {
+  description = "Private IP of test client"
+}
 variable "user" {
   description = "User to connect as"
   default     = "ubuntu"
