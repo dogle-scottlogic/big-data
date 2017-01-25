@@ -1,13 +1,17 @@
 package storers.consumers;
 
 import com.rabbitmq.client.*;
+import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by lcollingwood on 30/11/2016.
  */
 public class LogToConsoleRabbitMQ {
+    private final static Logger LOG = Logger.getLogger(LogToConsoleRabbitMQ.class);
     private final static String QUEUE_NAME = "event-queue";
     private final static String HOST_NAME = "localhost";
 
@@ -28,11 +32,11 @@ public class LogToConsoleRabbitMQ {
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body
                 ) throws UnsupportedEncodingException {
                     String message = new String(body, "UTF-8");
-                    System.out.println("Received '" + message + "'");
+                    LOG.info("Received '" + message + "'");
                 }
             };
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (TimeoutException | IOException e) {
+            LOG.warn("Failed to initialise", e);
         }
     }
 
@@ -42,12 +46,12 @@ public class LogToConsoleRabbitMQ {
 
     public static void on() {
         LogToConsoleRabbitMQ.initialise();
-        System.out.println("Listening...");
+        LOG.info("Listening...");
 
         try {
             channel.basicConsume(QUEUE_NAME, true, consumer);
         } catch (java.io.IOException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to consume message", e);
         }
     }
 
@@ -55,8 +59,8 @@ public class LogToConsoleRabbitMQ {
         try {
             channel.close();
             connection.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | TimeoutException e) {
+            LOG.warn("Failed to close connection", e);
         }
     }
 }

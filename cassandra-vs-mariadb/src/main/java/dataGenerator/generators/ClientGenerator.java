@@ -6,6 +6,7 @@
 package dataGenerator.generators;
 
 import dataGenerator.entities.Client;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
@@ -16,11 +17,9 @@ import java.util.UUID;
  */
 public class ClientGenerator {
 
-    private final Random random;
     private final DataGenerator dataGenerator;
 
     public ClientGenerator(Random random) {
-        this.random = random;
         this.dataGenerator = new DataGenerator(random);
     }
 
@@ -37,7 +36,6 @@ public class ClientGenerator {
         String name = dataGenerator.getNames(1)[0];
         String address = dataGenerator.getAddresses(1)[0];
         String email = dataGenerator.getEmail(name);
-        Client newClient = new Client(clientUUID, name, address, email);
-        return newClient;
+        return new Client(clientUUID, name, address, email);
     }
 }

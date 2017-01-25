@@ -1,13 +1,17 @@
 package dataGenerator.consumers;
 
 import com.rabbitmq.client.*;
+import org.apache.log4j.Logger;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by lcollingwood on 30/11/2016.
  */
 public class ConsoleLogger {
+    private final static Logger LOG = Logger.getLogger(ConsoleLogger.class);
     private final static String QUEUE_NAME = "event-queue";
     private final static String HOST_NAME = "localhost";
 
@@ -16,7 +20,7 @@ public class ConsoleLogger {
     private static Channel channel;
     private static Consumer consumer;
 
-    public static void initialise() {
+    private static void initialise() {
         try {
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
@@ -28,11 +32,11 @@ public class ConsoleLogger {
                     String consumerTag, Envelope envelope, AMQP.BasicProperties properties, byte[] body
                 ) throws UnsupportedEncodingException {
                     String message = new String(body, "UTF-8");
-                    System.out.println("Received '" + message + "'");
+                    LOG.info("Received '" + message + "'");
                 }
             };
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (TimeoutException | IOException e) {
+            LOG.warn("Failed to initialise", e);
         }
     }
 
@@ -42,12 +46,12 @@ public class ConsoleLogger {
 
     public static void on() {
         ConsoleLogger.initialise();
-        System.out.println("Listening...");
+        LOG.info("Listening...");
 
         try {
             channel.basicConsume(QUEUE_NAME, true, consumer);
         } catch (java.io.IOException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to consume channel", e);
         }
     }
 
@@ -55,8 +59,8 @@ public class ConsoleLogger {
         try {
             channel.close();
             connection.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (TimeoutException | IOException e) {
+            LOG.warn("Failed to close channel", e);
         }
     }
 }

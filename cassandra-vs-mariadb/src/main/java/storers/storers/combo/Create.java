@@ -2,19 +2,14 @@ package storers.storers.combo;
 
 import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.Order;
-import storers.storers.cassandra.CQL_Querys;
 import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.DBType;
-
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -22,16 +17,15 @@ import java.util.HashMap;
  */
 public class Create extends ComboQuery {
 
-    private ArrayList<String> lineItemsIds = new ArrayList<String>();
+    private ArrayList<String> lineItemsIds = new ArrayList<>();
     private String mariaLineItemQuery = "INSERT INTO orders.line_item(order_id, product_id, quantity) VALUES";
 
-    public Create(Session cassandraConnection, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
-        super(cassandraConnection, mariaConnection, logger, DBEventType.CREATE, type);
+    public Create(Session cassandraConnection, PreparedStatement orderPreparedStatement, PreparedStatement lineItemPreparedStatement, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
+        super(cassandraConnection, orderPreparedStatement, lineItemPreparedStatement, mariaConnection, logger, DBEventType.CREATE, type);
         addToBatch(order);
     }
 
     public void addToBatch(Order order) throws SQLException {
-        String keyspaceName = getCassandraConnection().getLoggedKeyspace();
 
         if (getDbtype() == DBType.MARIA_DB) {
             // Maria (Create Order Query)
@@ -40,7 +34,7 @@ public class Create extends ComboQuery {
 
         for (int i = 0; i < order.getLineItems().size(); i++) {
             HashMap<String, String> lineItem = order.getLineItems().get(i);
-            addLineItemToBatch(lineItem, order, keyspaceName);
+            addLineItemToBatch(lineItem, order);
         }
 
         if (getDbtype() == DBType.MARIA_DB) {
@@ -50,12 +44,11 @@ public class Create extends ComboQuery {
 
         // Add prepared statement to batch
         if (getDbtype() == DBType.CASSANDRA) {
-            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.addOrder(keyspaceName));
-            getCassandraBatch().add(p.bind(order.getOrderId(), this.lineItemsIds, order.getClientId(), order.getDate(), order.getStatus(), order.getSubTotal()));
+            getCassandraBatch().add(getOrderPreparedStatement().bind(order.getOrderId(), this.lineItemsIds, order.getClientId(), order.getDate(), order.getStatus(), order.getSubTotal()));
         }
     }
 
-    private void addLineItemToBatch(HashMap<String, String> lineItem, Order order, String keyspaceName) throws SQLException {
+    private void addLineItemToBatch(HashMap<String, String> lineItem, Order order) throws SQLException {
         // Extract values
         String lineItemId = lineItem.get("id");
         String productId = lineItem.get("productId");
@@ -64,8 +57,7 @@ public class Create extends ComboQuery {
 
         if (getDbtype() == DBType.CASSANDRA) {
             // Add Cassandra Batch Statement
-            PreparedStatement p = getCassandraConnection().prepare(CQL_Querys.addLineItem(keyspaceName));
-            getCassandraBatch().add(p.bind(order.getOrderId(), lineItemId, productId, quantity, linePrice));
+            getCassandraBatch().add(getLineItemPreparedStatement().bind(order.getOrderId(), lineItemId, productId, quantity, linePrice));
             this.lineItemsIds.add("'" + lineItemId + "'");
         }
 

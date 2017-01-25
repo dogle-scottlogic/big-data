@@ -9,8 +9,6 @@ import storers.CSVLogger;
 import storers.storers.Combo;
 import storers.storers.maria.enums.DBType;
 
-import java.io.File;
-
 /**
  * Created by lcollingwood on 16/12/2016.
  */

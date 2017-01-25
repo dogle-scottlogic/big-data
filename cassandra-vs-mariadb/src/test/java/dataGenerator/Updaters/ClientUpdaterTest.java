@@ -5,7 +5,6 @@ import dataGenerator.entities.Order;
 import dataGenerator.enums.Enums;
 import dataGenerator.generators.ClientGenerator;
 import dataGenerator.generators.LineItemGenerator;
-import dataGenerator.generators.OrderGenerator;
 import dataGenerator.generators.ProductGenerator;
 import org.junit.After;
 import org.junit.Before;

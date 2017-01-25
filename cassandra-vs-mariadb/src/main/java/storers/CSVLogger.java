@@ -1,5 +1,7 @@
 package storers;
 
+import org.apache.log4j.Logger;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,6 +11,7 @@ import java.io.IOException;
  */
 public class CSVLogger {
 
+    private final static Logger LOG = Logger.getLogger(CSVLogger.class);
     private static final String DEFAULT_FOLDER = "./testLogs";
     private boolean doNotLog;
     private String folderName;
@@ -35,7 +38,7 @@ public class CSVLogger {
     }
 
     public void logEvent(String[] eventData, boolean header) {
-        String logLine = "";
+        String logLine;
         synchronized (this) {
             if (!doNotLog) {
                 try {
@@ -44,9 +47,7 @@ public class CSVLogger {
                     logLine = eventDataToLogLine(eventData, header);
                     this.bufferedWriter.write(logLine);
                 } catch (IOException e) {
-                    System.out.println("Failed to write log line");
-                    System.out.println(e.getMessage());
-                    e.printStackTrace();
+                    LOG.warn("Failed to write log line", e);
                 } finally {
                     closeLog();
                 }
@@ -68,9 +69,7 @@ public class CSVLogger {
             if (this.bufferedWriter != null) this.bufferedWriter.close();
             if (this.fileWriter != null) this.fileWriter.close();
         } catch (IOException e) {
-            System.out.println("Failed to close writers");
-            System.out.println(e.getMessage());
-            e.printStackTrace();
+            LOG.warn("Failed to close writers", e);
         }
     }
 

@@ -106,3 +106,4 @@ cassandra-vs-mariadb/.gradle/3.1/taskArtifacts/fileSnapshots.bin
 cassandra-vs-mariadb/.gradle/3.1/taskArtifacts/taskArtifacts.bin
 cassandra-vs-mariadb/gradle/wrapper/gradle-wrapper.jar
 cassandra-vs-mariadb/gradle/wrapper/gradle-wrapper.properties
+cassandra-vs-mariadb/logs/*

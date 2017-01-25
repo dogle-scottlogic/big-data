@@ -1,7 +1,7 @@
 package dataGenerator.Updaters;
 
-import dataGenerator.entities.products.Hat;
 import dataGenerator.entities.LineItem;
+import dataGenerator.entities.products.Hat;
 import dataGenerator.enums.Enums;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by dogle on 02/12/2016.

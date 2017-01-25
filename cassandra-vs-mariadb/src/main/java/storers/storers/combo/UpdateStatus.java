@@ -1,6 +1,7 @@
 package storers.storers.combo;
 
 import com.datastax.driver.core.BoundStatement;
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.Session;
 import storers.CSVLogger;
 import storers.storers.Order;
@@ -16,8 +17,8 @@ import java.sql.SQLException;
  */
 public class UpdateStatus extends ComboQuery {
 
-    public UpdateStatus(Session cassandraConnection, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
-        super(cassandraConnection, mariaConnection, logger, DBEventType.UPDATE_STATUS, type);
+    public UpdateStatus(Session cassandraConnection, PreparedStatement orderPreparedStatement, PreparedStatement lineItemPreparedStatement, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
+        super(cassandraConnection, orderPreparedStatement, lineItemPreparedStatement, mariaConnection, logger, DBEventType.UPDATE_STATUS, type);
         addToBatch(order);
     }
 
@@ -36,10 +37,7 @@ public class UpdateStatus extends ComboQuery {
     }
 
     private BoundStatement prepareBoundStatement(String status, String orderId) {
-        String keyspaceName = getCassandraConnection().getLoggedKeyspace();
-        return getCassandraConnection()
-                .prepare(CQL_Querys.updateOrderStatus(keyspaceName))
-                .bind(status, orderId);
+        return getOrderPreparedStatement().bind(status, orderId);
     }
 
     private String prepareSQL(String status, String orderId) {

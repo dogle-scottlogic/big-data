@@ -1,17 +1,17 @@
 package storers.storers.combo;
 
 import com.datastax.driver.core.*;
-import com.datastax.driver.core.ResultSet;
-
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.common.util.concurrent.Futures;
-import storers.storers.Order;
-import storers.storers.maria.enums.DBEventType;
+import org.apache.log4j.Logger;
 import storers.CSVLogger;
+import storers.storers.Order;
 import storers.storers.Timer;
+import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.DBType;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
@@ -19,12 +19,15 @@ import java.util.ArrayList;
  * Created by lcollingwood on 14/12/2016.
  */
 public abstract class ComboQuery implements Runnable {
+    private final static Logger LOG = Logger.getLogger(ComboQuery.class);
     private DBEventType type;
     private DBType dbtype;
     private CSVLogger logger;
 
     // Cassandra
     private Session cassandraConnection;
+    private final PreparedStatement orderPreparedStatement;
+    private final PreparedStatement lineItemPreparedStatement;
     private BatchStatement cassandraBatch;
     private ArrayList<BoundStatement> cassandraQueryQueue;
 
@@ -34,16 +37,20 @@ public abstract class ComboQuery implements Runnable {
     private ArrayList<String> mariaQueryQueue;
 
     // Read Count Handler
-    final boolean[] readEventHappened = new boolean[]{false};
+    private final boolean[] readEventHappened = new boolean[]{false};
 
     public ComboQuery(
             Session cassandraConnection,
+            PreparedStatement orderPreparedStatement,
+            PreparedStatement lineItemPreparedStatement,
             Connection mariaConnection,
             CSVLogger logger,
             DBEventType type,
             DBType dbtype
     ) throws SQLException {
         this.cassandraConnection = cassandraConnection;
+        this.orderPreparedStatement = orderPreparedStatement;
+        this.lineItemPreparedStatement = lineItemPreparedStatement;
         this.cassandraBatch = new BatchStatement();
         this.cassandraQueryQueue = new ArrayList<BoundStatement>();
         this.mariaConnection = mariaConnection;
@@ -64,26 +71,8 @@ public abstract class ComboQuery implements Runnable {
         if (dbtype == DBType.MARIA_DB) {
             Timer mariaTimer = new Timer();
             mariaTimer.startTimer();
-//            ExecutorService executor = Executors.newCachedThreadPool();
             try {
                 if (type == DBEventType.READ) {
-//                    ArrayList<java.util.concurrent.Future<?>> futures = new ArrayList<java.util.concurrent.Future<?>>();
-//                    for (final String mariaQuery : mariaQueryQueue) {
-//                        futures.add(executor.submit(new Runnable() {
-//                            public void run() {
-//                                java.sql.ResultSet r = null;
-//                                try {
-//                                    r = getMariaBatch().executeQuery(mariaQuery);
-//                                    //noinspection StatementWithEmptyBody
-//                                    while (r.next()) { /* Iterate Over Results */ }
-//                                } catch (SQLException e) {
-//                                    e.printStackTrace();
-//                                }
-//                            }
-//                        }));
-//                        //noinspection StatementWithEmptyBody
-//                        while (!allFuturesComplete(futures)) { /* Waiting...*/ }
-//                    }
                     for (final String mariaQuery : mariaQueryQueue) {
                         java.sql.ResultSet r = getMariaBatch().executeQuery(mariaQuery);
                         //noinspection StatementWithEmptyBody
@@ -96,7 +85,7 @@ public abstract class ComboQuery implements Runnable {
                 }
                 getMariaConnection().commit();
             } catch (SQLException e) {
-                e.printStackTrace();
+                LOG.warn("Failed to apply database event", e);
                 mariaErrorMessage = e.getMessage();
                 mariaErrorMessage = mariaErrorMessage.replace("\n", " ");
                 mariaErrorMessage = mariaErrorMessage.replace(',', ' ');
@@ -111,10 +100,10 @@ public abstract class ComboQuery implements Runnable {
             // Cassandra
             Timer cassandraTimer = new Timer();
             cassandraTimer.startTimer();
-            ResultSetFuture futureOrders = getCassandraConnection().executeAsync(getCassandraBatch());
+            ResultSetFuture futureOrders = cassandraConnection.executeAsync(getCassandraBatch());
             if (type == DBEventType.READ) {
                 for (BoundStatement cassandraQuery : cassandraQueryQueue) {
-                    cassandraReadHandler(getCassandraConnection().executeAsync(cassandraQuery), "READ", cassandraTimer);
+                    cassandraReadHandler(cassandraConnection.executeAsync(cassandraQuery), "READ", cassandraTimer);
                 }
             } else {
                 queryHandler(futureOrders, type.toString(), cassandraTimer);
@@ -125,7 +114,7 @@ public abstract class ComboQuery implements Runnable {
             getMariaBatch().close();
             getMariaConnection().close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to close connections", e);
         }
     }
 
@@ -193,15 +182,19 @@ public abstract class ComboQuery implements Runnable {
         return this.mariaBatch;
     }
 
-    public Session getCassandraConnection() {
-        return this.cassandraConnection;
-    }
-
     public Connection getMariaConnection() {
         return mariaConnection;
     }
 
     public DBType getDbtype() {
         return dbtype;
+    }
+
+    protected PreparedStatement getOrderPreparedStatement() {
+        return orderPreparedStatement;
+    }
+
+    protected PreparedStatement getLineItemPreparedStatement() {
+        return lineItemPreparedStatement;
     }
 }

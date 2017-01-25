@@ -1,5 +1,6 @@
 package storers.storers;
 
+import org.apache.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -12,8 +13,9 @@ import java.util.HashMap;
  */
 public class Order {
 
+    private final static Logger LOG = Logger.getLogger(Order.class);
     private String orderId;
-    private ArrayList<HashMap<String, String>> lineItems = new ArrayList<HashMap<String, String>>();
+    private ArrayList<HashMap<String, String>> lineItems = new ArrayList<>();
     private String clientId;
     private String status;
     private Double subTotal;
@@ -32,18 +34,18 @@ public class Order {
             this.date = new Date(dateLong).toString();
             this.status = (String) data.get("status");
             JSONArray lineItems = (JSONArray) data.get("lineItems");
-            for (int i = 0; i < lineItems.size(); i++) {
+            for (Object lineItem1 : lineItems) {
                 // Extract values
-                HashMap<String, String> lineItemMap = new HashMap<String, String>();
-                JSONObject lineItem = (JSONObject) lineItems.get(i);
+                HashMap<String, String> lineItemMap = new HashMap<>();
+                JSONObject lineItem = (JSONObject) lineItem1;
                 lineItemMap.put("id", (String) lineItem.get("id"));
                 lineItemMap.put("productId", (String) ((JSONObject) lineItem.get("product")).get("id"));
                 lineItemMap.put("quantity", String.valueOf(lineItem.get("quantity")));
                 lineItemMap.put("linePrice", String.valueOf(lineItem.get("linePrice")));
                 this.lineItems.add(lineItemMap);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to create order", e);
         }
     }
 

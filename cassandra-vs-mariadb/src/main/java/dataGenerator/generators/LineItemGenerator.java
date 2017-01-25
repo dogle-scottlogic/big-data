@@ -6,12 +6,13 @@
 package dataGenerator.generators;
 
 import dataGenerator.data_handlers.Settings;
-import dataGenerator.entities.products.Hat;
 import dataGenerator.entities.LineItem;
+import dataGenerator.entities.products.Hat;
+import dataGenerator.enums.Enums.ProductType;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.UUID;
-import dataGenerator.enums.Enums.ProductType;
 
 /**
  *
@@ -32,7 +33,7 @@ public class LineItemGenerator {
     }
 
     public ArrayList<LineItem> generateLineItems(int num) {
-        ArrayList<LineItem> items = new ArrayList();
+        ArrayList<LineItem> items = new ArrayList<>();
         for(int i = 0; i < num; i++) {
             //get a random product
             int productIndex = random.nextInt(productList.length);
@@ -55,8 +56,7 @@ public class LineItemGenerator {
     
     private LineItem getHatLineItem(UUID id, Hat hat) {
         int quantity = random.nextInt(this.maxQuantity) + 1;
-        LineItem lineItem = new LineItem(id, hat, quantity);
-        return lineItem;
+        return new LineItem(id, hat, quantity);
     }
 
     public int getMaxQuantity() {

@@ -24,7 +24,7 @@ public class OrderCreateEvent extends QueryEvent {
         String clientId = (String) client.get("id");
         Long date = (Long) data.get("date");
         String status = (String) data.get("status");
-        doQuery("INSERT INTO orders.`order` VALUES('" + orderId + "', '" + clientId + "', '" + Long.valueOf(date).toString() + "', '" + status + "');");
+        doQuery("INSERT INTO orders.`order` VALUES('" + orderId + "', '" + clientId + "', '" + date.toString() + "', '" + status + "');");
         JSONArray lineItems = (JSONArray) data.get("lineItems");
         createLineItems(orderId, lineItems);
         end();
@@ -47,6 +47,6 @@ public class OrderCreateEvent extends QueryEvent {
         JSONObject product = (JSONObject) lineItem.get("product");
         String productId = (String) product.get("id");
         Long quantity = (Long) lineItem.get("quantity");
-        return "('" + orderId + "', '" + productId + "', " + Long.valueOf(quantity).toString() + ")";
+        return "('" + orderId + "', '" + productId + "', " + quantity.toString() + ")";
     }
 }

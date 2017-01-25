@@ -1,21 +1,24 @@
 package storers.consumers;
 
 import com.rabbitmq.client.*;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import storers.CSVLogger;
 import storers.storers.CassandraDBStorer;
-import storers.storers.cassandra.Cassandra;
 import storers.storers.MariaDBStorer;
 
-import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Created by lcollingwood on 30/11/2016.
  */
 public class InboundMessageHandlerRabbitMQ {
+    private final static Logger LOG = Logger.getLogger(InboundMessageHandlerRabbitMQ.class);
     private final static String QUEUE_NAME = "event-queue";
     private final static String HOST_NAME = "localhost";
 
@@ -53,12 +56,12 @@ public class InboundMessageHandlerRabbitMQ {
                         mariaDBStorer.messageHandler(jsonObject);
                         cassandraDBStorer.messageHandler(jsonObject);
                     } catch (ParseException e) {
-                        e.printStackTrace();
+                        LOG.warn("Failed to parse message", e);
                     }
                 }
             };
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | SQLException | TimeoutException e) {
+            LOG.warn("Failed to initialise", e);
         }
     }
 
@@ -68,12 +71,12 @@ public class InboundMessageHandlerRabbitMQ {
 
     public static void on() {
         InboundMessageHandlerRabbitMQ.initialise();
-        System.out.println("Listening...");
+        LOG.info("Listening...");
 
         try {
             channel.basicConsume(QUEUE_NAME, true, consumer);
         } catch (java.io.IOException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to handle message", e);
         }
     }
 
@@ -81,8 +84,8 @@ public class InboundMessageHandlerRabbitMQ {
         try {
             channel.close();
             connection.close();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (TimeoutException | IOException e) {
+            LOG.warn("Failed to close channel", e);
         }
     }
 }

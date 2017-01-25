@@ -15,7 +15,6 @@ import java.util.Random;
  */
 public class HatUpdater extends ProductUpdater {
 
-    private Random random;
     private DataGenerator dataGenerator;
     private HashMap<String, String> productData;
 

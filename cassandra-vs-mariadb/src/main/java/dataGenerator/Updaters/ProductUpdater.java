@@ -11,7 +11,7 @@ import java.util.Random;
  */
 public abstract class ProductUpdater {
 
-    private Random random;
+    protected Random random;
 
     public ProductUpdater(Random random) {
         this.random = random;

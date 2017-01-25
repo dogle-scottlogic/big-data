@@ -1,10 +1,10 @@
 package storers.storers;
 
-import com.datastax.driver.core.Cluster;
-import com.datastax.driver.core.Session;
+import com.datastax.driver.core.*;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.zaxxer.hikari.HikariDataSource;
 import dataGenerator.data_handlers.Settings;
+import org.apache.log4j.Logger;
 import org.json.simple.JSONObject;
 import storers.CSVLogger;
 import storers.storers.cassandra.CQL_Querys;
@@ -17,6 +17,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -26,6 +27,7 @@ import java.util.concurrent.TimeUnit;
  * Created by lcollingwood on 14/12/2016.
  */
 public class Combo implements Storer {
+    private final static Logger LOG = Logger.getLogger(Combo.class);
     private static final List<HikariDataSource> hikariDataSources = new ArrayList<>();
     private CSVLogger logger;
     private Cluster cluster;
@@ -37,6 +39,8 @@ public class Combo implements Storer {
     private DBType type;
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
     private int mariaConnectionPoolMax;
+    private HashMap<DBEventType, PreparedStatement> orderPreparedStatements;
+    private HashMap<DBEventType, PreparedStatement>  lineItemsPreparedStatements;
 
     public Combo(CSVLogger logger, DBType type, int mariaConnectionPoolMax) {
         this.type = type;
@@ -46,7 +50,7 @@ public class Combo implements Storer {
             initMariaDBInstance();
             initCassandraInstance();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to initialise database connections", e);
         }
     }
 
@@ -65,28 +69,30 @@ public class Combo implements Storer {
             order = new Order((String) message.get("data"));
         }
 
+        PreparedStatement orderPreparedStatement = orderPreparedStatements.get(eventType);
+        PreparedStatement lineItemPreparedStatement = lineItemsPreparedStatements.get(eventType);
         try {
             switch (eventType) {
                 case CREATE:
-                    this.cachedPool.submit(new Create(session, getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new Create(session, orderPreparedStatement, lineItemPreparedStatement, getConnection(), logger, order, this.type));
                     break;
                 case UPDATE:
-                    this.cachedPool.submit(new Update(session, getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new Update(session, orderPreparedStatement, lineItemPreparedStatement, getConnection(), logger, order, this.type));
                     break;
                 case UPDATE_STATUS:
-                    this.cachedPool.submit(new UpdateStatus(session, getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new UpdateStatus(session, orderPreparedStatement, lineItemPreparedStatement, getConnection(), logger, order, this.type));
                     break;
                 case DELETE:
-                    this.cachedPool.submit(new Delete(session, getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new Delete(session, orderPreparedStatement, lineItemPreparedStatement, getConnection(), logger, order, this.type));
                     break;
                 case READ:
-                    this.cachedPool.submit(new Read(session, getConnection(), logger, order, this.type));
+                    this.cachedPool.submit(new Read(session, orderPreparedStatement, lineItemPreparedStatement, getConnection(), logger, order, this.type));
                     break;
                 default:
                     break;
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOG.warn("Failed to apply event.", e);
         }
     }
 
@@ -128,11 +134,27 @@ public class Combo implements Storer {
 
     // Cassandra Setup
     private void initCassandraInstance() {
-        this.cluster = Cluster.builder().addContactPoint(cassandra_ip).withLoadBalancingPolicy(new RoundRobinPolicy()).build();
+        this.cluster = Cluster.builder().addContactPoint(cassandra_ip).withLoadBalancingPolicy(new RoundRobinPolicy()).withQueryOptions(new QueryOptions().setConsistencyLevel(ConsistencyLevel.ONE)).build();
         cassandraConnect();
         createKeySpace("orders");
         createLineItemTable();
         createOrderTable();
+        createPreparedStatements();
+    }
+
+    private void createPreparedStatements() {
+        orderPreparedStatements = new HashMap<>();
+        orderPreparedStatements.put(DBEventType.CREATE, session.prepare(CQL_Querys.addOrder(keyspaceName)));
+        orderPreparedStatements.put(DBEventType.UPDATE, session.prepare(CQL_Querys.updateOrder(keyspaceName)));
+        orderPreparedStatements.put(DBEventType.UPDATE_STATUS, session.prepare(CQL_Querys.updateOrderStatus(keyspaceName)));
+        orderPreparedStatements.put(DBEventType.DELETE, session.prepare(CQL_Querys.deleteOrder(keyspaceName)));
+        orderPreparedStatements.put(DBEventType.READ, session.prepare(CQL_Querys.selectAllOrders(keyspaceName)));
+
+        lineItemsPreparedStatements = new HashMap<>();
+        lineItemsPreparedStatements.put(DBEventType.CREATE, session.prepare(CQL_Querys.addLineItem(keyspaceName)));
+        lineItemsPreparedStatements.put(DBEventType.UPDATE, session.prepare(CQL_Querys.updateLineItem(keyspaceName)));
+        lineItemsPreparedStatements.put(DBEventType.DELETE, session.prepare(CQL_Querys.deleteLineItem(keyspaceName)));
+        lineItemsPreparedStatements.put(DBEventType.READ, session.prepare(CQL_Querys.selectAllLineItems(keyspaceName)));
     }
 
     private void cassandraConnect() {
@@ -149,8 +171,8 @@ public class Combo implements Storer {
     private void dropKeySpace(String name) {
         try {
             this.session.execute(CQL_Querys.dropKeySpace(name));
-        } catch (Exception e) {
-            System.out.println(e.fillInStackTrace());
+        } catch (RuntimeException e) {
+            LOG.warn("Failed to drop key space.", e);
         }
     }
 

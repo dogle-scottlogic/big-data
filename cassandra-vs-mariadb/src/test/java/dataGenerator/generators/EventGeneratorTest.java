@@ -1,14 +1,14 @@
 package dataGenerator.generators;
 
 import dataGenerator.entities.Client;
-import dataGenerator.entities.Order;
 import dataGenerator.entities.Event;
+import dataGenerator.entities.Order;
 import dataGenerator.enums.Enums;
 import org.junit.*;
-import static org.hamcrest.CoreMatchers.instanceOf;
 
 import java.util.Random;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.junit.Assert.*;
 
 /**
