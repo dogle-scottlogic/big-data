@@ -31,6 +31,8 @@ From within the `terraform/` directory, run `terraform plan`. This will show you
 
 Delete its block from `main.tf`. Run `terraform plan` / `terraform apply`.
 
+To delete all terraform resources run `terraform destroy`. *BE VERY CAUTIOUS ABOUT DOING THIS!*
+
 #### Running Analysis tests
 
 After running `terraform apply` as described above then the analysis test script can be run.
