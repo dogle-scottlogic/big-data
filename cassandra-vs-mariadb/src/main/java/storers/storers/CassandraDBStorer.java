@@ -80,7 +80,7 @@ public class CassandraDBStorer implements Storer {
         }
     }
 
-    public void updateStatus(final JSONObject message) throws DatabaseEventFailedException {
+    private void updateStatus(final JSONObject message) throws DatabaseEventFailedException {
         Timer timer = new Timer();
         try {
             cassandra.updateOrderStatus(message, timer);

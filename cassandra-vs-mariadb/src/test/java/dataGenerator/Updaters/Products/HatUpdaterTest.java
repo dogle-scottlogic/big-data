@@ -21,8 +21,7 @@ public class HatUpdaterTest {
 
     @Before
     public void setUp() throws Exception {
-        Random random = new Random(1234);
-        this.hatUpdater = new HatUpdater(random);
+        this.hatUpdater = new HatUpdater(new Random(1234));
     }
 
     @After

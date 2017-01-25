@@ -54,8 +54,8 @@ public abstract class ComboQuery implements Runnable {
         this.cassandraBatch = new BatchStatement();
         this.cassandraQueryQueue = new ArrayList<BoundStatement>();
         this.mariaConnection = mariaConnection;
-        this.mariaBatch = mariaConnection.createStatement();
-        this.mariaQueryQueue = new ArrayList<String>();
+        this.mariaBatch = mariaConnection == null ? null : mariaConnection.createStatement();
+        this.mariaQueryQueue = new ArrayList<>();
         this.logger = logger;
         this.type = type;
         this.dbtype = dbtype;

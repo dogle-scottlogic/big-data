@@ -1,10 +1,11 @@
 package dataGenerator.generators;
 
-import dataGenerator.entities.Client;
 import dataGenerator.entities.Event;
 import dataGenerator.entities.Order;
 import dataGenerator.enums.Enums;
-import org.junit.*;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Random;
 
@@ -16,39 +17,12 @@ import static org.junit.Assert.*;
  */
 public class EventGeneratorTest {
 
-    int seed = 1234;
-    Random random;
-    OrderGenerator og;
-    ProductGenerator pg;
-    LineItemGenerator lig;
-    Client client;
-    ClientGenerator cg;
-
-    public EventGeneratorTest() {
-
-    }
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
+    private int seed = 1234;
+    private Random random;
 
     @Before
     public void setUp() {
         this.random = new Random(this.seed);
-        this.pg = new ProductGenerator(this.random);
-        Enums.ProductType[] productList = {Enums.ProductType.HAT};
-        this.lig = new LineItemGenerator(this.random, this.pg, productList);
-        cg = new ClientGenerator(this.random);
-        this.client = cg.generateClient();
-        this.og = new OrderGenerator(this.random, lig, this.client);
-    }
-
-    @After
-    public void tearDown() {
     }
 
     @Test

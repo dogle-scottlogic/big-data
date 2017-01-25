@@ -1,56 +1,99 @@
 package showdown;
 
 import Conveyor.Conveyor;
+import com.datastax.driver.core.ConsistencyLevel;
 import dataGenerator.data_handlers.Settings;
 import dataGenerator.enums.Enums;
 import dataGenerator.generators.EventGenerator;
 import org.apache.log4j.Logger;
+import org.json.simple.parser.ParseException;
+import org.junit.Before;
 import org.junit.Test;
 import storers.CSVLogger;
 import storers.storers.Combo;
 import storers.storers.Timer;
 import storers.storers.maria.enums.DBType;
 
+import java.io.IOException;
+
 /**
  * Created by dogle on 08/12/2016.
  */
 public class RandomEventTest {
     private final static Logger LOG = Logger.getLogger(RandomEventTest.class);
+    private static final int NUMBER_OF_EVENTS = 50000;
+    private static final int ORDER_CACHE_SIZE = 5000;
+    private CSVLogger log;
+
+    @Before
+    public void setUp() throws IOException {
+        log = new CSVLogger(true);
+    }
+
     @Test
-    public void FiftyThousandTotalRandomEvents() throws Exception {
-        int numOfEvents = 50000;
-        Timer t = new Timer();
+    public void FiftyThousandRandomEvents() throws Exception {
+        String fileName = "FiftyThousandTotalRandomEvents";
 
-        EventGenerator eventGenerator;
-        int orderCacheSize = 5000;
-        Settings.setIntSetting("ORDER_CACHE_SIZE", orderCacheSize);
-        CSVLogger log = new CSVLogger(true);
-        Combo cs = new Combo(log, DBType.CASSANDRA);
-        Combo ms = new Combo(log, DBType.MARIA_DB);
-        LOG.info("Starting inserting " + orderCacheSize + " orders into Cassandra database.");
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        Conveyor.processEvents(orderCacheSize, cs, eventGenerator);
-        LOG.info("Starting inserting " + orderCacheSize + " orders into Maria database.");
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        Conveyor.processEvents(orderCacheSize, ms, eventGenerator);
+        Combo cassandraCombo = new Combo(log, DBType.CASSANDRA);
+        initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, fileName);
 
+        Combo mariaCombo = new Combo(log, DBType.MARIA_DB);
+        initialiseAndRunEvents(fileName, mariaCombo, DBType.MARIA_DB, fileName);
+    }
 
-        // COMBO!!
-        log = new CSVLogger("FiftyThousandTotalRandomEvents");
+    @Test
+    public void CassandraReplicationFactor() throws Exception {
+        String fileName = "CassandraReplicationFactor";
+
+        int maxReplication = 5;
+        for (int i = 1; i <= maxReplication; i++) {
+            Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, 1, ConsistencyLevel.ONE, i);
+            initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, Integer.toString(i));
+        }
+
+        Combo mariaCombo = new Combo(log, DBType.MARIA_DB);
+        initialiseAndRunEvents(fileName, mariaCombo, DBType.MARIA_DB, "ALL");
+    }
+
+    @Test
+    public void CassandraConsistencyLevel() throws Exception {
+        String fileName = "CassandraConsistencyLevel";
+
+        ConsistencyLevel[] consistencyValuesToTest= {ConsistencyLevel.ONE, ConsistencyLevel.TWO, ConsistencyLevel.THREE, ConsistencyLevel.QUORUM, ConsistencyLevel.ALL};
+        for (ConsistencyLevel level: consistencyValuesToTest) {
+            Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, 1, level, 3);
+            initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, level.toString());
+        }
+
+        Combo mariaCombo = new Combo(log, DBType.MARIA_DB);
+        initialiseAndRunEvents(fileName, mariaCombo, DBType.MARIA_DB, "ALL");
+    }
+
+    private void initialiseAndRunEvents(String fileName, Combo combo, DBType dbType, String id) throws IOException, ParseException {
+        Settings.setStringSetting("EVENT_GEN_MODE", "fixed");
+        Settings.setIntSetting("ORDER_CACHE_SIZE", ORDER_CACHE_SIZE);
+        EventGenerator eventGenerator = insertInitialData(dbType, combo);
+        runRandomEvents(dbType, eventGenerator, combo, fileName, id);
+    }
+
+    private void runRandomEvents(DBType type, EventGenerator eventGenerator, Combo combo, String fileName, String id) throws IOException, ParseException {
         Settings.setStringSetting("EVENT_GEN_MODE", "random");
-        cs.setLogger(log);
-        cs.reinitThreadPool();
-        ms.setLogger(log);
-        ms.reinitThreadPool();
+        CSVLogger csvLogger = new CSVLogger(fileName, id);
+        combo.setLogger(csvLogger);
+        combo.reinitThreadPool();
         eventGenerator.setEvents(new Enums.EventType[]{ });
 
-        LOG.info("Starting running " + numOfEvents + " random events into Cassandra database.");
+        Timer t = new Timer();
+        LOG.info("Starting running " + NUMBER_OF_EVENTS + " random events into " + type + " database.");
         t.startTimer();
-        Conveyor.processEvents(numOfEvents, cs, eventGenerator);
-        LOG.info("Completed processing Cassandra events in " + t.stopTimer() + "ns");
-        LOG.info("Starting running " + numOfEvents + " random events into Maria database.");
-        t.startTimer();
-        Conveyor.processEvents(numOfEvents, ms, eventGenerator);
-        LOG.info("Completed processing Maria DB events in " + t.stopTimer() + "ns");
+        Conveyor.processEvents(NUMBER_OF_EVENTS, combo, eventGenerator);
+        LOG.info("Completed processing " + type + " events in " + t.stopTimer() + "ns");
+    }
+
+    private EventGenerator insertInitialData(DBType type, Combo combo) throws IOException, ParseException {
+        EventGenerator eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        LOG.info("Starting inserting " + ORDER_CACHE_SIZE + " orders into " + type + " database.");
+        Conveyor.processEvents(ORDER_CACHE_SIZE, combo, eventGenerator);
+        return eventGenerator;
     }
 }
