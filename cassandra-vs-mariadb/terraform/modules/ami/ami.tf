@@ -1,112 +1,69 @@
-// Setup individual instances
-resource "aws_instance" "cassandra" {
-  ami             = "${var.ami}"
-  instance_type   = "${var.instance_type}"
-  security_groups = ["${var.security_group_name}"]
-  key_name        = "${var.key_name}"
-
-  tags {
-    Name = "cass-ami"
-  }
-
-  connection {
-    user        = "${var.user}"
-    private_key = "${var.private_key}"
-  }
-
-  provisioner "file" {
-    source = "scripts"
-    destination = "/tmp/scripts"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get install -y dos2unix",
-      "dos2unix /tmp/scripts/*/*",
-      "chmod a+x /tmp/scripts/*/*",
-      "echo chmod-ed all scripts",
-      "sudo /tmp/scripts/common/bootstrap.sh",
-      "sudo /tmp/scripts/cassandra/bootstrap.sh",
-      "mkdir -p /home/ubuntu/analysis/src",
-      "mkdir -p /home/ubuntu/analysis/testLogs"
-    ]
-  }
+variable "security_group_name" {}
+variable "key_name" {}
+variable "private_key" {}
+variable "mariadb_password" {
+  default = "myfirstpassword"
 }
 
-resource "aws_instance" "mariadb" {
-  ami             = "${var.ami}"
-  instance_type   = "${var.instance_type}"
-  security_groups = ["${var.security_group_name}"]
-  key_name        = "${var.key_name}"
-
-  tags {
-    Name = "maria-ami"
-  }
-
-  connection {
-    user        = "${var.user}"
-    private_key = "${var.private_key}"
-  }
-
-  provisioner "file" {
-    source = "scripts"
-    destination = "/tmp/scripts"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get install -y dos2unix",
-      "dos2unix /tmp/scripts/*/*",
-      "chmod a+x /tmp/scripts/*/*",
-      "echo chmod-ed all scripts",
-      "sudo /tmp/scripts/common/bootstrap.sh",
-      "sudo /tmp/scripts/mariadb/bootstrap.sh ${var.mariadb_password}"
-    ]
-  }
+module "cassandra" {
+  source              = "../resources/instance"
+  security_group_name = "${var.security_group_name}"
+  key_name            = "${var.key_name}"
+  private_key         = "${var.private_key}"
+  tag_name            = "cass-ami"
+  bootstrap_commands  = [
+    "sudo /tmp/scripts/cassandra/bootstrap.sh",
+    "mkdir -p /home/ubuntu/analysis/src",
+    "mkdir -p /home/ubuntu/analysis/testLogs"
+  ]
 }
 
-resource "aws_instance" "test" {
-  ami             = "${var.ami}"
-  instance_type   = "${var.instance_type}"
-  security_groups = ["${var.security_group_name}"]
-  key_name        = "${var.key_name}"
+module "mariadb" {
+  source              = "../resources/instance"
+  security_group_name = "${var.security_group_name}"
+  key_name            = "${var.key_name}"
+  private_key         = "${var.private_key}"
+  tag_name            = "maria-ami"
+  bootstrap_commands  = [
+    "sudo /tmp/scripts/mariadb/bootstrap.sh ${var.mariadb_password}"
+  ]
+}
 
-  tags {
-    Name = "test-client-ami"
-  }
-
-  connection {
-    user        = "${var.user}"
-    private_key = "${var.private_key}"
-  }
-
-  provisioner "file" {
-    source = "scripts"
-    destination = "/tmp/scripts"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "sudo apt-get install -y dos2unix",
-      "dos2unix /tmp/scripts/*/*",
-      "chmod a+x /tmp/scripts/*/*",
-      "echo chmod-ed all scripts",
-      "sudo /tmp/scripts/test-client/bootstrap.sh"
-    ]
-  }
+module "test" {
+  source              = "../resources/instance"
+  security_group_name = "${var.security_group_name}"
+  key_name            = "${var.key_name}"
+  private_key         = "${var.private_key}"
+  tag_name            = "test-client-ami"
+  bootstrap_commands  = [
+    "sudo /tmp/scripts/test-client/bootstrap.sh"
+  ]
 }
 
 resource "aws_ami_from_instance" "cass_ami" {
   name               = "cassandra-ami"
-  source_instance_id = "${aws_instance.cassandra.id}"
+  source_instance_id = "${element(module.cassandra.ids, 0)}"
 }
 
 resource "aws_ami_from_instance" "mariadb_ami" {
   name               = "mariadb-ami"
-  source_instance_id = "${aws_instance.mariadb.id}"
+  source_instance_id = "${element(module.mariadb.ids, 0)}"
 }
 
 resource "aws_ami_from_instance" "test-client_ami" {
   name = "test-client-ami"
-  source_instance_id = "${aws_instance.test.id}"
+  source_instance_id = "${element(module.test.ids, 0)}"
+}
+
+output "cassandra_ami_id" {
+  value = "${aws_ami_from_instance.cass_ami.id}"
+}
+output "mariadb_ami_id" {
+  value = "${aws_ami_from_instance.mariadb_ami.id}"
+}
+output "test-client_ami_id" {
+  value = "${aws_ami_from_instance.test-client_ami.id}"
+}
+output "mariadb_password" {
+  value = "${var.mariadb_password}"
 }

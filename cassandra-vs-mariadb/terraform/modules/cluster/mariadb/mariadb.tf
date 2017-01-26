@@ -1,94 +1,67 @@
-resource "aws_instance" "mariadb" {
-  ami             = "${var.ami}"
-  instance_type   = "${var.instance_type}"
-  count           = "${var.num_nodes}"
-  security_groups = ["${var.security_group_name}"]
-  key_name        = "${var.key_name}"
+variable "num_nodes" {}
+variable "cluster_name" {}
+variable "security_group_name" {}
+variable "key_name" {}
+variable "private_key" {}
+variable "ami" {}
+variable "mariadb_password" {}
+variable "test_client_ip" {}
 
-  tags {
-    Name = "${var.cluster_name}maria${count.index + 1}"
-  }
-
-  connection {
-    user        = "${var.user}"
-    private_key = "${var.private_key}"
-  }
-
-  provisioner "file" {
-    source = "scripts"
-    destination = "/tmp/scripts"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "dos2unix /tmp/scripts/*/*",
-      "chmod a+x /tmp/scripts/*/*",
-      "echo chmod-ed all scripts"
-    ]
-  }
+module "instances" {
+  source              = "../../resources/instance"
+  security_group_name = "${var.security_group_name}"
+  key_name            = "${var.key_name}"
+  private_key         = "${var.private_key}"
+  tag_name            = "${var.cluster_name}maria"
+  num_nodes           = "${var.num_nodes}"
+  ami                 = "${var.ami}"
 }
 
-resource "null_resource" "mariadb-cluster-config" {
-  count = "${var.num_nodes}"
-  triggers {
-    maria_ips = "${join(",", aws_instance.mariadb.*.private_ip)}"
-    // Change to any instance of the cluster requires reprovisioning
-    cluster_instance_ids = "${join(",", aws_instance.mariadb.*.id)}"
-  }
-  connection {
-    host        = "${element(aws_instance.mariadb.*.public_ip, count.index)}"
-    user        = "${var.user}"
-    private_key = "${var.private_key}"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo /tmp/scripts/mariadb/config.sh maria${count.index} ${join(",", aws_instance.mariadb.*.private_ip)}"
-    ]
-  }
+module "config" {
+  source      = "../../resources/remote_commands"
+  num_nodes   = "${var.num_nodes}"
+  ids         = "${module.instances.ids}"
+  public_ips  = "${module.instances.public_ips}"
+  user        = "${module.instances.user}"
+  private_key = "${var.private_key}"
+  commands    = [
+    "sudo /tmp/scripts/mariadb/config.sh ${join(",", module.instances.private_ips)}"
+  ]
 }
 
-resource "null_resource" "mariadb-cluster-primary" {
-  depends_on = ["null_resource.mariadb-cluster-config"]
+resource "null_resource" "primary" {
+  depends_on = ["module.config"]
   triggers {
-    password  = "${var.mariadb_password}"
-    maria_ips = "${join(",", aws_instance.mariadb.*.private_ip)}"
-    // Change to any instance of the cluster requires reprovisioning
-    cluster_instance_ids = "${join(",", aws_instance.mariadb.*.id)}"
+    ids   = "${join(",", module.instances.ids)}"
   }
   connection {
-    host        = "${aws_instance.mariadb.0.public_ip}"
-    user        = "${var.user}"
+    host        = "${element(module.instances.public_ips, 0)}"
+    user        = "${module.instances.user}"
     private_key = "${var.private_key}"
   }
   provisioner "remote-exec" {
-    inline = [
-      "/tmp/scripts/mariadb/start-primary.sh ${var.mariadb_password}"
-    ]
+    inline = ["/tmp/scripts/mariadb/start-primary.sh ${var.mariadb_password}"]
   }
 }
 
-resource "null_resource" "mariadb-cluster-start" {
-  depends_on = ["null_resource.mariadb-cluster-primary"]
+resource "null_resource" "start" {
+  depends_on = ["null_resource.primary"]
   triggers {
-    password  = "${var.mariadb_password}"
-    maria_ips = "${join(",", aws_instance.mariadb.*.private_ip)}"
-    // Change to any instance of the cluster requires reprovisioning
-    cluster_instance_ids = "${join(",", aws_instance.mariadb.*.id)}"
+    ids   = "${join(",", module.instances.ids)}"
   }
   provisioner "local-exec" {
-    command = "bash scripts/mariadb/start-cluster.sh ${join(" ", aws_instance.mariadb.*.public_ip)}"
+  command = "bash scripts/mariadb/start-cluster.sh ${join(" ", module.instances.public_ips)}"
   }
 }
 
-// Setup access to test client
 resource "null_resource" "setup_access" {
-  triggers = {
-    cluster_instance_ids = "${join(",", aws_instance.mariadb.*.id)}"
-    test_client_ip       = "${var.test_client_ip}"
+  depends_on = ["null_resource.start"]
+  triggers {
+    ids   = "${join(",", module.instances.ids)}"
   }
-  connection = {
-    host        = "${aws_instance.mariadb.0.public_ip}"
-    user        = "${var.user}"
+  connection {
+    host        = "${element(module.instances.public_ips, 0)}"
+    user        = "${module.instances.user}"
     private_key = "${var.private_key}"
   }
   provisioner "remote-exec" {
@@ -97,3 +70,11 @@ resource "null_resource" "setup_access" {
     ]
   }
 }
+
+output "public_ips" {
+  value = "${module.instances.public_ips}"
+}
+output "private_ips" {
+  value = "${module.instances.private_ips}"
+}
+

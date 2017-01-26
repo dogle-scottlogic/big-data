@@ -6,7 +6,7 @@ These instructions are only suppored in git bash.
 
 #### Install packages
 
-Ensure [Terraform](https://www.terraform.io/downloads.html) is installed. 
+Ensure [Terraform](https://www.terraform.io/downloads.html) is installed and on your `PATH`. 
 
 #### Setup AWS access
 

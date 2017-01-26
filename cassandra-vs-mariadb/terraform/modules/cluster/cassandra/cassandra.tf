@@ -1,64 +1,45 @@
-// Setup individual instances
-resource "aws_instance" "cassandra" {
-  ami             = "${var.ami}"
-  instance_type   = "${var.instance_type}"
-  count           = "${var.num_nodes}"
-  security_groups = ["${var.security_group_name}"]
-  key_name        = "${var.key_name}"
+variable "num_nodes" {}
+variable "cluster_name" {}
+variable "security_group_name" {}
+variable "key_name" {}
+variable "private_key" {}
+variable "ami" {}
 
-  tags {
-    Name = "${var.cluster_name}cass${count.index + 1}"
-  }
-
-  connection {
-    user        = "${var.user}"
-    private_key = "${var.private_key}"
-  }
-
-  provisioner "file" {
-    source = "scripts"
-    destination = "/tmp/scripts"
-  }
-
-  provisioner "remote-exec" {
-    inline = [
-      "dos2unix /tmp/scripts/*/*",
-      "chmod a+x /tmp/scripts/*/*",
-      "echo chmod-ed all scripts"
-    ]
-  }
+module "instances" {
+  source              = "../../resources/instance"
+  security_group_name = "${var.security_group_name}"
+  key_name            = "${var.key_name}"
+  private_key         = "${var.private_key}"
+  tag_name            = "${var.cluster_name}cass"
+  num_nodes           = "${var.num_nodes}"
+  ami                 = "${var.ami}"
 }
 
-resource "null_resource" "cassandra-cluster-config" {
-  count = "${var.num_nodes}"
-  triggers {
-    seed_ip = "${aws_instance.cassandra.0.private_ip}"
-    // Change to this instance requires reprovisioning
-    this_id = "${element(aws_instance.cassandra.*.id, count.index)}"
-  }
-  connection {
-    host        = "${element(aws_instance.cassandra.*.public_ip, count.index)}"
-    user        = "${var.user}"
-    private_key = "${var.private_key}"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "sudo /tmp/scripts/cassandra/config.sh ${aws_instance.cassandra.0.private_ip}"
-    ]
-  }
+module "config" {
+  source      = "../../resources/remote_commands"
+  num_nodes   = "${var.num_nodes}"
+  ids         = "${module.instances.ids}"
+  public_ips  = "${module.instances.public_ips}"
+  user        = "${module.instances.user}"
+  private_key = "${var.private_key}"
+  commands    = [
+    "sudo /tmp/scripts/cassandra/config.sh ${element(module.instances.private_ips, 0)}"
+  ]
 }
 
-resource "null_resource" "cassandra-cluster-start" {
-  depends_on = ["null_resource.cassandra-cluster-config"]
+resource "null_resource" "start" {
+  depends_on = ["module.config"]
   triggers {
-    seed_ip = "${aws_instance.cassandra.0.private_ip}"
-    this_ip = "${element(aws_instance.cassandra.*.private_ip, count.index)}"
-    // Change to this instance requires reprovisioning
-    this_id = "${element(aws_instance.cassandra.*.id, count.index)}"
+    ids = "${join(",", module.instances.ids)}"
   }
   provisioner "local-exec" {
-    command = "bash scripts/cassandra/start-cluster.sh ${join(" ", aws_instance.cassandra.*.public_ip)}"
+    command = "bash scripts/cassandra/start-cluster.sh ${join(" ", module.instances.public_ips)}"
   }
 }
 
-
+output "public_ips" {
+  value = "${module.instances.public_ips}"
+}
+output "primary_ip" {
+  value = "${element(module.instances.private_ips, 0)}"
+}

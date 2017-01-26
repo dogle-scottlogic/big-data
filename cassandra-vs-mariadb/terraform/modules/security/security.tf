@@ -1,3 +1,5 @@
+variable "subnet_cidr" {}
+
 // Define a security group allows SSH traffic and nothing else from outside.
 resource "aws_security_group" "clusterSecurityGroup" {
   name = "Cluster Security Group"
@@ -38,4 +40,8 @@ resource "aws_security_group" "clusterSecurityGroup" {
   tags {
     Name = "Cassandra / MariaDB"
   }
+}
+
+output "name" {
+  value = "${aws_security_group.clusterSecurityGroup.name}"
 }

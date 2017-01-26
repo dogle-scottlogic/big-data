@@ -1,37 +1,32 @@
-resource "aws_instance" "test-client" {
-  ami             = "${var.ami}"
-  instance_type   = "${var.instance_type}"
-  security_groups = ["${var.security_group_name}"]
-  key_name        = "${var.key_name}"
+variable "cassandra_primary_ip" {
+  description = "The broadcast IP of the first cassandra node"
+}
+variable "mariadb_ips" {
+  description = "Comma-separated list of all the MariaDB IPs"
+}
+variable "security_group_name" {}
+variable "key_name" {}
+variable "cluster_name" {}
+variable "private_key" {}
+variable "mariadb_password" {}
+variable "ami" {}
 
-  tags {
-    Name = "${var.cluster_name}test-client"
-  }
-
-  connection {
-    user        = "${var.user}"
-    private_key = "${var.private_key}"
-  }
-  provisioner "file" {
-    source      = "scripts"
-    destination = "/tmp/scripts"
-  }
-  provisioner "remote-exec" {
-    inline = [
-      "dos2unix /tmp/scripts/*/*",
-      "chmod a+x /tmp/scripts/*/*",
-      "echo chmod-ed all scripts",
-    ]
-  }
+module "test_client" {
+  source              = "../../resources/instance"
+  security_group_name = "${var.security_group_name}"
+  key_name            = "${var.key_name}"
+  private_key         = "${var.private_key}"
+  tag_name            = "${var.cluster_name}test-client"
+  ami                 = "${var.ami}"
 }
 
 resource "null_resource" "config" {
   triggers = {
-    this_id = "${aws_instance.test-client.id}" // Reprovision if instance changes!
+    this_id = "${module.test_client.id}"
   }
   connection = {
-    host        = "${aws_instance.test-client.public_ip}"
-    user        = "${var.user}"
+    host        = "${module.test_client.public_ip}"
+    user        = "${module.test_client.user}"
     private_key = "${var.private_key}"
   }
   provisioner "remote-exec" {
@@ -56,3 +51,9 @@ resource "null_resource" "config" {
   }
 }
 
+output "public_ip" {
+  value = "${module.test_client.public_ip}"
+}
+output "private_ip" {
+  value = "${module.test_client.private_ip}"
+}

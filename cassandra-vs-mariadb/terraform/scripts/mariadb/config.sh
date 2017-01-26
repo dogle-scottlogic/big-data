@@ -1,10 +1,9 @@
 #!/bin/bash -e
 
-NODE_NAME=$1
-MARIA_IPS=$2
-[[ -z $NODE_NAME ]] && echo Must pass name && exit 1
+MARIA_IPS=$1
 [[ -z $MARIA_IPS ]] && echo Must pass CSV Maria IPs && exit 1
 PRIVATE_IP=$(ip addr show eth0 | grep -oP "inet [\d\.]+" | cut -d" " -f2)
+NODE_NAME=$HOSTNAME
 GALERA_CONFIG=/etc/mysql/conf.d/galera.cnf
 
 # Ensure MariaDB is stopped and in initial state

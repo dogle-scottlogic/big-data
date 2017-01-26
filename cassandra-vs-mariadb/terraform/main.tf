@@ -1,7 +1,5 @@
-// Input variables
-// Add line: access_key="ACCESSS_KEY" to terraform.tfvars in this directory
+// Inputs
 variable "access_key" {}
-// Add line: secret_key="SECRET_KEY" to terraform.tfvars in this directory
 variable "secret_key" {}
 
 // Shouldn't need to override these inputs. If you do, use terraform.tfvars.
@@ -64,11 +62,12 @@ module "cluster_3" {
   private_key         = "${file(var.private_key_path)}"
 }
 
+// Outputs. Accessible with 'terraform output'
 output "cluster_3_cassandra_ips" {
-  value = "${module.cluster_3.cassandra_public_ips}"
+  value = "${join(",", module.cluster_3.cassandra_public_ips)}"
 }
 output "cluster_3_mariadb_ips" {
-  value = "${module.cluster_3.mariadb_public_ips}"
+  value = "${join(",", module.cluster_3.mariadb_public_ips)}"
 }
 output "cluster_3_test-client_ip" {
   value = "${module.cluster_3.test-client_public_ip}"
