@@ -49,8 +49,10 @@ echo Running tests...
 ssh -o StrictHostKeyChecking=no ubuntu@$IP /tmp/scripts/test-client/run.sh $TESTS_TO_RUN
 
 # Copy results
-LOCAL_DIR=../out/testLogs-$CLUSTER_NAME-$(date +%y%m%d-%H%M%S)
-echo Copying results to $LOCAL_DIR...
+cd ..
+LOCAL_DIR=out/testLogs-$CLUSTER_NAME-$(date +%y%m%d-%H%M%S)
+echo Copying results
 mkdir -p $LOCAL_DIR
 scp -o StrictHostKeyChecking=no ubuntu@$IP:/home/ubuntu/analysis/testLogs/* $LOCAL_DIR/
 echo COPYING COMPLETE
+echo Tests copied to: $LOCAL_DIR
