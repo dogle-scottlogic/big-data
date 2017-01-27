@@ -55,11 +55,12 @@ module "ndb_sql" {
   mgmt_private_ips    = "${module.ndb_mgmt.private_ips}"
   startup_commands    = [
     "sudo mv /tmp/my.cnf /etc/my.cnf",
-    "sudo rm -rf /var/lib/mysql",
-    # "sudo mysqld --initialize --user=mysql --datadir=/var/lib/mysql",
-    # "sudo cp /opt/mysql/server-*/support-files/mysql.server /etc/init.d/mysqld",
-    # "sudo systemctl enable mysqld.service",
-    # "sudo systemctl start mysqld.service"
+    "sudo rm -rf /var/lib/mysql /var/lib/mysql-files",
+    "sudo mysqld --initialize --user=ubuntu --datadir=/var/lib/mysql",
+    "sudo cp /opt/mysql/server-*/support-files/mysql.server /etc/init.d/mysqld",
+    "sudo mkdir /var/lib/mysql-files",
+    "sudo chown -R ubuntu /var/lib/mysql-files",
+    "nohup mysqld_safe --datadir=/var/lib/mysql --pid-file=/var/lib/mysql/mysql.pid --syslog --user=ubuntu >/dev/null 2>&1 &"
   ]
 }
 
