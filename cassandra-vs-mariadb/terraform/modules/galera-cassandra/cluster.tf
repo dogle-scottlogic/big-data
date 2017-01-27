@@ -12,7 +12,7 @@ variable "mariadb_password" {
 }
 
 module "cassandra" {
-  source              = "cassandra"
+  source              = "../resources/cluster/cassandra"
   ami                 = "${var.cassandra_ami}"
   num_nodes           = "${var.num_nodes}"
   cluster_name        = "${var.cluster_name}"
@@ -22,7 +22,7 @@ module "cassandra" {
 }
 
 module "mariadb" {
-  source              = "mariadb"
+  source              = "../resources/cluster/galera"
   ami                 = "${var.mariadb_ami}"
   mariadb_password    = "${var.mariadb_password}"
   num_nodes           = "${var.num_nodes}"
@@ -34,7 +34,7 @@ module "mariadb" {
 }
 
 module "test-client" {
-  source               = "test-client"
+  source               = "../resources/cluster/test-client"
   ami                  = "${var.test-client_ami}"
   key_name             = "${var.key_name}"
   mariadb_password     = "${var.mariadb_password}"

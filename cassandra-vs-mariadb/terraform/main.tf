@@ -20,14 +20,12 @@ variable "region" {
   default = "eu-west-2"
 }
 
-// AWS access details
 provider "aws" {
   access_key = "${var.access_key}"
   secret_key = "${var.secret_key}"
   region     = "${var.region}"
 }
 
-// Upload public key
 resource "aws_key_pair" "auth" {
   key_name_prefix = "${var.key_prefix}"
   public_key      = "${file(var.public_key_path)}"
@@ -50,7 +48,7 @@ module "ami-nodes" {
 // Add clusters here
 
 module "cluster_3" {
-  source              = "modules/cluster"
+  source              = "modules/galera-cassandra"
   num_nodes           = 3
   cassandra_ami       = "${module.ami-nodes.cassandra_ami_id}"
   mariadb_ami         = "${module.ami-nodes.mariadb_ami_id}"
@@ -72,3 +70,26 @@ output "cluster_3_mariadb_ips" {
 output "cluster_3_test-client_ip" {
   value = "${module.cluster_3.test-client_public_ip}"
 }
+
+# module "ndb_cluster" {
+#   source              = "modules/ndb-cassandra"
+#   num_ndb_replicas    = 1
+#   num_ndb_fragments   = 1
+#   num_sql_nodes       = 1
+#   cluster_name        = "ndb-cassandra-"
+#   security_group_name = "${module.security_group.name}"
+#   key_name            = "${aws_key_pair.auth.key_name}"
+#   private_key         = "${file(var.private_key_path)}"
+#   ndb_node_ami        = "${module.ami-nodes.ndb_ami_id}"
+#   sql_node_ami        = "${module.ami-nodes.ndb_sql_ami_id}"
+# }
+
+# output "ndb_cluster_mgmt_public_ips" {
+#   value = "${join(",", module.ndb_cluster.ndb_mgmt_public_ips)}"
+# }
+# output "ndb_cluster_data_public_ips" {
+#   value = "${join(",", module.ndb_cluster.ndb_data_public_ips)}"
+# }
+# output "ndb_cluster_sql_public_ips" {
+#   value = "${join(",", module.ndb_cluster.ndb_sql_public_ips)}"
+# }

@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+# Called in AMI creation. WARNING: Changes to this file will not automatically trigger the AMIs to be recreated.
+
 # Inputs
 PASSWORD=$1
 [[ -z $PASSWORD ]] && echo Must pass password && exit 1

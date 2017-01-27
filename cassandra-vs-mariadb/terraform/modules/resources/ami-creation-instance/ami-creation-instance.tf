@@ -16,7 +16,9 @@ variable "instance_type" {
 variable "ami" {
   // Ubuntu 16.04
   default = "ami-57eae033"
+  # default = "ami-6f587e1c"
 }
+
 variable "user" {
   default = "ubuntu"
 }
