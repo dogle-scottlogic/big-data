@@ -67,3 +67,8 @@ Master - master - every node identical.
 
 * SQL mysqld nodes run on top of ndbd data nodes.
 * Each node can access all tables.
+
+#### Stuff for future?
+
+* NewSQL databases?
+* memcached + Galera? cf [This article](https://gigaom.com/2011/12/06/facebook-shares-some-secrets-on-making-mysql-scale/)
