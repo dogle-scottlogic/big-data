@@ -12,8 +12,8 @@ variable "test-client_ip" {}
 variable "num_ndb_mgmt_nodes" {
   default = 1
 }
-variable "user" {
-  default = "ubuntu"
+variable "sql_start_cmd" {
+  default = "nohup mysqld_safe --ndbcluster --ndb-connectstring=${} --datadir=/var/lib/mysql --pid-file=/var/lib/mysql/mysql.pid --syslog --user=ubuntu >/dev/null 2>&1 &"
 }
 
 module "ndb_mgmt" {
@@ -66,22 +66,22 @@ module "ndb_sql" {
     "sudo cp /opt/mysql/server-*/support-files/mysql.server /etc/init.d/mysqld",
     "sudo mkdir /var/lib/mysql-files",
     "sudo chown -R ubuntu /var/lib/mysql-files",
-    "nohup mysqld_safe --datadir=/var/lib/mysql --pid-file=/var/lib/mysql/mysql.pid --syslog --user=ubuntu >/dev/null 2>&1 &",
   ]
 }
 
-module "ndb_sql_config" {
-  source      = "../../remote_commands"
-  ids         = "${module.ndb_sql.ids}"
-  public_ips  = "${module.ndb_sql.public_ips}"
-  user        = "${var.user}"
-  private_key = "${var.private_key}"
-  trigger     = "${var.test-client_ip}"
-  commands    = [
-    "mysqladmin -u root password \"${var.sql_password}\"",
-    "mysql -u root --password=${var.sql_password} -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'${var.test-client_ip}' IDENTIFIED BY '${var.sql_password}' WITH GRANT OPTION\""
-  ]
-}
+# module "ndb_sql_config" {
+#   source      = "../../remote_commands"
+#   num_nodes   = "${var.num_sql_nodes}"
+#   ids         = "${module.ndb_sql.ids}"
+#   public_ips  = "${module.ndb_sql.public_ips}"
+#   user        = "${module.ndb_sql.user}"
+#   private_key = "${var.private_key}"
+#   commands    = [
+#     # "nohup mysqld_safe --ndbcluster --ndb-connectstring=${module.ndb_mgmt.private_ip} --datadir=/var/lib/mysql --pid-file=/var/lib/mysql/mysql.pid --syslog --user=ubuntu >/dev/null 2>&1 &",
+#     "mysqladmin -u root password \"${var.sql_password}\"",
+#     "mysql -u root --password=${var.sql_password} -e \"GRANT ALL PRIVILEGES ON *.* TO 'root'@'${var.test-client_ip}' IDENTIFIED BY '${var.sql_password}' WITH GRANT OPTION\""
+#   ]
+# }
 
 output "mgmt_public_ips" {
   value = "${module.ndb_mgmt.public_ips}"

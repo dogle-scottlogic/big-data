@@ -66,3 +66,6 @@ output "ndb_cassandra_public_ips" {
 output "ndb_test_client_public_ip" {
   value  ="${module.test-client.public_ip}"
 }
+output "ndb_test_client_private_ip" {
+  value = "${module.test-client.private_ip}"
+}

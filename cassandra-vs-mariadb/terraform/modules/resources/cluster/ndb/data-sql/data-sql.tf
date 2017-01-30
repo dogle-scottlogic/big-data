@@ -51,3 +51,6 @@ output "public_ips" {
 output "ids" {
   value = "${module.nodes.ids}"
 }
+output "user" {
+  value = "${module.nodes.user}"
+}

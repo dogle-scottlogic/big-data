@@ -75,7 +75,7 @@ module "ndb_cluster" {
   source              = "modules/ndb-cassandra"
   num_ndb_replicas    = 1
   num_ndb_fragments   = 1
-  num_sql_nodes       = 1
+  num_sql_nodes       = 2
   num_cassandra_nodes = 1
   cluster_name        = "ndb-cassandra-"
   security_group_name = "${module.security_group.name}"
@@ -101,4 +101,7 @@ output "ndb_cluster_cassandra_ips" {
 }
 output "ndb_cluster_test-client_ip" {
   value = "${module.ndb_cluster.ndb_test_client_public_ip}"
+}
+output "ndb_cluster_test-client_private_ip" {
+  value = "${module.ndb_cluster.ndb_test_client_private_ip}"
 }

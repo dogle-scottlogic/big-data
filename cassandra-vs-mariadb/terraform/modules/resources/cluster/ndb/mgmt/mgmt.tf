@@ -53,6 +53,9 @@ module "config" {
   ]
 }
 
+output "private_ip" {
+  value = "${element(module.nodes.private_ips, 0)}"
+}
 output "private_ips" {
   value = "${module.nodes.private_ips}"
 }
