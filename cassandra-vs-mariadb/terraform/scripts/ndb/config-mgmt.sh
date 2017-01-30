@@ -4,7 +4,7 @@
 
 # Templated variables
 MGMT_IPS=${mgmt_ips}
-DATA_IPS=${data_ips}
+DATA_IPS="${data_ips}"
 MYSQL_IPS="${mysql_ips}"
 
 # Initialise file

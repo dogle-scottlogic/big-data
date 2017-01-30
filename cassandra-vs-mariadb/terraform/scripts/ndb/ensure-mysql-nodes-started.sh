@@ -2,8 +2,6 @@
 
 PASSWORD=myfirstpassword
 
-cd terraform
-
 MGMT_IPS=$(terraform output | grep mgmt_public_ips | grep -oP "[\d,\.]+" | sed 's#,# #g')
 
 SQL_IPS=$(terraform output | grep sql_public_ips | grep -oP "[\d,\.]+" | sed 's#,# #g')

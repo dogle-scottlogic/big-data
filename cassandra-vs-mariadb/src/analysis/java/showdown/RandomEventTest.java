@@ -25,6 +25,7 @@ public class RandomEventTest {
         int orderCacheSize = 5000;
         Settings.setIntSetting("ORDER_CACHE_SIZE", orderCacheSize);
         CSVLogger log = new CSVLogger(true);
+        LOG.info("HELLO");
         Combo cs = new Combo(log, DBType.CASSANDRA);
         Combo ms = new Combo(log, DBType.MARIA_DB);
         LOG.info("Starting inserting " + orderCacheSize + " orders into Cassandra database.");

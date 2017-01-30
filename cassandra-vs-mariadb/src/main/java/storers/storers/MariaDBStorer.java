@@ -92,10 +92,19 @@ public class MariaDBStorer implements Storer {
     }
 
     private static void initTables(Connection queryConnection) throws SQLException {
-        doQuery(queryConnection, SQLQuery.DROP_ORDERS_DB);
-        doQuery(queryConnection, SQLQuery.CREATE_ORDERS_DB);
-        doQuery(queryConnection, SQLQuery.CREATE_ORDER_TABLE);
-        doQuery(queryConnection, SQLQuery.CREATE_LINE_ITEM_TABLE);
+        Connection connection = queryConnection;
+        doSingleMariaQuery(connection, SQLQuery.DROP_ORDERS_DB);
+        LOG.info("Just created DB");
+        doSingleMariaQueryAndLog(connection, SQLQuery.SHOW_TABLES);
+        doSingleMariaQuery(connection, SQLQuery.CREATE_ORDERS_DB);
+        LOG.info("Created one table");
+        doSingleMariaQueryAndLog(connection, SQLQuery.SHOW_TABLES);
+        doSingleMariaQuery(connection, SQLQuery.CREATE_ORDER_TABLE);
+        LOG.info("Created two tables");
+        doSingleMariaQueryAndLog(connection, SQLQuery.SHOW_TABLES);
+        doSingleMariaQuery(connection, SQLQuery.CREATE_LINE_ITEM_TABLE);
+        LOG.info("Created three tables");
+        doSingleMariaQueryAndLog(connection, SQLQuery.SHOW_TABLES);
         queryConnection.commit();
         queryConnection.close();
     }
@@ -103,6 +112,22 @@ public class MariaDBStorer implements Storer {
     private static void doQuery(Connection connection, SQLQuery query) throws SQLException {
         Statement statement = connection.createStatement();
         statement.execute(query.getQuery());
+        statement.close();
+    }
+
+    private static void doSingleMariaQuery(Connection connection, SQLQuery query) throws SQLException {
+        doQuery(connection, query);
+    }
+
+    private static void doSingleMariaQueryAndLog(Connection connection, SQLQuery query) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute(query.getQuery());
+        java.sql.ResultSet results = statement.getResultSet();
+
+        while (results.next()) {
+            LOG.info("TABLE ROW: " + results.getString("Tables_in_orders"));
+        }
+
         statement.close();
     }
 

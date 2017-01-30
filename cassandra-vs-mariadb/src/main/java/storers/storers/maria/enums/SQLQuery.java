@@ -10,13 +10,15 @@ public enum SQLQuery {
 
     CREATE_ORDERS_DB("CREATE DATABASE `orders`"),
 
+    SHOW_TABLES("SHOW TABLES IN `orders`"),
+
     CREATE_ORDER_TABLE(
         "CREATE TABLE orders.`order`(" +
             "id VARCHAR(40) NOT NULL, " +
             "client_id VARCHAR(40) NOT NULL, " +
             "created VARCHAR(40) NOT NULL, " +
             "status VARCHAR(40) NOT NULL, " +
-            "PRIMARY KEY (id))"
+            "PRIMARY KEY (id)) ENGINE=NDBCLUSTER"
     ),
 
     CREATE_LINE_ITEM_TABLE(
@@ -25,7 +27,8 @@ public enum SQLQuery {
             "order_id VARCHAR(40) NOT NULL, " +
             "product_id VARCHAR(40) NOT NULL, " +
             "quantity INT NOT NULL, " +
-        "PRIMARY KEY(id), FOREIGN KEY(order_id) REFERENCES orders.order(id)" + ")"
+        "PRIMARY KEY(id), FOREIGN KEY(order_id) REFERENCES orders.order(id)" + ")" +
+            "ENGINE=NDBCLUSTER"
     );
 
     private String query;

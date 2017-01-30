@@ -1,6 +1,7 @@
 package storers.storers;
 
 import com.datastax.driver.core.*;
+import com.datastax.driver.core.PreparedStatement;
 import com.datastax.driver.core.policies.RoundRobinPolicy;
 import com.zaxxer.hikari.HikariDataSource;
 import dataGenerator.data_handlers.Settings;
@@ -13,8 +14,7 @@ import storers.storers.maria.enums.DBEventType;
 import storers.storers.maria.enums.DBType;
 import storers.storers.maria.enums.SQLQuery;
 
-import java.sql.Connection;
-import java.sql.SQLException;
+import java.sql.*;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,6 +47,7 @@ public class Combo implements Storer {
         this.logger = logger;
         this.mariaConnectionPoolMax = mariaConnectionPoolMax;
         try {
+            LOG.info("Hello: Initialising DB connections");
             initMariaDBInstance();
             initCassandraInstance();
         } catch (SQLException e) {
@@ -108,8 +109,14 @@ public class Combo implements Storer {
         Connection connection = getConnection();
         doSingleMariaQuery(connection, SQLQuery.DROP_ORDERS_DB);
         doSingleMariaQuery(connection, SQLQuery.CREATE_ORDERS_DB);
+        LOG.info("Created DB");
+        doSingleMariaQueryAndLog(connection, SQLQuery.SHOW_TABLES);
         doSingleMariaQuery(connection, SQLQuery.CREATE_ORDER_TABLE);
+        LOG.info("Created one table");
+        doSingleMariaQueryAndLog(connection, SQLQuery.SHOW_TABLES);
         doSingleMariaQuery(connection, SQLQuery.CREATE_LINE_ITEM_TABLE);
+        LOG.info("Created twp tables");
+        doSingleMariaQueryAndLog(connection, SQLQuery.SHOW_TABLES);
         connection.commit();
         connection.close();
     }
@@ -129,6 +136,18 @@ public class Combo implements Storer {
     private void doSingleMariaQuery(Connection connection, SQLQuery query) throws SQLException {
         Statement statement = connection.createStatement();
         statement.execute(query.getQuery());
+        statement.close();
+    }
+
+    private void doSingleMariaQueryAndLog(Connection connection, SQLQuery query) throws SQLException {
+        Statement statement = connection.createStatement();
+        statement.execute(query.getQuery());
+        java.sql.ResultSet results = statement.getResultSet();
+
+        while ((results != null) && results.next()) {
+            LOG.info("TABLE ROW: " + results.getString("Tables_in_orders"));
+        }
+
         statement.close();
     }
 

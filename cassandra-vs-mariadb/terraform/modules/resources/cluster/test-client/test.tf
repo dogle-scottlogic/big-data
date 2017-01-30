@@ -37,7 +37,7 @@ resource "null_resource" "config" {
   }
   provisioner "file" {
     source      = "../src"
-    destination = "/home/ubuntu/analysis/src"
+    destination = "/home/ubuntu/analysis/"
   }
   provisioner "file" {
     source      = "../build.gradle"
@@ -56,4 +56,7 @@ output "public_ip" {
 }
 output "private_ip" {
   value = "${module.test_client.private_ip}"
+}
+output "user" {
+  value = "${module.test_client.user}"
 }

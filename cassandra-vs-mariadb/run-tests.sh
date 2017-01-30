@@ -56,3 +56,21 @@ mkdir -p $LOCAL_DIR
 scp -o StrictHostKeyChecking=no ubuntu@$IP:/home/ubuntu/analysis/testLogs/* $LOCAL_DIR/
 echo COPYING COMPLETE
 echo Tests copied to: $LOCAL_DIR
+
+SHARED_DEST=/s/temp/domk/$(basename $LOCAL_DIR)
+cp -r $LOCAL_DIR $SHARED_DEST
+echo Copied to $SHARED_DEST
+
+# Record types of nodes
+cd terraform
+NUM_OF_CASSANDRA=$(terraform output | grep ${CLUSTER_NAME}_cassandra_ips | grep -oP "[\d\.\,]+" | sed "s#,#\n#g" | wc -l)
+NUM_OF_DATA=$(terraform output | grep ${CLUSTER_NAME}_data | grep -oP "[\d\.\,]+" | sed "s#,#\n#g" | wc -l)
+NUM_OF_SQL=$(terraform output | grep ${CLUSTER_NAME}_sql | grep -oP "[\d\.\,]+" | sed "s#,#\n#g" | wc -l)
+NUM_REPLICAS=$(terraform output | grep ${CLUSTER_NAME}_num_ndb_replicas)
+NUM_FRAGMENTS=$(terraform output | grep ${CLUSTER_NAME}_num_ndb_fragments)
+FILE=$SHARED_DEST/details.readme
+echo Number of Cassandra nodes: $NUM_OF_CASSANDRA > $FILE
+echo Number of data nodes: $NUM_OF_DATA >> $FILE
+echo Number of SQL nodes: $NUM_OF_SQL >> $FILE
+echo Number of NDB fragments: $NUM_FRAGMENTS >> $FILE
+echo Number of NDB replicas: $NUM_REPLICAS >> $FILE
