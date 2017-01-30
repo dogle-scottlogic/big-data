@@ -48,3 +48,6 @@ output "private_ips" {
 output "public_ips" {
   value = "${module.nodes.public_ips}"
 }
+output "ids" {
+  value = "${module.nodes.ids}"
+}

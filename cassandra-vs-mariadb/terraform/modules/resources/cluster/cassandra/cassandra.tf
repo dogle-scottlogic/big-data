@@ -6,7 +6,7 @@ variable "private_key" {}
 variable "ami" {}
 
 module "instances" {
-  source              = "../../resources/instance"
+  source              = "../../instance"
   security_group_name = "${var.security_group_name}"
   key_name            = "${var.key_name}"
   private_key         = "${var.private_key}"
@@ -16,7 +16,7 @@ module "instances" {
 }
 
 module "config" {
-  source      = "../../resources/remote_commands"
+  source      = "../../remote_commands"
   num_nodes   = "${var.num_nodes}"
   ids         = "${module.instances.ids}"
   public_ips  = "${module.instances.public_ips}"

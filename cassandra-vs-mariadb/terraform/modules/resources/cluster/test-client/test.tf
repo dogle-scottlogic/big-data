@@ -12,7 +12,7 @@ variable "mariadb_password" {}
 variable "ami" {}
 
 module "test_client" {
-  source              = "../../resources/instance"
+  source              = "../../instance"
   security_group_name = "${var.security_group_name}"
   key_name            = "${var.key_name}"
   private_key         = "${var.private_key}"
