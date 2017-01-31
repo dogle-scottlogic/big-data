@@ -51,20 +51,20 @@ module "test-client" {
   mariadb_ips          = "${join(",", module.ndb.sql_private_ips)}"
 }
 
-resource "null_resource" "config" {
-  depends_on = ["module.test-client"]
-  triggers = {
-    this_id = "${module.test-client.private_ip}"
-  }
-  connection = {
-    host        = "${module.test-client.public_ip}"
-    user        = "${module.test-client.user}"
-    private_key = "${var.private_key}"
-  }
-  provisioner "local-exec" {
-    command = "bash scripts/ndb/ensure-mysql-nodes-started.sh"
-  }
-}
+# resource "null_resource" "config" {
+#   depends_on = ["module.test-client"]
+#   triggers = {
+#     this_id = "${module.test-client.private_ip}"
+#   }
+#   connection = {
+#     host        = "${module.test-client.public_ip}"
+#     user        = "${module.test-client.user}"
+#     private_key = "${var.private_key}"
+#   }
+#   provisioner "local-exec" {
+#     command = "bash scripts/ndb/ensure-mysql-nodes-started.sh"
+#   }
+# }
 
 output "ndb_mgmt_public_ips" {
   value = "${module.ndb.mgmt_public_ips}"

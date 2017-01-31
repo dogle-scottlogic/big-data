@@ -37,6 +37,8 @@ To delete all terraform resources run `terraform destroy`. *BE VERY CAUTIOUS ABO
 
 After running `terraform apply` as described above then the analysis test script can be run.
 
+EXCEPTION FOR NDB CLUSTERS: You need to run the `ensure-mysql-nodes-started.sh` script before running the tests. Run the script from within the `terraform/` directory. This starts up mysql and sets up access from the test client. We haven't managed to automate this yet.
+
 To run tests on a particular cluster
 ```
 ./run-tests.sh <CLUSTER_NAME> <TESTS_TO_RUN>
