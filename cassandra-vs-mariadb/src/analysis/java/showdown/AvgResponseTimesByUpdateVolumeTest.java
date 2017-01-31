@@ -10,26 +10,26 @@ import storers.storers.Combo;
 import storers.storers.maria.enums.DBType;
 
 /**
- * Created by lcollingwood on 16/12/2016.
+ * Created by lcollingwood on 12/12/2016.
  */
-public class responseTimesByTableSize {
-    public void testHelper(int nCreates, int nUpdates, Enums.EventType updateType, CSVLogger logger) throws Exception {
+public class AvgResponseTimesByUpdateVolumeTest {
+    private void avgResponseTimesByUpdateVolumeTestHelper(int nUpdates, Enums.EventType updateType, CSVLogger logger) throws Exception {
         EventGenerator eventGenerator;
 
         // Init
-        Settings.setIntSetting("ORDER_CACHE_SIZE", nCreates);
+        Settings.setIntSetting("ORDER_CACHE_SIZE", 5000);
         CSVLogger log = new CSVLogger(true);
         Combo cs = new Combo(log, DBType.CASSANDRA);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        Conveyor.processEvents(nCreates, cs, eventGenerator);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(5000, cs, eventGenerator);
         cs.setLogger(logger);
         cs.reinitThreadPool();
         eventGenerator.setEvents(new Enums.EventType[]{updateType});
         Conveyor.processEvents(nUpdates, cs, eventGenerator);
 
         Combo ms = new Combo(log, DBType.MARIA_DB);
-        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{ Enums.EventType.CREATE});
-        Conveyor.processEvents(nCreates, ms, eventGenerator);
+        eventGenerator = Conveyor.initialiseEventsGenerator(new Enums.EventType[]{Enums.EventType.CREATE});
+        Conveyor.processEvents(5000, ms, eventGenerator);
         ms.setLogger(logger);
         ms.reinitThreadPool();
         eventGenerator.setEvents(new Enums.EventType[]{updateType});
@@ -37,12 +37,19 @@ public class responseTimesByTableSize {
     }
 
     private void testAllVolumes(Enums.EventType updateType) throws Exception {
-        CSVLogger log = new CSVLogger("updateResponseByTableSize");
+        CSVLogger log = new CSVLogger("UpdateTests_f");
 
-        for(int i = 1; i < 21; i++) {
-            log.setTestID(Integer.toString(i * 2000));
-            testHelper((i * 2000), 10000, updateType, log);
-        }
+        log.setTestID(Integer.toString(100000));
+        avgResponseTimesByUpdateVolumeTestHelper(100000, updateType, log);
+
+        log.setTestID(Integer.toString( 200000));
+        avgResponseTimesByUpdateVolumeTestHelper(200000, updateType, log);
+
+        log.setTestID(Integer.toString(300000));
+        avgResponseTimesByUpdateVolumeTestHelper(300000, updateType, log);
+
+        log.setTestID(Integer.toString(400000));
+        avgResponseTimesByUpdateVolumeTestHelper(400000, updateType, log);
     }
 
     @Test

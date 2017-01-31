@@ -23,8 +23,7 @@ public class Conveyor {
     private static int seed = Settings.getIntSetting("SEED");
 
     public static EventGenerator initialiseEventsGenerator(Enums.EventType[] events) {
-        Random random = new Random(seed);
-        return new EventGenerator(random, events);
+        return new EventGenerator(new Random(seed), events);
     }
 
     public static void processEvents(int numberOfEventsToProcess, Storer storer, EventGenerator eventGenerator) throws IOException, ParseException {

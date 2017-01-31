@@ -22,7 +22,7 @@ public class CSVLogger {
     private String testID;
 
     public CSVLogger(String fileName) throws IOException {
-        this(DEFAULT_FOLDER, fileName, fileName);
+        this(fileName, fileName);
     }
 
     public CSVLogger(String folderName, String fileName, String testID) throws IOException {
@@ -37,14 +37,17 @@ public class CSVLogger {
         this.doNotLog = doNotLog;
     }
 
+    public CSVLogger(String fileName, String id) throws IOException {
+        this(DEFAULT_FOLDER, fileName, id);
+    }
+
     public void logEvent(String[] eventData, boolean header) {
-        String logLine;
         synchronized (this) {
             if (!doNotLog) {
                 try {
                     this.fileWriter = new FileWriter(this.folderName + "/" + this.fileName + ".csv", true);
                     this.bufferedWriter = new BufferedWriter(fileWriter);
-                    logLine = eventDataToLogLine(eventData, header);
+                    String logLine = eventDataToLogLine(eventData, header);
                     this.bufferedWriter.write(logLine);
                 } catch (IOException e) {
                     LOG.warn("Failed to write log line", e);
@@ -64,7 +67,7 @@ public class CSVLogger {
         return logLine + "\n";
     }
 
-    public void closeLog() {
+    private void closeLog() {
         try {
             if (this.bufferedWriter != null) this.bufferedWriter.close();
             if (this.fileWriter != null) this.fileWriter.close();
@@ -73,7 +76,7 @@ public class CSVLogger {
         }
     }
 
-    public void setUpLogFile() {
+    private void setUpLogFile() {
         logEvent(this.headers, true);
     }
 

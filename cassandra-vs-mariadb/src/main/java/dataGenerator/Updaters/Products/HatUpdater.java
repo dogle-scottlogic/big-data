@@ -68,7 +68,7 @@ public class HatUpdater extends ProductUpdater {
     }
 
     public ArrayList<Field> getUpdatableFields(Field[] declaredFields) {
-        ArrayList<Field> trimmedFields = new ArrayList<Field>();
+        ArrayList<Field> trimmedFields = new ArrayList<>();
         for (Field field : declaredFields) {
             if (!field.getName().equals("productType") && !field.getName().equals("id")) {
                 trimmedFields.add(field);

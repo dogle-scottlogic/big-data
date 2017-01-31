@@ -35,10 +35,9 @@ public class OrderUpdateEvent extends QueryEvent {
     }
 
     private void updateLineItems(String orderId, JSONArray lineItems) {
-        Iterator lineItemsIterator = lineItems.iterator();
 
-        while (lineItemsIterator.hasNext()) {
-            JSONObject nextLineItem = (JSONObject) lineItemsIterator.next();
+        for (Object lineItem : lineItems) {
+            JSONObject nextLineItem = (JSONObject) lineItem;
             JSONObject product = (JSONObject) nextLineItem.get("product");
             String productId = (String) product.get("id");
             Long quantity = (Long) nextLineItem.get("quantity");

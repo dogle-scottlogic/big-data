@@ -19,6 +19,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -39,24 +40,36 @@ public class Combo implements Storer {
     private DBType type;
     private ExecutorService cachedPool = Executors.newCachedThreadPool();
     private int mariaConnectionPoolMax;
-    private HashMap<DBEventType, PreparedStatement> orderPreparedStatements;
-    private HashMap<DBEventType, PreparedStatement>  lineItemsPreparedStatements;
+    private Map<DBEventType, PreparedStatement> orderPreparedStatements = new HashMap<>();
+    private Map<DBEventType, PreparedStatement>  lineItemsPreparedStatements = new HashMap<>();
+    private final ConsistencyLevel consistencyLevel;
+    private final int replicationNumber;
 
     public Combo(CSVLogger logger, DBType type, int mariaConnectionPoolMax) {
-        this.type = type;
-        this.logger = logger;
-        this.mariaConnectionPoolMax = mariaConnectionPoolMax;
-        try {
-            LOG.info("Hello: Initialising DB connections");
-            initMariaDBInstance();
-            initCassandraInstance();
-        } catch (SQLException e) {
-            LOG.warn("Failed to initialise database connections", e);
-        }
+        this(logger, type, mariaConnectionPoolMax, ConsistencyLevel.ONE, 1);
     }
 
     public Combo(CSVLogger logger, DBType type) {
         this(logger, type, 1);
+    }
+
+    public Combo(CSVLogger logger, DBType type, int mariaConnectionPoolMax, ConsistencyLevel consistencyLevel, int replicationNumber) {
+        this.type = type;
+        this.logger = logger;
+        this.mariaConnectionPoolMax = mariaConnectionPoolMax;
+        this.consistencyLevel = consistencyLevel;
+        this.replicationNumber = replicationNumber;
+        if (DBType.CASSANDRA.equals(type)) {
+            initCassandraInstance();
+        } else if (DBType.MARIA_DB.equals(type)) {
+            try {
+                initMariaDBInstance();
+            } catch (SQLException e) {
+                LOG.warn("Failed to initialise database connections", e);
+            }
+        } else {
+            throw new IllegalArgumentException("Database type must be provided");
+        }
     }
 
     public void messageHandler(JSONObject message) {
@@ -125,6 +138,11 @@ public class Combo implements Storer {
      * Returns the next maria connection from the list to provide round robin load balancing.
      */
     private Connection getConnection() throws SQLException {
+        if (hikariDataSources.isEmpty()) {
+            // Return null if this is a Cassandra connection.
+            return null;
+        }
+
         if (mariaConnectionIndex + 1 == hikariDataSources.size()) {
             mariaConnectionIndex = 0;
         } else {
@@ -153,7 +171,7 @@ public class Combo implements Storer {
 
     // Cassandra Setup
     private void initCassandraInstance() {
-        this.cluster = Cluster.builder().addContactPoint(cassandra_ip).withLoadBalancingPolicy(new RoundRobinPolicy()).withQueryOptions(new QueryOptions().setConsistencyLevel(ConsistencyLevel.ONE)).build();
+        this.cluster = Cluster.builder().addContactPoint(cassandra_ip).withLoadBalancingPolicy(new RoundRobinPolicy()).withQueryOptions(new QueryOptions().setConsistencyLevel(consistencyLevel)).build();
         cassandraConnect();
         createKeySpace("orders");
         createLineItemTable();
@@ -162,14 +180,12 @@ public class Combo implements Storer {
     }
 
     private void createPreparedStatements() {
-        orderPreparedStatements = new HashMap<>();
         orderPreparedStatements.put(DBEventType.CREATE, session.prepare(CQL_Querys.addOrder(keyspaceName)));
         orderPreparedStatements.put(DBEventType.UPDATE, session.prepare(CQL_Querys.updateOrder(keyspaceName)));
         orderPreparedStatements.put(DBEventType.UPDATE_STATUS, session.prepare(CQL_Querys.updateOrderStatus(keyspaceName)));
         orderPreparedStatements.put(DBEventType.DELETE, session.prepare(CQL_Querys.deleteOrder(keyspaceName)));
         orderPreparedStatements.put(DBEventType.READ, session.prepare(CQL_Querys.selectAllOrders(keyspaceName)));
 
-        lineItemsPreparedStatements = new HashMap<>();
         lineItemsPreparedStatements.put(DBEventType.CREATE, session.prepare(CQL_Querys.addLineItem(keyspaceName)));
         lineItemsPreparedStatements.put(DBEventType.UPDATE, session.prepare(CQL_Querys.updateLineItem(keyspaceName)));
         lineItemsPreparedStatements.put(DBEventType.DELETE, session.prepare(CQL_Querys.deleteLineItem(keyspaceName)));
@@ -182,7 +198,7 @@ public class Combo implements Storer {
 
     private void createKeySpace(String name) {
         dropKeySpace(name);
-        this.session.execute(CQL_Querys.createKeySpace(name, 1));
+        this.session.execute(CQL_Querys.createKeySpace(name, replicationNumber));
         this.session.execute("USE " + name);
         this.keyspaceName = name;
     }

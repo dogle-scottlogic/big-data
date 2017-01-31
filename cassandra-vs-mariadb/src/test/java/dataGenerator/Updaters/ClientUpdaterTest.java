@@ -2,11 +2,6 @@ package dataGenerator.Updaters;
 
 import dataGenerator.entities.Client;
 import dataGenerator.entities.Order;
-import dataGenerator.enums.Enums;
-import dataGenerator.generators.ClientGenerator;
-import dataGenerator.generators.LineItemGenerator;
-import dataGenerator.generators.ProductGenerator;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,11 +22,6 @@ public class ClientUpdaterTest {
     @Before
     public void setUp() throws Exception {
         this.random = new Random(1234);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
     }
 
     @Test
@@ -77,9 +67,6 @@ public class ClientUpdaterTest {
     @Test
     public void removeIdFromFieldsList() throws Exception {
         ClientUpdater cu = new ClientUpdater(this.random);
-        ClientGenerator cg = new ClientGenerator(this.random);
-        ProductGenerator pg = new ProductGenerator(this.random);
-        LineItemGenerator lig = new LineItemGenerator(this.random, pg, Enums.ProductType.values());
 
         Field[] fieldsWithId = Order.class.getDeclaredFields();
         boolean containsId = false;

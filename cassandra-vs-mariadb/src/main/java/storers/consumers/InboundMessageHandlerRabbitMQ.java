@@ -27,7 +27,7 @@ public class InboundMessageHandlerRabbitMQ {
     private static Channel channel;
     private static Consumer consumer;
 
-    public static void initialise() {
+    private static void initialise() {
         try {
             connectionFactory = new ConnectionFactory();
             connectionFactory.setHost(HOST_NAME);
