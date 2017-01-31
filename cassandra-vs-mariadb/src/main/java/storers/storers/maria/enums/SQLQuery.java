@@ -27,8 +27,8 @@ public enum SQLQuery {
             "order_id VARCHAR(40) NOT NULL, " +
             "product_id VARCHAR(40) NOT NULL, " +
             "quantity INT NOT NULL, " +
-        "PRIMARY KEY(id), FOREIGN KEY(order_id) REFERENCES orders.order(id)" + ")" +
-            "ENGINE=NDBCLUSTER"
+        "PRIMARY KEY(id, order_id), FOREIGN KEY(order_id) REFERENCES orders.order(id)" + ")" +
+            "ENGINE=NDBCLUSTER PARTITION BY KEY(order_id)"
     );
 
     private String query;
