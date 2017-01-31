@@ -46,7 +46,7 @@ module "config" {
   commands         = [
     "dos2unix /tmp/config-mgmt.sh",
     "sudo bash /tmp/config-mgmt.sh",
-    "sudo pkill ndb_mgmd",
+    "sudo pkill ndb_mgmd || true",
     "sudo ndb_mgmd -f /var/lib/mysql-cluster/config.ini --ndb-nodeid=1 --reload",
     "sudo systemctl enable rc-local.service", # Ensure ndb_mgmd starts on boot
     "sudo sed -i -r \"s|(ndb_mgmd.*\\n)?exit 0|ndb_mgmd -f /var/lib/mysql-cluster/config.ini\\nexit 0|\" /etc/rc.local"
