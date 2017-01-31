@@ -27,6 +27,10 @@ secret_key=<SECRET_KEY>
 
 From within the `terraform/` directory, run `terraform plan`. This will show you what AWS resources will be created and deleted if you choose to apply this config. If everything is ok, run `terraform apply`. Once this completes, you can see the public IPs you can use to access the cluster with `terraform output`. To log in, run `ssh ubuntu@<PUBLIC_IP>`. No password will be required.
 
+#### Changing number of nodes in a cluster
+
+From within the `terraform/` directory, run `scripts/mark-for-destruction.sh <CLUSTER_NAME>`. Then, run `terraform apply`.
+
 #### Deleting a cluster
 
 Delete its block from `main.tf`. Run `terraform plan` / `terraform apply`.

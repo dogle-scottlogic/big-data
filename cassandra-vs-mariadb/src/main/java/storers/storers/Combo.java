@@ -46,14 +46,18 @@ public class Combo implements Storer {
     private final int replicationNumber;
 
     public Combo(CSVLogger logger, DBType type, int mariaConnectionPoolMax) {
-        this(logger, type, mariaConnectionPoolMax, ConsistencyLevel.ONE, 1);
+        this(logger, type, ConsistencyLevel.ONE, 1, mariaConnectionPoolMax);
     }
 
     public Combo(CSVLogger logger, DBType type) {
         this(logger, type, 1);
     }
 
-    public Combo(CSVLogger logger, DBType type, int mariaConnectionPoolMax, ConsistencyLevel consistencyLevel, int replicationNumber) {
+    public Combo(CSVLogger logger, DBType type, ConsistencyLevel consistencyLevel, int replicationNumber) {
+        this(logger, type, consistencyLevel, replicationNumber, 1);
+    }
+
+    public Combo(CSVLogger logger, DBType type, ConsistencyLevel consistencyLevel, int replicationNumber, int mariaConnectionPoolMax) {
         this.type = type;
         this.logger = logger;
         this.mariaConnectionPoolMax = mariaConnectionPoolMax;

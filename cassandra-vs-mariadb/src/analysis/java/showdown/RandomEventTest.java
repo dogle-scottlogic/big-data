@@ -34,7 +34,10 @@ public class RandomEventTest {
     public void FiftyThousandRandomEvents() throws Exception {
         String fileName = "FiftyThousandTotalRandomEvents";
 
-        Combo cassandraCombo = new Combo(log, DBType.CASSANDRA);
+        ConsistencyLevel consistencyLevel = ConsistencyLevel.ALL;
+        int replicationFactor = 2;
+
+        Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, consistencyLevel, replicationFactor);
         initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, fileName);
 
         Combo mariaCombo = new Combo(log, DBType.MARIA_DB);
@@ -47,7 +50,7 @@ public class RandomEventTest {
 
         int maxReplication = 5;
         for (int i = 1; i <= maxReplication; i++) {
-            Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, 1, ConsistencyLevel.ONE, i);
+            Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, ConsistencyLevel.ONE, i, 1);
             initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, Integer.toString(i));
         }
 
@@ -61,7 +64,7 @@ public class RandomEventTest {
 
         ConsistencyLevel[] consistencyValuesToTest= {ConsistencyLevel.ANY, ConsistencyLevel.ONE, ConsistencyLevel.TWO, ConsistencyLevel.THREE, ConsistencyLevel.QUORUM, ConsistencyLevel.ALL};
         for (ConsistencyLevel level: consistencyValuesToTest) {
-            Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, 1, level, 3);
+            Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, level, 3, 1);
             initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, level.toString());
         }
 
