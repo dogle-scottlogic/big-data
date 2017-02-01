@@ -35,7 +35,7 @@ public class RandomEventTest {
         String fileName = "FiftyThousandTotalRandomEvents";
 
         ConsistencyLevel consistencyLevel = ConsistencyLevel.ALL;
-        int replicationFactor = 2;
+        int replicationFactor = 3;
 
         Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, consistencyLevel, replicationFactor);
         initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, fileName);

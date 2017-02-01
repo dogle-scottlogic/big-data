@@ -1,0 +1,79 @@
+\ProvidesPackage{beamerthemeScottLogic}[2017/02/01]
+\mode<presentation>
+
+\usetheme{Rochester}
+\useoutertheme{infolines}
+\usecolortheme[named=Black]{structure}
+
+\newlength{\headerheight}
+\newlength{\footerheight}
+\setlength{\headerheight}{4.5ex}
+\setlength{\footerheight}{3.25ex}
+
+% colour definition from beameroutertheminfolines.sty
+\setbeamercolor{scottlogic@ftcolor}{parent=palette secondary}
+
+% Headline
+\setbeamertemplate{headline}
+{
+  \ifnum\c@framenumber>1
+  \leavevmode%
+  \usebeamerfont{structure}
+  \begin{beamercolorbox}[wd=\paperwidth,ht=\headerheight,dp=0ex]{scottlogic@ftcolor}%
+    \vbox to\headerheight%
+    {%
+      \vfil
+      \hspace{4mm}%
+      \large
+      \ifx\insertsectionhead\@empty
+      {
+        \textbf{\insertframetitle}
+      }
+      \else
+      {
+        \textbf{\insertsectionhead}
+        \hfill
+        {
+          \small
+          \insertframetitle
+          \hspace{4mm}
+        }
+      }
+      \fi
+      \vfil%
+    }%
+  \end{beamercolorbox}%
+  \fi
+}
+
+% Scott Logic footline
+\setbeamertemplate{footline}{%
+  \leavevmode%
+  \usebeamerfont{structure}
+  \begin{beamercolorbox}[wd=\paperwidth,ht=\footerheight,dp=0ex]{scottlogic@ftcolor}%
+    \vbox to\footerheight%
+    {%
+      \vfil
+      \hspace{4mm}
+      {
+        \tiny
+        \textbf{SCOTT} LOGIC {\TINY / ALTOGETHER SMARTER}
+      }
+      \hfill
+      {
+        \Tiny
+        \insertframenumber/\inserttotalframenumber
+        \hspace{4mm}
+      }
+      \vfil
+    }%
+  \end{beamercolorbox}%
+}
+
+\setbeamertemplate{items}[ball]
+\setbeamertemplate{blocks}[rounded][shadow=false]
+
+% don't show navigation buttons
+\setbeamertemplate{navigation symbols}{}
+
+\mode<all>

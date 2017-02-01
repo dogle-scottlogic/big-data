@@ -73,10 +73,10 @@ module "ami-nodes" {
 
 module "ndb_cluster" {
   source              = "modules/ndb-cassandra"
-  num_ndb_replicas    = 1
+  num_ndb_replicas    = 3
   num_ndb_fragments   = 1
-  num_sql_nodes       = 1
-  num_cassandra_nodes = 1
+  num_sql_nodes       = 2
+  num_cassandra_nodes = 3
   cluster_name        = "ndb-cassandra-"
   security_group_name = "${module.security_group.name}"
   key_name            = "${aws_key_pair.auth.key_name}"
