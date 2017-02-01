@@ -23,7 +23,11 @@
     * Declarative language was attractive
     * Client-based. Seemed easier at a quick glance to get up and running than with something like Chef (probably a mistake!)
 * Downside
+<<<<<<< HEAD
     * Immature. Weird missing holes, e.g. lack of `count` support in modules. Multiple copy-pasting of variable definitions. Felt almost there.
+=======
+    * Immature. Weird missing holes, e.g. lack of `count` support in modules.
+>>>>>>> f3d6d91f044da320c09df391bf0c5459067ed60f
     * Not suitable for provisioning, but fine for basic installs and AMI creation (though immature - instances not terminated after AMI creation)
     * Poor error diagnostics. 
         * "Script failed with error code 1" - what script? what nodes?!
