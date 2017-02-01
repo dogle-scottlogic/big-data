@@ -1,71 +1,72 @@
 \ProvidesPackage{beamerthemeScottLogic}[2017/02/01]
+\usepackage{lmodern}
 \mode<presentation>
 
+% Our theme is based on these
 \usetheme{Rochester}
 \useoutertheme{infolines}
 \usecolortheme[named=Black]{structure}
 
+% Footer / header sizes
 \newlength{\headerheight}
 \newlength{\footerheight}
+\newlength{\imagefooterheight}
 \setlength{\headerheight}{4.5ex}
-\setlength{\footerheight}{3.25ex}
+\setlength{\imagefooterheight}{2.5ex}
+\setlength{\footerheight}{2.5ex}
 
 % colour definition from beameroutertheminfolines.sty
 \setbeamercolor{scottlogic@ftcolor}{parent=palette secondary}
 
 % Headline
-\setbeamertemplate{headline}
-{
-  \ifnum\c@framenumber>1
+\setbeamertemplate{headline}{%
+  \ifnum\c@framenumber>1%
   \leavevmode%
-  \usebeamerfont{structure}
+  \usebeamerfont{structure}%
   \begin{beamercolorbox}[wd=\paperwidth,ht=\headerheight,dp=0ex]{scottlogic@ftcolor}%
     \vbox to\headerheight%
     {%
-      \vfil
+      \vfil%
       \hspace{4mm}%
-      \large
-      \ifx\insertsectionhead\@empty
-      {
-        \textbf{\insertframetitle}
-      }
-      \else
-      {
-        \textbf{\insertsectionhead}
-        \hfill
-        {
-          \small
-          \insertframetitle
+      \large%
+      \ifx\insertsectionhead\@empty%
+      {%
+        \textbf{\insertframetitle}%
+      }%
+      \else%
+      {%
+        \textbf{\insertsectionhead}%
+        \hfill%
+        {%
+          \small%
+          \insertframetitle%
           \hspace{4mm}
-        }
-      }
-      \fi
+        }%
+      }%
+      \fi%
       \vfil%
     }%
   \end{beamercolorbox}%
-  \fi
+  \fi%
 }
 
 % Scott Logic footline
 \setbeamertemplate{footline}{%
   \leavevmode%
-  \usebeamerfont{structure}
+  \usebeamerfont{structure}%
   \begin{beamercolorbox}[wd=\paperwidth,ht=\footerheight,dp=0ex]{scottlogic@ftcolor}%
     \vbox to\footerheight%
     {%
-      \vfil
-      \hspace{4mm}
-      {
-        \tiny
-        \textbf{SCOTT} LOGIC {\TINY / ALTOGETHER SMARTER}
-      }
-      \hfill
-      {
-        \Tiny
-        \insertframenumber/\inserttotalframenumber
+      \includegraphics[width=\paperwidth,height=\imagefooterheight]{scott-logic-footer.png}%
+      \vskip-\imagefooterheight%
+      \vfil%
+      \hfill%
+      {%
+        \Tiny%
+        \insertframenumber/\inserttotalframenumber%
         \hspace{4mm}
-      }
-      \vfil
+      }%
+      \vfil%
     }%
   \end{beamercolorbox}%
 }
@@ -75,5 +76,14 @@
 
 % don't show navigation buttons
 \setbeamertemplate{navigation symbols}{}
+
+% Final slide
+\setbeamertemplate{endpage}{%
+  \begin{frame}[plain]% No header or footer
+    \makebox[\linewidth]{%
+      \includegraphics[width=\paperwidth,height=\paperheight]{full-scott-logic.png}%
+    }
+  \end{frame}
+}
 
 \mode<all>
