@@ -1,6 +1,7 @@
 \ProvidesPackage{beamerthemeScottLogic}[2017/02/01]
 \usepackage{lmodern}
 \mode<presentation>
+\AtEndDocument{\usebeamertemplate{endpage}}
 
 % Our theme is based on these
 \usetheme{Rochester}
@@ -62,7 +63,7 @@
       \vfil%
       \hfill%
       {%
-        \Tiny%
+        \tiny%
         \insertframenumber/\inserttotalframenumber%
         \hspace{4mm}
       }%
@@ -71,8 +72,32 @@
   \end{beamercolorbox}%
 }
 
-\setbeamertemplate{items}[ball]
+% Colours for lists
+\definecolor{listone}{RGB}{43,175,186}
+\definecolor{listtwo}{RGB}{197,23,101}
+\definecolor{listthree}{RGB}{153,153,153}
+
+% Lists
+\setbeamertemplate{enumerate items}[default]
+\setbeamertemplate{itemize items}[default]
+
+\setbeamercolor{enumerate item}{fg=listone}
+\setbeamercolor{enumerate subitem}{fg=listtwo}
+\setbeamercolor{enumerate subsubitem}{fg=listthree}
+
+\setbeamercolor{itemize item}{fg=listone}
+\setbeamercolor{itemize subitem}{fg=listtwo}
+\setbeamercolor{itemize subsubitem}{fg=listthree}
+
+\setbeamercolor{itemize/enumerate subsubbody}{fg=listthree}
+
+% Block
 \setbeamertemplate{blocks}[rounded][shadow=false]
+
+% Table of contents
+\setbeamertemplate{sections/subsections in toc}[circle]
+\setbeamercolor{section in toc}{fg=listone}
+\setbeamercolor{subsection in toc}{fg=listtwo}
 
 % don't show navigation buttons
 \setbeamertemplate{navigation symbols}{}

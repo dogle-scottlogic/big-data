@@ -7,8 +7,6 @@
 \author{A Monster}
 \institute{In A Cave}
 \date{\today}
-\AtEndDocument{\usebeamertemplate{endpage}}
-
 
 \begin{document}
 
@@ -25,9 +23,31 @@
 \subsection{Sub a}
 
 \begin{frame}
-\frametitle{Garbage}
-Some text
+\frametitle{Numbered list}
+\begin{enumerate}
+  \item Item1
+  \item Item2
+  \begin{enumerate}
+    \item Item1
+    \begin{enumerate}
+      \item Item1
+    \end{enumerate}
+  \end{enumerate}
+\end{enumerate}
 \end{frame}
 
+\begin{frame}
+\frametitle{List}
+\begin{itemize}
+  \item Point1
+  \item Point2
+  \begin{itemize}
+    \item Point1
+    \begin{itemize}
+      \item Point1
+    \end{itemize}
+  \end{itemize}
+\end{itemize}
+\end{frame}
 
 \end{document}
