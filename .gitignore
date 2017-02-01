@@ -42,6 +42,7 @@ cassandra-vs-mariadb/keys/*
 
 # Presentation output
 */presentations/**/out/*
+*.pdf
 
 # Ignore credentials
 cassandra-vs-mariadb/awscredentials.rb
