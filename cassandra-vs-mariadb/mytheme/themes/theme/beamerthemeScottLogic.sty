@@ -4,9 +4,8 @@
 \AtEndDocument{\usebeamertemplate{endpage}}
 
 % Our theme is based on these
-\usetheme{Rochester}
-\useoutertheme{infolines}
-\usecolortheme[named=Black]{structure}
+\usetheme{Frankfurt}
+\usecolortheme[named=gray]{structure}
 
 % Footer / header sizes
 \newlength{\headerheight}
@@ -16,39 +15,17 @@
 \setlength{\imagefooterheight}{2.5ex}
 \setlength{\footerheight}{2.5ex}
 
-% colour definition from beameroutertheminfolines.sty
-\setbeamercolor{scottlogic@ftcolor}{parent=palette secondary}
+\setbeamercolor{scottlogic@ftcolor}{parent=palette primary}
 
-% Headline
-\setbeamertemplate{headline}{%
-  \ifnum\c@framenumber>1%
-  \leavevmode%
-  \usebeamerfont{structure}%
-  \begin{beamercolorbox}[wd=\paperwidth,ht=\headerheight,dp=0ex]{scottlogic@ftcolor}%
-    \vbox to\headerheight%
-    {%
-      \vfil%
-      \hspace{4mm}%
-      \large%
-      \ifx\insertsectionhead\@empty%
-      {%
-        \textbf{\insertframetitle}%
-      }%
-      \else%
-      {%
-        \textbf{\insertsectionhead}%
-        \hfill%
-        {%
-          \small%
-          \insertframetitle%
-          \hspace{4mm}
-        }%
-      }%
-      \fi%
-      \vfil%
-    }%
-  \end{beamercolorbox}%
-  \fi%
+% Section title pages
+\AtBeginSection[]{
+  {
+    \begin{frame}
+      \centering
+      \Large
+      \textbf{\textcolor{structure}{\insertsection}}
+    \end{frame}
+  }
 }
 
 % Scott Logic footline
@@ -71,6 +48,7 @@
     }%
   \end{beamercolorbox}%
 }
+
 
 % Colours for lists
 \definecolor{listone}{RGB}{43,175,186}
@@ -95,9 +73,10 @@
 \setbeamertemplate{blocks}[rounded][shadow=false]
 
 % Table of contents
-\setbeamertemplate{sections/subsections in toc}[circle]
-\setbeamercolor{section in toc}{fg=listone}
-\setbeamercolor{subsection in toc}{fg=listtwo}
+\setbeamertemplate{section in toc}[ball unnumbered]
+\setbeamertemplate{subsection in toc}[default]
+\setbeamercolor{section in toc}{fg=black}
+\setbeamercolor{subsection in toc}{fg=listthree}
 
 % don't show navigation buttons
 \setbeamertemplate{navigation symbols}{}
