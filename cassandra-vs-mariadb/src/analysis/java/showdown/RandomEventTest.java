@@ -34,14 +34,14 @@ public class RandomEventTest {
     public void FiftyThousandRandomEvents() throws Exception {
         String fileName = "FiftyThousandTotalRandomEvents";
 
-        ConsistencyLevel consistencyLevel = ConsistencyLevel.ALL;
-        int replicationFactor = 2;
+        ConsistencyLevel consistencyLevel = ConsistencyLevel.ONE;
+        int replicationFactor = 1;
 
         Combo cassandraCombo = new Combo(log, DBType.CASSANDRA, consistencyLevel, replicationFactor);
-        initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, fileName);
+        initialiseAndRunEvents(fileName, cassandraCombo, DBType.CASSANDRA, "5 Nodes");
 
         Combo mariaCombo = new Combo(log, DBType.MARIA_DB);
-        initialiseAndRunEvents(fileName, mariaCombo, DBType.MARIA_DB, fileName);
+        initialiseAndRunEvents(fileName, mariaCombo, DBType.MARIA_DB, "5 Nodes, 1 replica, 5 fragments");
     }
 
     @Test

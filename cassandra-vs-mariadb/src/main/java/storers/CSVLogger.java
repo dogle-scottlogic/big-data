@@ -29,8 +29,20 @@ public class CSVLogger {
         this.headers = new String[]{"TestID", "DatabaseType", "EventType", "TimeTaken", "Success", "ErrorMessage", "TimeStamp"};
         this.folderName = folderName;
         this.fileName = fileName;
-        this.testID = testID;
+        this.testID = quoteIfContiansComma(testID);
         setUpLogFile();
+    }
+
+    /**
+     * Returns the string if it does not contain a comma, but if it does contain a comma it is surrounded with quotes to
+     * prevent the value being interpreted as separate columns.
+     */
+    private String quoteIfContiansComma(String string) {
+        if (string.indexOf(',') != -1) {
+            return "\"" + string + "\"";
+        } else {
+            return string;
+        }
     }
 
     public CSVLogger(boolean doNotLog) throws IOException {
@@ -62,7 +74,7 @@ public class CSVLogger {
         String logLine = "";
         if (!header) logLine = this.testID + ", ";
         for (String eventDatum : eventData) {
-            logLine = logLine + eventDatum + ", ";
+            logLine = logLine + quoteIfContiansComma(eventDatum) + ", ";
         }
         return logLine + "\n";
     }

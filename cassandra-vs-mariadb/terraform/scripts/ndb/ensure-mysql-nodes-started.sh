@@ -7,7 +7,7 @@ MGMT_IPS=$(terraform output | grep mgmt_public_ips | grep -oP "[\d,\.]+" | sed '
 SQL_IPS=$(terraform output | grep sql_public_ips | grep -oP "[\d,\.]+" | sed 's#,# #g')
 DATA_IPS=$(terraform output | grep data_public_ips | grep -oP "[\d,\.]+" | sed 's#,# #g')
 TEST_IP=$(terraform output | grep test-client_private_ip | grep -oP "[\d,\.]+" )
-START_CMD='nohup mysqld_safe --ndbcluster --ndb-connectstring=$(grep ndb-connectstring /etc/my.cnf | cut -d= -f2) --datadir=/var/lib/mysql --pid-file=/var/lib/mysql/mysql.pid --syslog --user=ubuntu >/tmp/output.txt 2>&1 &'
+START_CMD='nohup mysqld_safe --ndbcluster --ndb-cluster-connection-pool=2 --ndb-connectstring=$(grep ndb-connectstring /etc/my.cnf | cut -d= -f2) --datadir=/var/lib/mysql --pid-file=/var/lib/mysql/mysql.pid --syslog --user=ubuntu >/tmp/output.txt 2>&1 &'
 SSH_OPTS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 
 #for IP in $MGMT_IPS ; do
