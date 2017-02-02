@@ -1,0 +1,136 @@
+% Theme stuff
+\documentclass[xcolor=dvipsnames]{beamer}
+\usepackage{wasysym}
+\usepackage{lstlisting}
+\usetheme{ScottLogic}
+
+\title{AWSome fun in Amazon Web Services}
+\date{\today}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\section*{Outline}
+\subsection*{Overview}
+\begin{frame}{Overview}
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+\subsection*{Who's this for}
+\begin{frame}{Who's this for}
+  \begin{itemize}
+    \item If you already know about...
+    \begin{itemize}
+      \item Vagrant
+      \item Terraform
+      \item Automation of cloud infrastructure
+    \end{itemize}
+    \item ...then you're not likely to get much out of this talk \smiley
+  \end{itemize}
+\end{frame}
+
+
+\section{Review}
+\subsection{Project goal}
+\begin{frame}{Project goal}
+  \begin{block}{Goal}
+    Investigate the different clustering strategies and performance of
+    Cassandra and MariaDB.
+  \end{block}
+  \pause
+  \begin{itemize}
+    \item See James' talk for discussion of these databases
+    \item Here concentrate on how we automated provisioning of the clusters
+  \end{itemize}
+\end{frame}
+
+\subsection{Previous work}
+\begin{frame}{Previous work}
+  \begin{itemize}
+    \item Dave and Laurie - single node comparison
+    \item Docker containers running in an Ubuntu VM
+    \item Manual setup of the VM
+  \end{itemize}
+\end{frame}
+
+\subsection{Our aims}
+\begin{frame}{Our aims}
+  \begin{itemize}
+    \item Move each database node to its own VM
+    \item Initially running locally, later in AWS
+    \item Automate setup of VMs - reproducibility, ease of use
+    \item Get to play with various cloud orchestation tools \smiley
+  \end{itemize}
+\end{frame}
+
+
+\section[Vagrant]{Vagrant - from local VMs to AWS}
+
+\subsection{Overview of Vagrant}
+\begin{frame}{Vagrant overview}
+  \begin{block}{}
+    \begin{quote}
+      Create and configure lightweight, reproducible, and portable development environments
+
+      \small{\hfill vagrantup.com}
+    \end{quote}
+  \end{block}
+  \pause
+  \begin{itemize}
+    \item Ruby-based, procedural framework
+    \item Flexible
+    \begin{itemize}
+      \item Multiple providers: VirtualBox, AWS, Docker...
+      \item Multiple provisioners: Shell, Chef, Ansible...
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\subsection{Moving to multiple VMs}
+\begin{frame}[fragile]{Moving to multiple VMs with Vagrant}
+  \begin{itemize}
+    \item Two Ubuntu-based VMs, one per database
+    \item Vagrant handles networking
+    \item Provisioned via shell scripts
+    \item Push button process - all handled from Vagrant
+    \pause
+    \begin{block}{To spin up a cluster}
+      \begin{verbatim}
+        vagrant up\end{verbatim}
+    \end{block}
+    \item Downloads Ubuntu box, creates and provisions two VMs
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \begin{lstlisting}
+
+  \end{lstlisting}
+\end{frame}
+
+\subsection[Cloudy time]{Moving into AWS}
+\begin{frame}
+  \begin{itemize}
+    \item Moving to AWS is simple...
+  \end{itemize}
+\end{frame}
+
+ % Awkward to express dependencies
+
+
+\section[Terraform]{Terraform - declarative language for infrastructure}
+
+\subsection[Motivation]{Motivation for using Terraform}
+
+\subsection{Advantages}
+
+\subsection{Horrors}
+
+
+
+\section[Next steps]{Mistakes and next steps}
+
+\end{document}
