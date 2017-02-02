@@ -1,7 +1,6 @@
 % Theme stuff
 \documentclass[xcolor=dvipsnames]{beamer}
 \usepackage{wasysym}
-\usepackage{listings}
 \usetheme{ScottLogic}
 
 \title{AWSome fun in Amazon Web Services}
@@ -107,13 +106,7 @@
 
 \begin{frame}[fragile]{Snippet to provision a seed Cassandra node}
   \begin{block}{Vagrantfile}
-  \begin{lstlisting}[language=ruby,
-                     columns=fullflexible,
-                     basicstyle=\ttfamily\small,
-                     keywordstyle=\color{blue}\ttfamily,
-                     stringstyle=\color{red}\ttfamily,
-                     commentstyle=\color{green}\ttfamily,
-                     breaklines=true]
+  \begin{code}{ruby}
 Vagrant.configure("2") do |config|
   config.vm.provider "virtualbox" do |vb, vbconfig|
     vbconfig.vm.box = "ubuntu/xenial64"
@@ -127,7 +120,7 @@ Vagrant.configure("2") do |config|
     end
   end
 end
-  \end{lstlisting}
+  \end{code}
   \end{block}
 \end{frame}
 
@@ -136,13 +129,7 @@ end
   \begin{itemize}
     \item Moving to AWS is simple...
     \begin{block}{Vagrantfile - with AWS provider}
-      \begin{lstlisting}[language=ruby,
-                         columns=fullflexible,
-                         basicstyle=\ttfamily\small,
-                         keywordstyle=\color{blue}\ttfamily,
-                         stringstyle=\color{red}\ttfamily,
-                         commentstyle=\color{green}\ttfamily,
-                         breaklines=true]
+      \begin{code}{ruby}
 node.vm.provider "aws" do |aws, awsconfig|
   awsconfig.vm.box     = "dummy"
   awsconfig.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
@@ -154,7 +141,7 @@ node.vm.provider "aws" do |aws, awsconfig|
   aws.subnet_id          = AWS_SUBNET_ID
   aws.security_groups    = [AWS_SECURITY_GROUP_ID]
 end
-      \end{lstlisting}
+      \end{code}
     \end{block}
   \end{itemize}
 \end{frame}

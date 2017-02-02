@@ -1,7 +1,19 @@
 \ProvidesPackage{beamerthemeScottLogic}[2017/02/01]
 \usepackage{lmodern}
+\usepackage{listings}
 \mode<presentation>
 \AtEndDocument{\usebeamertemplate{endpage}}
+
+% Code environment
+\lstnewenvironment{code}[1]{%
+  \lstset{language=#1,
+          columns=fullflexible,
+          basicstyle=\ttfamily\small,
+          keywordstyle=\color{blue}\ttfamily,
+          stringstyle=\color{red}\ttfamily,
+          commentstyle=\color{green}\ttfamily,
+          breaklines=true}
+}{}
 
 % Our theme is based on these
 \usetheme{Frankfurt}
