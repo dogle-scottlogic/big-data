@@ -1,7 +1,7 @@
 % Theme stuff
 \documentclass[xcolor=dvipsnames]{beamer}
 \usepackage{wasysym}
-\usepackage{lstlisting}
+\usepackage{listings}
 \usetheme{ScottLogic}
 
 \title{AWSome fun in Amazon Web Services}
@@ -105,21 +105,68 @@
   \end{itemize}
 \end{frame}
 
-\begin{frame}
-  \begin{lstlisting}
+\begin{frame}[fragile]{Snippet to provision a seed Cassandra node}
+  \begin{block}{Vagrantfile}
+  \begin{lstlisting}[language=ruby,
+                     columns=fullflexible,
+                     basicstyle=\ttfamily\small,
+                     keywordstyle=\color{blue}\ttfamily,
+                     stringstyle=\color{red}\ttfamily,
+                     commentstyle=\color{green}\ttfamily,
+                     breaklines=true]
+Vagrant.configure("2") do |config|
+  config.vm.provider "virtualbox" do |vb, vbconfig|
+    vbconfig.vm.box = "ubuntu/xenial64"
+    vb.memory       = 1024
+    vbconfig.vm.network "private_network", ip: private_ip
+  end
 
+  (cassandra_nodes + maria_nodes).each_with_index do |name, index|
+    config.vm.define name do |node|
+      node.vm.provision "shell", path: "cassandra/bootstrap.sh"
+    end
+  end
+end
   \end{lstlisting}
+  \end{block}
 \end{frame}
 
 \subsection[Cloudy time]{Moving into AWS}
-\begin{frame}
+\begin{frame}[fragile]{Extra AWS stuff}
   \begin{itemize}
     \item Moving to AWS is simple...
+    \begin{block}{Vagrantfile - with AWS provider}
+      \begin{lstlisting}[language=ruby,
+                         columns=fullflexible,
+                         basicstyle=\ttfamily\small,
+                         keywordstyle=\color{blue}\ttfamily,
+                         stringstyle=\color{red}\ttfamily,
+                         commentstyle=\color{green}\ttfamily,
+                         breaklines=true]
+node.vm.provider "aws" do |aws, awsconfig|
+  awsconfig.vm.box     = "dummy"
+  awsconfig.vm.box_url = "https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box"
+
+  # VM details
+  aws.ami                = "ami-57eae033" # Ubuntu Server 16.04
+  aws.region             = "eu-west-2"
+  aws.instance_type      = "t2.micro"
+  aws.subnet_id          = AWS_SUBNET_ID
+  aws.security_groups    = [AWS_SECURITY_GROUP_ID]
+end
+      \end{lstlisting}
+    \end{block}
   \end{itemize}
 \end{frame}
 
- % Awkward to express dependencies
-
+\begin{frame}{Extra AWS stuff - downsides}
+BUT
+  \begin{itemize}
+    \item Lots more manual setup
+    \item Security group, keys
+    \item As complexity grows, awkward to express dependencies
+  \end{itemize}
+\end{frame}
 
 \section[Terraform]{Terraform - declarative language for infrastructure}
 
