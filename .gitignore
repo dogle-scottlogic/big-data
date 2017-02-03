@@ -20,6 +20,30 @@ cassandra-vs-mariadb/BigDataProject2WithMavennbproject/.nb-gradle/
 # Ignore SSH keys
 cassandra-vs-mariadb/keys/*
 
+# Temporary LaTeX files
+*.blg
+*.bbl
+*.aux
+*.log
+*.brf
+*.nlo
+*.out
+*.dvi
+*.ps
+*.lof
+*.toc
+*.fls
+*.fdb_latexmk
+*.pdfsync
+*.synctex.gz
+*.ind
+*.ilg
+*.idx
+
+# Presentation output
+*/presentations/**/out/*
+*.pdf
+
 # Ignore credentials
 cassandra-vs-mariadb/awscredentials.rb
 
@@ -110,3 +134,4 @@ cassandra-vs-mariadb/.gradle/3.1/taskArtifacts/taskArtifacts.bin
 cassandra-vs-mariadb/gradle/wrapper/gradle-wrapper.jar
 cassandra-vs-mariadb/gradle/wrapper/gradle-wrapper.properties
 cassandra-vs-mariadb/logs/*
+/.project
