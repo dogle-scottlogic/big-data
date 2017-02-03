@@ -57,3 +57,28 @@ This will use the default 4:3 aspect ratio. If you want the 16:9 aspect ratio, p
 ```
 \documentclass[aspectratio=169]{beamer}
 ```
+
+#### Overview of theme
+
+In brief, the theme
+* Gives a navigation header based on section and subsection
+* Generates a title page for each section
+* Adds a final branded page to each presentation
+* Introduces a `code` environment. To grey out some code, use the delimeters `<@` and `@>`. For example
+```
+  \begin{block}{cluster.tf}
+    \begin{code}{ruby}
+module "test-client" {
+  <@source               = "../resources/cluster/test-client"
+  ami                  = "${var.test-client_ami}"
+  key_name             = "${var.key_name}"
+  mariadb_password     = "${var.mariadb_password}"
+  security_group_name  = "${var.security_group_name}"
+  private_key          = "${var.private_key}"
+  cluster_name         = "${var.cluster_name}"@>
+  cassandra_primary_ip = "${module.cassandra.primary_ip}"
+  mariadb_ips          = "${join(",", module.mariadb.private_ips)}"
+}
+    \end{code}
+  \end{block}
+```
