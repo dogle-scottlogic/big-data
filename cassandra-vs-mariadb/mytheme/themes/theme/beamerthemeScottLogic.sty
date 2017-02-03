@@ -25,10 +25,8 @@
 % Footer / header sizes
 \newlength{\headerheight}
 \newlength{\footerheight}
-\newlength{\imagefooterheight}
 \setlength{\headerheight}{4.5ex}
-\setlength{\imagefooterheight}{2.5ex}
-\setlength{\footerheight}{2.5ex}
+\setlength{\footerheight}{0.06\paperheight}
 
 \setbeamercolor{scottlogic@ftcolor}{parent=palette primary}
 
@@ -50,8 +48,10 @@
   \begin{beamercolorbox}[wd=\paperwidth,ht=\footerheight,dp=0ex]{scottlogic@ftcolor}%
     \vbox to\footerheight%
     {%
-      \includegraphics[width=\paperwidth,height=\imagefooterheight]{scott-logic-footer.png}%
-      \vskip-\imagefooterheight%
+      % Set width explicitly as image is for 16:9 aspect ratio. Will be cropped
+      % automatically if the default 4:3
+      \includegraphics[width=16cm,height=\footerheight]{scott-logic-footer.png}%
+      \vskip-\footerheight%
       \vfil%
       \hfill%
       {%
@@ -100,7 +100,9 @@
 \setbeamertemplate{endpage}{%
   \begin{frame}[plain]% No header or footer
     \makebox[\linewidth]{%
-      \includegraphics[width=\paperwidth,height=\paperheight]{full-scott-logic.png}%
+      % Set width explicitly as image is for 16:9 aspect ratio. Will be cropped
+      % automatically if the default 4:3
+      \includegraphics[width=16cm,height=\paperheight]{full-scott-logic.png}%
     }
   \end{frame}
 }
