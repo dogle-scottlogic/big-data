@@ -17,10 +17,10 @@ Before we start we must tip our hats to Dave and Laurie for their [previous blog
 To assess the performance of the different clusters we made use of the database event generation and logging mechanism created by Dave and Laurie. The Java client for Cassandra by default supports load balancing so it was relatively straight forward to start up multiple docker containers and run some tests. However it quickly became apparent that this approach was unrealistic, **Fig1** shows a slow down in write response times as the number of nodes increases and **Fig2** shows a drastic slow down in read response times. As more nodes were started the more they were competing for the same limited hardware resources of the machine, in order to make an kind of realistic assessment of the scaling we needed to run the nodes on multiple machines.   
 
 **Fig 1**
-![](https://drive.google.com/a/scottlogic.co.uk/file/d/0B65w2mgTevTpN1VjUkEyWXVDaGM/view?usp=sharing "Write operation response times for multiple Cassandra nodes running on the same machine")
+![](https://drive.google.com/open?id=0B65w2mgTevTpS1NZTU1MQjZZR0U "Write operation response times for multiple Cassandra nodes running on the same machine")
 
 **Fig 2**
-![](https://drive.google.com/open?id=0B65w2mgTevTpeFZlQWpYdmJ4a0k "Read response times for multiple Cassandra nodes running on the same machine")
+![](https://drive.google.com/open?id=0B65w2mgTevTpSmJfdEEwdVcwbTA "Read response times for multiple Cassandra nodes running on the same machine")
 
 The decision was made to use Amazon Web Services as this enabled us to quickly and easily create and destroy different virtual machines with new nodes to run our different tests. Since we had moved the database instances to remote machines the possibility that network latency would muddy the results became a concern so we created an additional VM that would run the tests thereby keeping network latency to a minimum.
 
@@ -61,21 +61,26 @@ The consistency level is configured on a per query basis and specifies how many 
 There are other consistency levels that are data centre aware which we did not look at as we just had a single cluster. The less strict the consistency level is the higher the availability of the system will be but there will be a greater chance of stale data being read. For example a write operation with consistency of ANY can succeed even if none of the replica nodes are available but it will not be possible to read that data until the nodes are available again. The higher consistency levels provide a higher likelihood of the data being up to date but they have lower availability. For example with the consistency of ALL if any of the replica nodes do not respond then the operation will not succeed. **Fig 3** show the performance of the different consitency levels in a 5 node cluster with a replication factor of 3. As might be expected the general trend is that the higher consistency levels take slightly longer to be processed.   
  
 **Fig 3**
-![](https://drive.google.com/open?id=0B65w2mgTevTpU181ZmFwWFhVQXc "Response times for different Cassandra consistency levels")
+![](https://drive.google.com/open?id=0B65w2mgTevTpcE9TcDJzS2I3elk "Response times for different Cassandra consistency levels")
 
 The replication factor is another important configuration to be considered. This is set when the keyspace is created and it defines how many copies of the data are created on different nodes and as such increasing this increases the availability of the data. **Fig 4** shows the different response times for different replication strategies in a five node cluster. There is a slight overhead for the higher replication factors but there is the benefit of not having a single point of failure for the specific items of data. Since this is set at the keyspace level different data can be replicated onto different numbers of nodes. The cluster can also be configured with different replication strategies. We just used the simple strategy which put the replicas on the next nodes in a ring but there are more sophisticated strategies which are aware of the datacentres and racks which will place the replicas on nodes that are less likely to fail together.    
  
 **Fig 4**
-![](https://drive.google.com/open?id=0B65w2mgTevTpNDFVblJhOHZXOXM "Response times for different Cassandra replication factors in a 5 node cluster")
+![](https://drive.google.com/open?id=0B65w2mgTevTpYVV3bWl4VXFHY00 "Response times for different Cassandra replication factors in a 5 node cluster")
  
 ## Configuring MariaDB Cluster
 ### Galera cluster
 MariaDB does not by itself support clustering but the API for[Galera cluster](http://galeracluster.com/products/)is included with MariaDB so this was the first approach we tried for creating a MariaDB cluster. Galera cluster is a multi-master system which offers synchronous replication across all the nodes so each one contains the same data. Galera cluster is not directly equivalent to a Cassandra cluster; the aim of Cassandra cluster is to provide horizontal scaling whereas the aim of the Galera cluster is to improve availability without compromising the consistency of the data. Since all of the nodes in a Galera cluster have all the data and can handle requests, we implemented simple round robin load balancing in our tests to fire requests to all of the nodes. **Fig 5** shows what happens to response times as more nodes are added to both a Cassandra cluster and a Galera cluster.
 
 **Fig 5**
-![](https://drive.google.com/open?id=0B65w2mgTevTpWThKeGIyUjNHdHM "Response times for different cluster sizes for Cassandra and Galera")
+![](https://drive.google.com/open?id=0B65w2mgTevTpbTg2bHN2ZXdoMG8 "Response times for different cluster sizes for Cassandra and Galera")
 
-As more nodes were added the response times of Cassandra clearly decreased whereas the MariaDB write times increased. The MariaDB read times stayed roughly the same as they are effectively still returning the data off the node which receives the request, all the extra work to replicate the data across the nodes is handled at write time. Whilst Galera cluster might theoretically offer some[mild scaling](https://www.percona.com/blog/2014/11/17/typical-misconceptions-on-galera-for-mysql/)due to there being multiple nodes to handle requests it is not what we observed here and certainly not the primary function of a Galera cluster. Additionally as more nodes are added there is a greater chance of deadlocks where two nodes try to edit the same data at the same time, this is shown in **Fig 6**.
+As more nodes were added the response times of Cassandra clearly decreased whereas the MariaDB write times increased. The MariaDB read times stayed roughly the same as they are effectively still returning the data off the node which receives the request, all the extra work to replicate the data across the nodes is handled at write time. However this is not an entirely fair comparison as the Galera cluster replicates the data to all nodes but Cassandra only has 2 copies. **Fig 6** shows what happens when we configure Cassandra to replicate across all nodes.
+
+**Fig 6**
+![](https://drive.google.com/open?id=0B65w2mgTevTpMHQ1R1ZtQi01aWM "Response times for a Cassandra cluster with a replication factor equal to the nodes compared with a Galera cluster")
+
+With this configuration the performance difference is less striking but but Cassandra's performance is remaining fairly constant whilst Galera response times are getting longer as more nodes are added. Whilst Galera cluster might theoretically offer some[mild scaling](https://www.percona.com/blog/2014/11/17/typical-misconceptions-on-galera-for-mysql/)due to there being multiple nodes to handle requests it is not what we observed here and certainly not the primary function of a Galera cluster. Additionally as more nodes are added there is a greater chance of deadlocks where two nodes try to edit the same data at the same time, this is shown in **Fig 6**.
 
 **Fig 6**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpVmFNcExnUnNjWTg "Number of deadlocks in a Galera cluster as more nodes were added")
@@ -113,6 +118,7 @@ As can be seen in this graph the perfomrnce of the two cluster are reasonably si
 Very small clusters
 
 Limitations of AWS
+* nodes going down
 
 ## Stuff for future?
 
