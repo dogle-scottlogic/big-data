@@ -27,7 +27,7 @@ initexmf --update-fndb
 
 #### To use
 
-Call the theme after declaring your `documentclass`.
+Call the theme after declaring your `documentclass`. 
 ```
 \documentclass{beamer}
 \usetheme{ScottLogic}
@@ -41,4 +41,9 @@ All the best words
 \end{frame}
 
 \end{document}
+```
+
+This will use the default 4:3 aspect ratio. If you want the 16:9 aspect ratio, pass in the relevant option to `documentclass`
+```
+\documentclass[aspectratio=169]{beamer}
 ```
