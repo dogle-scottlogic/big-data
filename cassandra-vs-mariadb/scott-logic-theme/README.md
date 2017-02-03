@@ -9,8 +9,8 @@ Note: I've only tested these instructions with MikTex, not with TexLive.
 </aside>
 
 * Create a directory to store local Beamer themes in. I created mine at `C:\Users\USERNAME\localmiktex`.
-* Within that directory, create the directory structure `tex/latex/beamer/themes/theme`.
-* Copy the template file into the `theme/` directory:
+* Within that directory, create the directory structure `tex\latex\beamer\themes\theme`.
+* Copy the template file into the `theme\` directory:
 ```
 cp beamerthemeScottLogic.sty C:\Users\USERNAME\localmiktex\tex\latex\beamer\themes\theme\
 ```
