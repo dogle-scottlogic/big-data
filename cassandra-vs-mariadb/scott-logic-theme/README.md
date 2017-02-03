@@ -39,10 +39,18 @@ Call the theme after declaring your `documentclass`.
 \begin{document}
 
 \begin{frame}
-All the best words
+  \titlepage
+\end{frame}
+
+\section{First section}
+\subsection{First subsection}
+
+\begin{frame}
+  All the best words
 \end{frame}
 
 \end{document}
+
 ```
 
 This will use the default 4:3 aspect ratio. If you want the 16:9 aspect ratio, pass in the relevant option to `documentclass`
