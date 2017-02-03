@@ -1,4 +1,4 @@
-### Scott Logic beamer template
+### Scott Logic Beamer template
 
 This is a default template for use in Beamer LaTeX presentations.
 
