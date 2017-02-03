@@ -58,7 +58,8 @@ public class Update extends ComboQuery {
                     "order_id='" + order.getOrderId() + "', " +
                     "product_id='" + lineItem.get("productId") + "', " +
                     "quantity=" + lineItem.get("quantity") + " " +
-                    "WHERE order_id='" + order.getOrderId() + "';");
+                    "WHERE order_id='" + order.getOrderId() + "'" +
+                    "AND id='" + lineItemId + "';");
         }
     }
 }

@@ -23,7 +23,7 @@ public enum SQLQuery {
 
     CREATE_LINE_ITEM_TABLE(
         "CREATE TABLE orders.`line_item` (" +
-            "id INT NOT NULL AUTO_INCREMENT, " +
+            "id VARCHAR(40) NOT NULL, " +
             "order_id VARCHAR(40) NOT NULL, " +
             "product_id VARCHAR(40) NOT NULL, " +
             "quantity INT NOT NULL, " +

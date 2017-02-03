@@ -18,7 +18,7 @@ import java.util.HashMap;
 public class Create extends ComboQuery {
 
     private ArrayList<String> lineItemsIds = new ArrayList<>();
-    private String mariaLineItemQuery = "INSERT INTO orders.line_item(order_id, product_id, quantity) VALUES";
+    private String mariaLineItemQuery = "INSERT INTO orders.line_item(id, order_id, product_id, quantity) VALUES";
 
     public Create(Session cassandraConnection, PreparedStatement orderPreparedStatement, PreparedStatement lineItemPreparedStatement, Connection mariaConnection, CSVLogger logger, Order order, DBType type) throws SQLException {
         super(cassandraConnection, orderPreparedStatement, lineItemPreparedStatement, mariaConnection, logger, DBEventType.CREATE, type);
@@ -63,11 +63,11 @@ public class Create extends ComboQuery {
 
         if (getDbtype() == DBType.MARIA_DB) {
             // Add Maria Batch Statement
-            this.mariaLineItemQuery = this.mariaLineItemQuery.concat(createLineItemPartialMariaQuery(order.getOrderId(), productId, lineItem.get("quantity"))).concat(", ");
+            this.mariaLineItemQuery = this.mariaLineItemQuery.concat(createLineItemPartialMariaQuery(lineItemId, order.getOrderId(), productId, lineItem.get("quantity"))).concat(", ");
         }
     }
 
-    private String createLineItemPartialMariaQuery(String orderId, String productId, String quantity) {
-        return "('" + orderId + "', '" + productId + "', " + quantity + ")";
+    private String createLineItemPartialMariaQuery(String id, String orderId, String productId, String quantity) {
+        return "('" + id + "', '" + orderId + "', '" + productId + "', " + quantity + ")";
     }
 }
