@@ -161,7 +161,7 @@ BUT
 \begin{frame}{Choose Terraform}
   \begin{itemize}
     \item Same people as Vagrant
-    \item Easy to setup dependent AWS resources
+    \item Easy to setup required AWS resources
     \item Handles dependencies for you
     \begin{itemize}
       \item e.g. test client needs to know IPs of database nodes
@@ -169,12 +169,90 @@ BUT
   \end{itemize}
 \end{frame}
 
+\begin{frame}[fragile]{Terraform dependency handling}
+  \begin{block}{cluster.tf}
+    \begin{code}{ruby}
+module "test-client" {
+  <@source               = "../resources/cluster/test-client"
+  ami                  = "${var.test-client_ami}"
+  key_name             = "${var.key_name}"
+  mariadb_password     = "${var.mariadb_password}"
+  security_group_name  = "${var.security_group_name}"
+  private_key          = "${var.private_key}"
+  cluster_name         = "${var.cluster_name}"@>
+  cassandra_primary_ip = "${module.cassandra.primary_ip}"
+  mariadb_ips          = "${join(",", module.mariadb.private_ips)}"
+}
+    \end{code}
+  \end{block}
+\end{frame}
+
 \subsection{Advantages}
+\begin{frame}{Other advantages}
+  \begin{itemize}
+    \item Handles dependencies between VMs nicely
+    \item Declarative - only makes changes needed
+    \item Easy to modularise code
+  \end{itemize}
+\end{frame}
 
 \subsection{Horrors}
+\begin{frame}{Minor horrors}
+  \begin{itemize}
+    \item Immature - latest version 0.8.5 at time of writing
+    \item Not meant for provisioning...
+    \item Rubbish errors
+    \pause
+    \begin{block}{Example error message}
+      \texttt{Script failed with error code 1}
+    \end{block}
+    \item What script? What nodes?
+    \item Missing functionality
+    \begin{itemize}
+      \item Can't loop over modules
+      \item Doesn't delete VMs after AMI creation
+    \end{itemize}
+  \end{itemize}
+\end{frame}
 
 
+\section[Next steps]{Self-inflicted horrors / next steps}
+\begin{frame}{Self-inflicted horrors}
+\begin{itemize}
+  \item Using Terraform for provisioning - spaghettified mess of shell scripts
+  \item Be wary of AWS free tier - easy to go beyond free hours with lots of VMs!
+\end{itemize}
+\pause
+\begin{columns}
+  \centering
+  \begin{column}{0.5\textwidth}
+    \begin{block}{Oops...}
+      \centering
+      \includegraphics[width=0.8\textwidth]{AWSbilling.png}
+    \end{block}
+  \end{column}
+\end{columns}
+\end{frame}
 
-\section[Next steps]{Mistakes and next steps}
+\begin{frame}{Next steps?}
+  \begin{itemize}
+    \item Use 'proper' provisioning solution?
+    \item Try Chef for [infrastructure and] provisioning
+    \begin{itemize}
+      \item Lots of recipes available for Galera / Cassandra clusters
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\section{Summary}
+\begin{frame}{Summary}
+  \begin{itemize}
+    \item We played about with lots of automation tools
+    \item Vagrant is nice for simple independent dev environments
+    \item Terraform is nice for cloud environments with lots of dependencies...
+    \item ...but don't use it for provisioning
+    \item Would be nice to know how it compares against more mature solutions
+  \end{itemize}
+\end{frame}
 
 \end{document}
