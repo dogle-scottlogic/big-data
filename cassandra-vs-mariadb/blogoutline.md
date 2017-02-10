@@ -78,12 +78,27 @@ In practice this gives us a tradeoff between **C**onsistency and latency.
 It *is* possible to get strong consistency in Cassandra... if you're willing to accept high latency.
 This tradeoff is controlled via the *consistency level* parameter.
 
+### Replication Factor
+<!-- Think this needs to come first because the consistency level section references the replication factor -->
+The replication factor is another important configuration to be considered.
+This is set when the keyspace is created and it defines how many copies of the data are created on different nodes.
+Increasing the replication factor naturally increases the availability of the data.
+**Fig 3** shows the different response times for different replication strategies in a five node cluster.
+There is a slight overhead for the higher replication factors.
+Since this is set at the keyspace level, we can opt for greater replication of more important data.
+Two kinds of replication strategy are available in Cassandra.
+We use the `SimpleStrategy` which is rack and data centre unaware. In this strategy, replicas are stored on the next nodes on the ring.
+Alternatively there is the `NetworkTopologyStrategy` in which replicas are stored in distinct racks.
+ 
+**Fig 3**
+![](https://drive.google.com/open?id=0B65w2mgTevTpYVV3bWl4VXFHY00 "Response times for different Cassandra replication factors in a 5 node cluster")
+
+### Consistency Level  
+<!-- Also talk about what happens when nodes disagree on the value -->
+
 The consistency level is configured on a per query basis and specifies how many nodes need to respond successfully for the operation to be considered successful. 
 This flexibility enables individual operations to determine how important getting the most up to date data is. 
 A selection of the consistency levels are described below:
-<!-- First need some chat about replicas and replication factors -->
-<!-- Also talk about what happens when nodes disagree on the value -->
-  
 | Consistency level | Write effect | Read effect|
 | ----------------- | ------------ | ---------- |
 | `ONE`, `TWO`, `THREE`   | The write must be successfully written to the specified number of replicas | Returns the response from the specified number of closest replicas |
@@ -99,22 +114,12 @@ Conversely, higher consistency levels give a higher likelihood of the data being
 The extreme example of `ALL` is instructive. 
 The latency of the query will be determined by the slowest node in the cluster. 
 If *any* nodes are down then the operation will not succeed.
-**Fig 3** show the performance of the different consistency levels in a 5 node cluster with a replication factor of 3. As expected, higher consistency levels lead to higher latency. 
+**Fig 4** show the performance of the different consistency levels in a 5 node cluster with a replication factor of 3. As expected, higher consistency levels lead to higher latency. 
  <!-- Got up to here -->
-**Fig 3**
-![](https://drive.google.com/open?id=0B65w2mgTevTpcE9TcDJzS2I3elk "Response times for different Cassandra consistency levels")
-
-The replication factor is another important configuration to be considered.
-This is set when the keyspace is created and it defines how many copies of the data are created on different nodes and as such increasing this increases the availability of the data.
-**Fig 4** shows the different response times for different replication strategies in a five node cluster.
-There is a slight overhead for the higher replication factors.
-Since this is set at the keyspace level different data can be replicated onto different numbers of nodes.
-The cluster can also be configured with different replication strategies. We just used the simple strategy which put the replicas on the next nodes in a ring but there are more sophisticated strategies which are aware of the datacentres and racks which will place the replicas on nodes that are less likely to fail together.    
- 
 **Fig 4**
-![](https://drive.google.com/open?id=0B65w2mgTevTpYVV3bWl4VXFHY00 "Response times for different Cassandra replication factors in a 5 node cluster")
- 
-## Configuring MariaDB Cluster
+![](https://drive.google.com/open?id=0B65w2mgTevTpcE9TcDJzS2I3elk "Response times for different Cassandra consistency levels")
+<!-- Got up to here -->
+## SQL Clustering
 ### Galera cluster
 MariaDB does not by itself support clustering but the API for[Galera cluster](http://galeracluster.com/products/)is included with MariaDB so this was the first approach we tried for creating a MariaDB cluster. Galera cluster is a multi-master system which offers synchronous replication across all the nodes so each one contains the same data. Galera cluster is not directly equivalent to a Cassandra cluster; the aim of Cassandra cluster is to provide horizontal scaling whereas the aim of the Galera cluster is to improve availability without compromising the consistency of the data. Since all of the nodes in a Galera cluster have all the data and can handle requests, we implemented simple round robin load balancing in our tests to fire requests to all of the nodes. **Fig 5** shows what happens to response times as more nodes are added to both a Cassandra cluster and a Galera cluster.
 
