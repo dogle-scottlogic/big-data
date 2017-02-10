@@ -45,7 +45,7 @@ cassandra-vs-mariadb/keys/*
 *.pdf
 
 # Ignore credentials
-cassandra-vs-mariadb/awscredentials.rb
+cassandra-vs-mariadb/deprecated/awscredentials.rb
 
 # out files
 cassandra-vs-mariadb/out/galera.cnf.*
