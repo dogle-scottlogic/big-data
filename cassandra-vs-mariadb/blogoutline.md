@@ -12,7 +12,7 @@ layout: post
 <!--Add real link when previous blog post is up -->
 Welcome [back](http://blog.scottlogic.com/) to the world's most popular hat shop, now under new management!
 Our database remains creaky, but our quest for a modern, scalable solution continues.
-The previous management, Dave and Laurie, [compared](http://blog.scottlogic.com/) running our database on single node instances of Cassandra(http://cassandra.apache.org/) and MariaDB(https://mariadb.org/).
+The previous management, Dave and Laurie, [compared](http://blog.scottlogic.com/) running our database on single node instances of [Cassandra](http://cassandra.apache.org/) and [MariaDB](https://mariadb.org/).
 In that scenario, the unoptimised performance of the two databases is fairly equivalent.
 But, what shall we do as our hat shop grows more popular? 
 How do we scale out our new database, or is our shop's size doomed to be... *capped*?
