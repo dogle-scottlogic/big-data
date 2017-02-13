@@ -65,7 +65,9 @@ In this scenario the CAP theorem states it becomes impossible to guarantee more 
  * Partition tolerance - the database continues to operate when communication between the nodes is interrupted.
 
 For our clusters this gives us the following tradeoffs
- * Galera cluster emphasies data safety and consistency. Its configuration has a tradeoff between cluster availability and partition tolerance. Low partition tolerance implies longer cluster outages in the event of node failure.
+ * Galera cluster emphasises data safety and consistency.
+ In order to guarantee this consistency and remain running when partitioned it has to sacrifice availability.
+ When the cluster is split only the largest group continues operating whist the others will return errors.
  * In contast, Cassandra generally emphasises availability and partition (AP) tolerance over consistency, although this can be tuned. 
  <!-- Greater subtlety here, e.g. see https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed -->
  <!-- Maybe add a discussion on ACID vs BASE -->
@@ -73,9 +75,8 @@ For our clusters this gives us the following tradeoffs
 
 ## 'APpy Times - Configuring Cassandra Cluster 
 
-As previously mentioned, in terms of the CAP theorem Cassandra values **A**vailability and **P**artition tolerance. 
-In practice this gives us a tradeoff between **C**onsistency and latency. 
-It *is* possible to get strong consistency in Cassandra... if you're willing to accept high latency.
+As previously mentioned, in terms of the CAP theorem Cassandra values **A**vailability and **P**artition tolerance.  
+However it *is* possible to configure strong **C**onsistency in Cassandra but this increases latency and sacrifices some availability.
 This tradeoff is controlled via the *consistency level* parameter.
 
 ### Replication Factor
@@ -88,7 +89,7 @@ There is a slight overhead for the higher replication factors.
 Since this is set at the keyspace level, we can opt for greater replication of more important data.
 Two kinds of replication strategy are available in Cassandra.
 We use the `SimpleStrategy` which is rack and data centre unaware. In this strategy, replicas are stored on the next nodes on the ring.
-Alternatively there is the `NetworkTopologyStrategy` in which replicas are stored in distinct racks.
+Alternatively there is the `NetworkTopologyStrategy` in which replicas are stored in distinct racks to minimise the chances of the nodes going offline at the same time.
  
 **Fig 3**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpYVV3bWl4VXFHY00 "Response times for different Cassandra replication factors in a 5 node cluster")
@@ -99,6 +100,7 @@ Alternatively there is the `NetworkTopologyStrategy` in which replicas are store
 The consistency level is configured on a per query basis and specifies how many nodes need to respond successfully for the operation to be considered successful. 
 This flexibility enables individual operations to determine how important getting the most up to date data is. 
 A selection of the consistency levels are described below:
+
 | Consistency level | Write effect | Read effect|
 | ----------------- | ------------ | ---------- |
 | `ONE`, `TWO`, `THREE`   | The write must be successfully written to the specified number of replicas | Returns the response from the specified number of closest replicas |
