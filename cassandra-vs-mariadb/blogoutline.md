@@ -115,57 +115,85 @@ The extreme example of `ALL` is instructive.
 The latency of the query will be determined by the slowest node in the cluster. 
 If *any* nodes are down then the operation will not succeed.
 **Fig 4** show the performance of the different consistency levels in a 5 node cluster with a replication factor of 3. As expected, higher consistency levels lead to higher latency. 
- <!-- Got up to here -->
+
 **Fig 4**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpcE9TcDJzS2I3elk "Response times for different Cassandra consistency levels")
 <!-- Got up to here -->
-## SQL Clustering
+## Clustering: the SQL
 ### Galera cluster
-MariaDB does not by itself support clustering but the API for[Galera cluster](http://galeracluster.com/products/)is included with MariaDB so this was the first approach we tried for creating a MariaDB cluster. Galera cluster is a multi-master system which offers synchronous replication across all the nodes so each one contains the same data. Galera cluster is not directly equivalent to a Cassandra cluster; the aim of Cassandra cluster is to provide horizontal scaling whereas the aim of the Galera cluster is to improve availability without compromising the consistency of the data. Since all of the nodes in a Galera cluster have all the data and can handle requests, we implemented simple round robin load balancing in our tests to fire requests to all of the nodes. **Fig 5** shows what happens to response times as more nodes are added to both a Cassandra cluster and a Galera cluster.
+
+Though MariaDB does not by itself support clustering, the API for[Galera cluster](http://galeracluster.com/products/)is included with MariaDB.
+Therefore this is the first approach we try for creating a SQL cluster. 
+Galera cluster is a multi-master system which offers synchronous replication across all the nodes so that each one contains the same data. 
+Galera cluster is not directly equivalent to a Cassandra cluster; the aim of Cassandra cluster is to provide horizontal scaling.
+Conversely, Galera only provides mild read scaling but negative write scaling - 
+the aim of Galera cluster is to improve availability without compromising the consistency of the data. 
+<!-- Some chat about setting it up? -->
+
+## Comparing Galera and Cassandra
+
+<!-- Need some chat about Cassandra settings -->
+Since all of the nodes in a Galera cluster have all the data and can handle requests, we use a simple round robin load balancing strategy in our tests. 
+**Fig 5** shows what happens to response times as more nodes are added to Cassandra and Galera clusters.
 
 **Fig 5**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpbTg2bHN2ZXdoMG8 "Response times for different cluster sizes for Cassandra and Galera")
 
-As more nodes were added the response times of Cassandra clearly decreased whereas the MariaDB write times increased.
+As more nodes are added the response times of Cassandra decreases whereas the MariaDB write times increases.
 For Cassandra the update status is noticeably slower than the similar update operation.
 This is because this query uses the `IF EXISTS` condition to ensure the item is present before it is updated.
-By default Cassandra would just create a new row with the updated data without any check to see if the row already existed.
-The updated data would be combined with the previous record when the row is read.
+By default Cassandra creates a new row with the updated data without any check to see if the row already exists.
+The updated data is then combined with the previous record on read.
 Adding this extra check adds a significant overhead to the operation.
-The MariaDB read times stayed roughly the same as they are effectively still returning the data off the node which receives the request, all the extra work to replicate the data across the nodes is handled at write time.
-However this is not an entirely fair comparison as the Galera cluster replicates the data to all nodes but Cassandra only has 2 copies.
-**Fig 6** shows what happens when we configure Cassandra to replicate across all nodes.
+The MariaDB read times stay roughly the same as they are effectively still returning the data off the node which receives the request - all the extra work to replicate the data across the nodes is handled at write time.
+
+This comparison isn't particularly informative as we are comparing apples with oranges and top hats with fezes.
+Galera cluster replicates data to every node, so as we add nodes we are increasing the cost of storing that data.
+Conversely, Cassandra is configured to store only two copies of the data, irrespective of the number of ndoes.  
+We can achieve a fair, yet artifical comparison by requiring Cassandra to replicate data to every node (up to a maximum of four nodes). **Fig 6** shows the resulting response times.
 
 **Fig 6**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpMHQ1R1ZtQi01aWM "Response times for a Cassandra cluster with a replication factor equal to the nodes compared with a Galera cluster")
 
-With this configuration the performance difference is less striking but but Cassandra's performance is remaining fairly constant whilst Galera response times are getting longer as more nodes are added.
-This comparison is somewhat artificial as we are configuring Cassandra to behave like Galera but it is not likely to be how you would actually configure Cassandra.
+With this configuration the performance difference is less striking, though Cassandra still scales better. 
+Cassandra's performance remains fairly constant whilst Galera response times increase with the number of nodes.
 
-Whilst Galera cluster might theoretically offer some[mild scaling](https://www.percona.com/blog/2014/11/17/typical-misconceptions-on-galera-for-mysql/)due to there being multiple nodes to handle requests it is not what we observed here and certainly not the primary function of a Galera cluster. Additionally as more nodes are added there is a greater chance of deadlocks where two nodes try to edit the same data at the same time, this is shown in **Fig 7**.
+Whilst Galera cluster might theoretically offer some[mild scaling](https://www.percona.com/blog/2014/11/17/typical-misconceptions-on-galera-for-mysql/)due to there being multiple nodes to handle requests it is not what we observed here and certainly not the primary function of a Galera cluster. 
+Additionally as more nodes are added there is a greater chance of deadlocks where two nodes try to edit the same data at the same time (see **Fig 7**).
 
 **Fig 7**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpOHBLYmR1YU8wVnM "Number of deadlocks in a Galera cluster as more nodes were added")
 
-Each of these failed requests would need to be retried by the application for them to be applied. However with Cassandra if two conflicting writes occurred concurrently both would have succeeded but Cassandra will consider the one with the most recent timestamp as the correct version. So with MariaDB it is immediately clear when data has failed to be updated whereas in Cassandra there is a small chance that the update will not be applied.
+Each of these failed requests would need to be retried by the application for them to be applied.
+However with Cassandra if two conflicting writes occurred concurrently both would have succeeded.
+On the next read, Cassandra will consider the one with the most recent timestamp as the correct version. 
+So with Galera it is immediately clear when data has failed to be updated whereas in Cassandra there is a chance that the update will silently not be applied.
 
-### Network Database (NDB) Cluster
+## Network Database (NDB): the Return of (SQL) Scaling
 
-For a SQL clustering mechanism which is more comparable to Cassandra we looked at [NDB](https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html). Unfortunately this is not currently supported by MariaDB so in order to investigate this we had to use MySQL instead. NDB works by having the data partitioned into shards and stored across various NoSQL data nodes, this is then accessed through SQL nodes. Each SQL node can access all the data across the different data nodes. The data is replicated synchronously across multiple nodes. The data is partitioned across the data nodes based upon the table and primary key so the SQL nodes can consistently calculate which data nodes the required data will be on. NDB does not have the same flexibility as Cassandra, the number of replicas and the number of nodes the data is split across is configured for the cluster as a whole and the number of nodes must equal the number of replicas times the number of fragments.
+For a SQL clustering mechanism which is more comparable to Cassandra we look at [NDB](https://dev.mysql.com/doc/refman/5.7/en/mysql-cluster.html). 
+Unfortunately this is not currently supported by MariaDB so in order to investigate this we use [MySQL](https://www.mysql.com/) instead. 
+NDB consists of SQL frontend nodes, whose data is stored on NoSQL backend data nodes.
+Cluster configuration is controlled by management nodes.
+Scaling is achieved by automatically sharding the data across the NoSQL nodes.
+The data nodes can then be replicated up to four times to protect against data loss.
+Therefore the number of data nodes is equal to the desired number of fragments multipled by the number of replicas.
 
-Since an NDB cluster has both SQL nodes and NoSQL nodes which can be varied independently we looked at both of these to see how they affected the performance. Firstly we looked at the the SQL nodes and found for our relatively small clusters that adding more SQL nodes made no noticeable impact on performance.
+Though NDB provides an API to store data directly on the NoSQL data nodes, we do not use this - all our requests go via the SQL nodes.
 
-When we initially looked at the NoSQL nodes we saw that their performance was relatively slow as we added more nodes.
-We then looked if there were any simple optimisations we could make to the configuration.
-We made two changes, firstly we increased the connection pool on the SQL nodes so they could communicate with multiple data nodes at once.
-Secondly the default partitioning for NDB is based on the primary key of the row so this means for the data we were using (orders and order lines) the items we were performing the operations on could be spread across multiple nodes.
-We changed the partitioning of the order items to be by the order id rather than the item id meaning all the data we were using in any single transaction should be on the same NoSQL node.
+Since an NDB cluster has both SQL nodes and NoSQL nodes which can be varied independently we look at both of these to see how they affect performance. 
+However, we find that, for our small test client, varying the number of SQL nodes makes no noticeable impact on performance.
+
+Unexpectedly, when we vary the number of data nodes, we see that the performance *degrades* with the number of nodes.
+In seeking simple optimisations we make two changes to the configuration.
+1. We double the connection pool on the SQL nodes from one to two, in line with the guideline of twice the number of cores on the node. This connection pool controls the maximum number of simultaneous connections to the data nodes.
+1. The default partitioning for NDB is based on the primary key. For our data, this means operations affecting a single order could hit multiple data nodes. To fix this we alter the partitioning of the order items table to be by the order ID.
 **Fig 8** shows the difference in response times these changes made.
 
 **Fig 8**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpQkd2NVdTTUd1R2M "NDB cluster response times before and after optimisation")
 
-Having made these optimisations we then compared NDB to Cassandra.
+Having made these optimisations we then compare NDB to Cassandra.
 **Fig 9** shows the response times for the two clusters.
 
 **Fig 9**
@@ -180,35 +208,37 @@ Alternatively the number of replicas can be increased instead.
 **Fig 10**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpLWZEWS0yRGxPX0U "Response times as more replicas are added")
 
-As might be expected like Cassandra the response times increase as more replicas are stored but for NDB the read times remain fairly consistently low.
+As might be expected, like Cassandra the response times increase as more replicas are stored but for NDB the read times remain fairly consistently low.
 
 ## Conclusions
 
-From our investigations have seen that Cassandra is very easy to horizontally scale and it is highly configurable through replication factor and consistency level to get the balance between availability and consistency for the different items of data.
+Cassandra seems to scale well out of the box.
+It is highly flexible - the replication factor can be set on a per-keyspace basis.
+Furthermore, the consistency level is set by the client in the query, allowing the balance between availability and consistency to be tuned differently for different types of data and different client needs.
 Galera cluster offers a robust multi-master cluster that will replicate your data across nodes but it is not designed to provide horizontal scaling.
-NDB does offer a way to scale an SQL database horizontally although it is not as configurable as Cassandra.
+NDB provides a way to scale a SQL database horizontally, though without the flexibility of Cassandra.
 
 A few thing need to be kept in mind whilst looking at any conclusions about performance.
-Firstly these are still rather small clusters and it is difficult to extrapolate how this will perform with hundreds of nodes.
-Secondly we were using the free tier of AWS so the virtual machines were very limited.
-They only had single virtual processors with 1GB of ram and we observed the performance would occasionally slow down dramatically.
-This was particularly restrictive on the test VM as it mean we could not have multiple threads firing requests to the database.
-Crucially overall the differences we observed were tiny; even the slowest data point was less than 15ms.
+1. We tested against small clusters with a small test client, so it is not clear how these results extrapolate to more realistic production scenarios.
+1. We restricted our VMs to those available through the free tier of AWS, the resources of which are very limited. They only had single processors with 1GB of RAM. Further, there seemed to be contention for resources at the host level - the performance would sometimes slow dramatically.
+1. Crucially, however, the differences in response times we observed were tiny; even the slowest data point was less than 15ms.
 
-## Thoughts for Future Investigations
-The queries we have used in the tests have been fairly simple, most using primary keys.
+## Future Work
+
+The queries we use in these tests are fairly simple, mostly using primary keys.
 It would be interesting to see how we could make our analysis more realistic.
-Firstly we could investigate how the different databases perform with more complex operations, ideally it would be nice if we could use some real world data to know how representative our test data is.
-We would expect different data models to perform very differently for different databases, we could see how correct these expectations are.
-For example it would be interesting how NDB performs when it has to fetch data across multiple nodes or even scan the whole table.
+Firstly we could investigate how the different databases perform with more complex operations, ideally using real world data.
+We would expect different use cases to require particular data models, and this would drive the choice of database technology. 
+It'd be worth investigating this through a series of case studies.
  
-We could also extend our analysis so we are not just looking at average response times. We could look specifically at the slow queries, the VM's resources as the tests run, the failed requests or the impact on performance when nodes are added and removed (Netflix's [Chaos Monkey](https://github.com/Netflix/SimianArmy) might be worth looking into for this). 
+We could also extend our analysis so we are not just looking at average response times. We could look specifically at the slow queries, the VM's resources as the tests run or the failed requests.
 
-In reality for a large system is going to have multiple clusters in different data centers.
-We could investigate how the observed trends carry on when extra clusters are added.
+In the real world, nodes fail and so database resilience is an important characteristic.
+Netflix's [Chaos Monkey](https://github.com/Netflix/SimianArmy) might be a useful tool for investigating this.
 
-We only did very superficial optimisation, we could spend more time looking at how to best configure the databases.
-Perhaps looking at how large companies use these databases in reality could help. e.g. look at how Netflix use Cassandra and Facebook use MySQL.
- 
-We have so far looked at a limited selection of databases.
-We could consider other databases such as NewSQL databases.
+In reality, a large system is going to span multiple data centres.
+Future testing should use more realistic deployment topologies and sizes.
+Ideally, we would take inspiration from how large companies setup their databases in the real world.
+
+Our investigations on scaling SQL were constrained by our starting point of using MariaDB.
+In reality, there are a class of [NewSQL](https://en.wikipedia.org/wiki/NewSQL) scalable databases  to choose from.
