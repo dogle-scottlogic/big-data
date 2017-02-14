@@ -124,7 +124,7 @@ If *any* replica nodes are down then the operation will not succeed.
 ## Clustering: the SQL
 ### Galera cluster
 
-Though MariaDB does not by itself support clustering, the API for[Galera cluster](http://galeracluster.com/products/)is included with MariaDB.
+Though MariaDB does not by itself support clustering, the API for [Galera cluster](http://galeracluster.com/products/) is included with MariaDB.
 Therefore this is the first approach we try for creating a SQL cluster. 
 Galera cluster is a multi-master system which offers synchronous replication across all the nodes so that each one contains the same data. 
 Galera cluster is not directly equivalent to a Cassandra cluster; the aim of Cassandra cluster is to provide horizontal scaling.
@@ -160,7 +160,7 @@ We can achieve a fair, yet artificial comparison by requiring Cassandra to repli
 With this configuration the performance difference is less striking, though Cassandra still scales better. 
 Cassandra's performance remains fairly constant whilst Galera response times increase with the number of nodes.
 
-Whilst Galera cluster might theoretically offer some[mild scaling](https://www.percona.com/blog/2014/11/17/typical-misconceptions-on-galera-for-mysql/)due to there being multiple nodes to handle requests it is not what we observed here and certainly not the primary function of a Galera cluster. 
+Whilst Galera cluster might theoretically offer some [mild scaling](https://www.percona.com/blog/2014/11/17/typical-misconceptions-on-galera-for-mysql/) due to there being multiple nodes to handle requests it is not what we observed here and certainly not the primary function of a Galera cluster. 
 Additionally as more nodes are added there is a greater chance of deadlocks where two nodes try to edit the same data at the same time (see **Fig 7**).
 
 **Fig 7**
