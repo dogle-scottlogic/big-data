@@ -16,7 +16,7 @@ The previous management, Dave and Laurie, [compared](http://blog.scottlogic.com/
 In that scenario, the unoptimised performance of the two databases is fairly equivalent.
 But, what shall we do as our hat shop grows more popular? 
 How do we scale out our new database, or is our shop's size doomed to be... *capped*?
-[Previously](http://blog.scottlogic.com) Dave and Laurie claimed that it's a foregone conclusion that Cassandra should outscale a traditional relational database.
+[Previously](http://blog.scottlogic.com) Dave and Laurie claimed that it's a foregone conclusion that Cassandra should out scale a traditional relational database.
 In this post, we test that assumption.
 Do we have to sacrifice the [ACID](https://en.wikipedia.org/wiki/ACID) properties of SQL databases?
 What other options are available to us?
@@ -44,7 +44,7 @@ We use [Vagrant](https://www.vagrantup.com/) to automate spinning up and provisi
 In addition to the cluster hosts, we now spin up a separate test client host in the same region and subnet (previously we were running the tests locally) thus minimising the effect of network latency on our results.
 
 <!-- I don't think this is necessary
-## Tradeoffs Whilst Selecting Scaling Approaches
+## Trade-offs Whilst Selecting Scaling Approaches
 ### ACID and BASE
 When selecting the database to use it is necessary to consider the importance or not of guaranteeing ACID properties of the database operations. These are:
 * Atomicity - If part of the transaction fails then none of it is applied and the database is left unchanged.
@@ -64,11 +64,11 @@ In this scenario the CAP theorem states it becomes impossible to guarantee more 
  * Availability - valid requests return non-error responses
  * Partition tolerance - the database continues to operate when communication between the nodes is interrupted.
 
-For our clusters this gives us the following tradeoffs
+For our clusters this gives us the following trade-offs
  * Galera cluster emphasises data safety and consistency.
  In order to guarantee this consistency and remain running when partitioned it has to sacrifice availability.
  When the cluster is split only the largest group continues operating whist the others will return errors.
- * In contast, Cassandra generally emphasises availability and partition (AP) tolerance over consistency, although this can be tuned. 
+ * In contrast, Cassandra generally emphasises availability and partition (AP) tolerance over consistency, although this can be tuned. 
  <!-- Greater subtlety here, e.g. see https://www.infoq.com/articles/cap-twelve-years-later-how-the-rules-have-changed -->
  <!-- Maybe add a discussion on ACID vs BASE -->
  <!-- Maybe talk about Cassandra guarantees? eventual consistency -->
@@ -77,7 +77,7 @@ For our clusters this gives us the following tradeoffs
 
 As previously mentioned, in terms of the CAP theorem Cassandra values **A**vailability and **P**artition tolerance.  
 However it *is* possible to configure strong **C**onsistency in Cassandra but this increases latency and sacrifices some availability.
-This tradeoff is controlled via the *consistency level* parameter.
+This trade-off is controlled via the *consistency level* parameter.
 
 ### Replication Factor
 <!-- Think this needs to come first because the consistency level section references the replication factor -->
@@ -114,8 +114,8 @@ For example a write operation with consistency of `ANY` can succeed even if none
 <!-- This is confusing - we need some chat about how writes are only written on READ -->
 Conversely, higher consistency levels give a higher likelihood of the data being up to date at a cost of lower availability and higher latency. 
 The extreme example of `ALL` is instructive. 
-The latency of the query will be determined by the slowest node in the cluster. 
-If *any* nodes are down then the operation will not succeed.
+The latency of the query will be determined by the slowest replica node in the cluster. 
+If *any* replica nodes are down then the operation will not succeed.
 **Fig 4** show the performance of the different consistency levels in a 5 node cluster with a replication factor of 3. As expected, higher consistency levels lead to higher latency. 
 
 **Fig 4**
@@ -149,10 +149,10 @@ The updated data is then combined with the previous record on read.
 Adding this extra check adds a significant overhead to the operation.
 The MariaDB read times stay roughly the same as they are effectively still returning the data off the node which receives the request - all the extra work to replicate the data across the nodes is handled at write time.
 
-This comparison isn't particularly informative as we are comparing apples with oranges and top hats with fezes.
+This comparison isn't particularly informative as we are comparing apples with oranges and top hats with fezzes.
 Galera cluster replicates data to every node, so as we add nodes we are increasing the cost of storing that data.
-Conversely, Cassandra is configured to store only two copies of the data, irrespective of the number of ndoes.  
-We can achieve a fair, yet artifical comparison by requiring Cassandra to replicate data to every node (up to a maximum of four nodes). **Fig 6** shows the resulting response times.
+Conversely, Cassandra is configured to store only two copies of the data, irrespective of the number of nodes. 
+We can achieve a fair, yet artificial comparison by requiring Cassandra to replicate data to every node (up to a maximum of four nodes). **Fig 6** shows the resulting response times.
 
 **Fig 6**
 ![](https://drive.google.com/open?id=0B65w2mgTevTpMHQ1R1ZtQi01aWM "Response times for a Cassandra cluster with a replication factor equal to the nodes compared with a Galera cluster")
@@ -179,7 +179,7 @@ NDB consists of SQL frontend nodes, whose data is stored on NoSQL backend data n
 Cluster configuration is controlled by management nodes.
 Scaling is achieved by automatically sharding the data across the NoSQL nodes.
 The data nodes can then be replicated up to four times to protect against data loss.
-Therefore the number of data nodes is equal to the desired number of fragments multipled by the number of replicas.
+Therefore the number of data nodes is equal to the desired number of fragments multiplied by the number of replicas.
 
 Though NDB provides an API to store data directly on the NoSQL data nodes, we do not use this - all our requests go via the SQL nodes.
 
@@ -188,7 +188,7 @@ However, we find that, for our small test client, varying the number of SQL node
 
 Unexpectedly, when we vary the number of data nodes, we see that the performance *degrades* with the number of nodes.
 In seeking simple optimisations we make two changes to the configuration.
-1. We double the connection pool on the SQL nodes from one to two, in line with the guideline of twice the number of cores on the node. This connection pool controls the maximum number of simultaneous connections to the data nodes.
+1. We double the connection pool on the SQL nodes from one to two, in line with the guideline of twice the number of cores on the SQL node. This connection pool controls the maximum number of simultaneous connections to the data nodes.
 1. The default partitioning for NDB is based on the primary key. For our data, this means operations affecting a single order could hit multiple data nodes. To fix this we alter the partitioning of the order items table to be by the order ID.
 **Fig 8** shows the difference in response times these changes made.
 
