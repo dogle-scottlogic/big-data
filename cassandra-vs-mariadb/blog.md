@@ -188,8 +188,10 @@ However, we find that, for our small test client, varying the number of SQL node
 
 Unexpectedly, when we vary the number of data nodes, we see that the performance *degrades* with the number of nodes.
 In seeking simple optimisations we make two changes to the configuration.
+
 1. We double the connection pool on the SQL nodes from one to two, in line with the guideline of twice the number of cores on the SQL node. This connection pool controls the maximum number of simultaneous connections to the data nodes.
 1. The default partitioning for NDB is based on the primary key. For our data, this means operations affecting a single order could hit multiple data nodes. To fix this we alter the partitioning of the order items table to be by the order ID.
+
 **Fig 8** shows the difference in response times these changes made.
 
 **Fig 8**
